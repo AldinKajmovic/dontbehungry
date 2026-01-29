@@ -1,0 +1,328 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==================== ENUMS ====================
+
+enum UserRole {
+  CUSTOMER
+  RESTAURANT_OWNER
+  DELIVERY_DRIVER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY_FOR_PICKUP
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  DIGITAL_WALLET
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+// ==================== USER & AUTH ====================
+
+model User {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  passwordHash  String?
+  firstName     String
+  lastName      String
+  phone         String?
+  avatarUrl     String?
+  role          UserRole     @default(CUSTOMER)
+  emailVerified Boolean      @default(false)
+  phoneVerified Boolean      @default(false)
+  authProvider  AuthProvider @default(LOCAL)
+  providerId    String?
+
+  // Relations
+  addresses          UserAddress[]
+  restaurants        Restaurant[]        @relation("RestaurantOwner")
+  orders             Order[]
+  reviews            Review[]
+  deliveries         Order[]             @relation("DeliveryDriver")
+  refreshTokens      RefreshToken[]
+  verificationTokens VerificationToken[]
+
+  @@index([email])
+  @@index([role])
+  @@index([authProvider])
+}
+
+// ==================== PLACES & ADDRESSES ====================
+
+model Place {
+  id          String   @id @default(uuid())
+  address     String
+  city        String
+  state       String?
+  country     String
+  postalCode  String?
+
+  // Relations
+  restaurants   Restaurant[]
+  userAddresses UserAddress[]
+  orders        Order[]
+
+  @@index([city])
+  @@index([country])
+}
+
+model UserAddress {
+  id        String   @id @default(uuid())
+  userId    String
+  placeId   String
+  isDefault Boolean  @default(false)
+  notes     String?
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, placeId])
+  @@index([userId])
+}
+
+// ==================== RESTAURANT ====================
+
+model Restaurant {
+  id              String   @id @default(uuid())
+  name            String
+  description     String?
+  phone           String?
+  email           String?
+  logoUrl         String?
+  coverUrl        String?
+  ownerId         String
+  placeId         String
+  rating          Decimal  @default(0) @db.Decimal(2, 1)
+  minOrderAmount  Decimal? @db.Decimal(10, 2)
+  deliveryFee     Decimal? @db.Decimal(10, 2)
+
+  // Relations
+  owner        User                 @relation("RestaurantOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  place        Place                @relation(fields: [placeId], references: [id])
+  categories   RestaurantCategory[]
+  menuItems    MenuItem[]
+  orders       Order[]
+  reviews      Review[]
+  openingHours OpeningHours[]
+
+  @@index([ownerId])
+  @@index([placeId])
+  @@index([name])
+}
+
+model Category {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  iconUrl     String?
+
+  // Relations
+  restaurants RestaurantCategory[]
+  menuItems   MenuItem[]
+
+  @@index([name])
+}
+
+model RestaurantCategory {
+  id           String @id @default(uuid())
+  restaurantId String
+  categoryId   String
+
+  // Relations
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  category   Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, categoryId])
+  @@index([restaurantId])
+  @@index([categoryId])
+}
+
+model OpeningHours {
+  id           String  @id @default(uuid())
+  restaurantId String
+  dayOfWeek    Int
+  openTime     String
+  closeTime    String
+  isClosed     Boolean @default(false)
+
+  // Relations
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, dayOfWeek])
+  @@index([restaurantId])
+}
+
+// ==================== MENU ====================
+
+model MenuItem {
+  id              String  @id @default(uuid())
+  name            String
+  description     String?
+  price           Decimal @db.Decimal(10, 2)
+  imageUrl        String?
+  restaurantId    String
+  categoryId      String?
+  isAvailable     Boolean @default(true)
+  preparationTime Int?
+
+  // Relations
+  restaurant Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  category   Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  orderItems OrderItem[]
+
+  @@index([restaurantId])
+  @@index([categoryId])
+  @@index([isAvailable])
+}
+
+// ==================== ORDERS ====================
+
+model Order {
+  id                String      @id @default(uuid())
+  userId            String
+  restaurantId      String
+  deliveryPlaceId   String
+  driverId          String?
+  status            OrderStatus @default(PENDING)
+  subtotal          Decimal     @db.Decimal(10, 2)
+  deliveryFee       Decimal     @db.Decimal(10, 2)
+  tax               Decimal     @db.Decimal(10, 2)
+  totalAmount       Decimal     @db.Decimal(10, 2)
+  notes             String?
+  estimatedDelivery DateTime?
+  deliveredAt       DateTime?
+
+  // Relations
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurant    Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  deliveryPlace Place       @relation(fields: [deliveryPlaceId], references: [id])
+  driver        User?       @relation("DeliveryDriver", fields: [driverId], references: [id], onDelete: SetNull)
+  orderItems    OrderItem[]
+  payment       Payment?
+
+  @@index([userId])
+  @@index([restaurantId])
+  @@index([driverId])
+  @@index([status])
+}
+
+model OrderItem {
+  id         String  @id @default(uuid())
+  orderId    String
+  menuItemId String
+  quantity   Int
+  unitPrice  Decimal @db.Decimal(10, 2)
+  totalPrice Decimal @db.Decimal(10, 2)
+  notes      String?
+
+  // Relations
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([menuItemId])
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  orderId       String        @unique
+  amount        Decimal       @db.Decimal(10, 2)
+  method        PaymentMethod
+  status        PaymentStatus @default(PENDING)
+
+  // Relations
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([status])
+}
+
+// ==================== REVIEWS & COMMENTS ====================
+model Review {
+  id           String  @id @default(uuid())
+  userId       String
+  restaurantId String
+  rating       Int
+  title        String?
+  content      String?
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, restaurantId])
+  @@index([userId])
+  @@index([restaurantId])
+  @@index([rating])
+}
+
+// ==================== AUTH TOKENS ====================
+
+model RefreshToken {
+  id         String    @id @default(uuid())
+  token      String    @unique
+  userId     String
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  revokedAt  DateTime?
+  replacedBy String?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model VerificationToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  type      TokenType
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([type])
+}
+

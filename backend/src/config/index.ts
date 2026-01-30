@@ -1,11 +1,15 @@
 const isProduction = process.env.NODE_ENV === 'production'
 
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required')
+}
+
 export const config = {
   port: parseInt(process.env.PORT || '3001', 10),
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
   isProduction,
   jwt: {
-    secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+    secret: process.env.JWT_SECRET,
     accessExpiresIn: '15m',
     refreshExpiresIn: '7d',
   },

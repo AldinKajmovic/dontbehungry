@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { CountryCode } from 'libphonenumber-js'
-import { Input, Button, PhoneInput, Alert, PasswordStrength, AuthLayout } from '@/components/ui'
+import { Input, Button, PhoneInput, Alert, AuthLayout } from '@/components/ui'
 import { registerSchema, extractZodErrors, formatPhoneE164, RegisterForm } from '@/services/validation'
 import { useFormValidation } from '@/hooks/useFormValidation'
 import { useAuth } from '@/hooks/useAuth'
@@ -31,6 +31,9 @@ export default function RegisterPage() {
       phone: '',
       password: '',
       confirmPassword: '',
+      address: '',
+      city: '',
+      country: '',
     },
     phoneFields: [{ field: 'phone', countryState: () => selectedCountry }],
   })
@@ -41,8 +44,16 @@ export default function RegisterPage() {
     const result = registerSchema.safeParse(formData)
     if (!result.success) {
       setErrors(extractZodErrors<RegisterForm>(result))
-      markAllTouched(['firstName', 'lastName', 'email', 'phone', 'password', 'confirmPassword'])
+      markAllTouched(['firstName', 'lastName', 'email', 'phone', 'password', 'confirmPassword', 'address', 'city', 'country'])
       return
+    }
+
+    // Validate address fields if any are filled
+    if (formData.address || formData.city || formData.country) {
+      if (!formData.address || !formData.city || !formData.country) {
+        setServerError('Please fill in all address fields (address, city, and country)')
+        return
+      }
     }
 
     setIsLoading(true)
@@ -55,6 +66,9 @@ export default function RegisterPage() {
         email: formData.email,
         phone: formatPhoneE164(formData.phone || '', selectedCountry),
         password: formData.password,
+        address: formData.address || undefined,
+        city: formData.city || undefined,
+        country: formData.country || undefined,
       })
       // Redirect is handled by AuthProvider
     } catch (err) {
@@ -150,9 +164,6 @@ export default function RegisterPage() {
           autoComplete="new-password"
           showPasswordToggle
         />
-        {formData.password && !getFieldError('password') && (
-          <PasswordStrength password={formData.password} />
-        )}
 
         <Input
           label="Confirm password"
@@ -167,6 +178,48 @@ export default function RegisterPage() {
           autoComplete="new-password"
           showPasswordToggle
         />
+
+        {/* Delivery Address */}
+        <div className="pt-4 border-t border-gray-200">
+          <p className="text-sm font-medium text-gray-700 mb-3">Delivery Address</p>
+          <div className="space-y-3">
+            <Input
+              label="Street address"
+              id="address"
+              name="address"
+              value={formData.address || ''}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={getFieldError('address')}
+              placeholder="123 Main Street, Apt 4"
+              autoComplete="street-address"
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                label="City"
+                id="city"
+                name="city"
+                value={formData.city || ''}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={getFieldError('city')}
+                placeholder="New York"
+                autoComplete="address-level2"
+              />
+              <Input
+                label="Country"
+                id="country"
+                name="country"
+                value={formData.country || ''}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={getFieldError('country')}
+                placeholder="USA"
+                autoComplete="country-name"
+              />
+            </div>
+          </div>
+        </div>
 
         <Button type="submit" isLoading={isLoading} className="mt-2">
           {isLoading ? 'Creating account...' : 'Create account'}

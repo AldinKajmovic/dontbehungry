@@ -1,12 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import { AuthLayout } from '@/components/ui/AuthLayout'
-import { Input } from '@/components/ui/Input'
-import { Button } from '@/components/ui/Button'
-import { Alert } from '@/components/ui/Alert'
+import { AuthLayout, Input, Button, Alert, StatusMessage } from '@/components/ui'
 import { authService } from '@/services/auth'
+
+const EmailIcon = (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+  </svg>
+)
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -43,32 +46,19 @@ export default function ForgotPasswordPage() {
         icon={icon}
         backgroundGradient="orange"
       >
-        <div className="flex flex-col items-center py-6">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-500" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-            </svg>
-          </div>
-
-          <p className="text-gray-600 text-center mb-2">
+        <StatusMessage
+          status="success"
+          icon={EmailIcon}
+          actions={[{ label: 'Back to Login', href: '/auth/login', variant: 'secondary' }]}
+        >
+          <p className="mb-2">
             If an account with that email exists, we&apos;ve sent a password reset link to:
           </p>
-
-          <p className="font-medium text-gray-900 mb-4">
-            {email}
-          </p>
-
-          <p className="text-sm text-gray-500 text-center mb-6">
+          <p className="font-medium text-gray-900 mb-4">{email}</p>
+          <p className="text-sm text-gray-500">
             The link will expire in 1 hour. Check your spam folder if you don&apos;t see it.
           </p>
-
-          <Link href="/auth/login" className="w-full">
-            <Button variant="secondary" className="w-full">
-              Back to Login
-            </Button>
-          </Link>
-        </div>
+        </StatusMessage>
       </AuthLayout>
     )
   }

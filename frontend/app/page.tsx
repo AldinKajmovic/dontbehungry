@@ -2,12 +2,32 @@
 
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { EmailVerificationBanner, FeatureCard } from '@/components/ui'
+
+const ClockIcon = (
+  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+)
+
+const CheckIcon = (
+  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+)
+
+const PaymentIcon = (
+  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+  </svg>
+)
 
 export default function Home() {
-  const { user, isAuthenticated, logout, isLoading } = useAuth()
+  const { user, isAuthenticated, isLoading } = useAuth()
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50">
+      <EmailVerificationBanner />
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary-100 rounded-full blur-3xl opacity-40" />
@@ -30,12 +50,12 @@ export default function Home() {
           ) : isAuthenticated ? (
             <>
               <span className="text-gray-700">Hi, {user?.firstName}</span>
-              <button
-                onClick={logout}
-                className="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl transition-all hover:scale-105 active:scale-95"
+              <Link
+                href="/my-profile"
+                className="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-xl transition-all hover:scale-105 active:scale-95"
               >
-                Logout
-              </button>
+                My Profile
+              </Link>
             </>
           ) : (
             <>
@@ -87,35 +107,24 @@ export default function Home() {
 
         {/* Feature cards */}
         <div className="mt-24 grid md:grid-cols-3 gap-8">
-          <div className="bg-white rounded-2xl p-8 shadow-lg shadow-gray-200/50 hover:shadow-xl transition-shadow">
-            <div className="w-14 h-14 bg-primary-100 rounded-2xl flex items-center justify-center mb-6">
-              <svg className="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Fast Delivery</h3>
-            <p className="text-gray-600">Get your food delivered in under 30 minutes from restaurants near you.</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-8 shadow-lg shadow-gray-200/50 hover:shadow-xl transition-shadow">
-            <div className="w-14 h-14 bg-secondary-100 rounded-2xl flex items-center justify-center mb-6">
-              <svg className="w-7 h-7 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Quality Food</h3>
-            <p className="text-gray-600">Partnered with the best local restaurants to ensure fresh, quality meals.</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-8 shadow-lg shadow-gray-200/50 hover:shadow-xl transition-shadow">
-            <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
-              <svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Easy Payment</h3>
-            <p className="text-gray-600">Multiple payment options including cards, digital wallets, and cash.</p>
-          </div>
+          <FeatureCard
+            icon={ClockIcon}
+            iconColor="primary"
+            title="Fast Delivery"
+            description="Get your food delivered in under 30 minutes from restaurants near you."
+          />
+          <FeatureCard
+            icon={CheckIcon}
+            iconColor="secondary"
+            title="Quality Food"
+            description="Partnered with the best local restaurants to ensure fresh, quality meals."
+          />
+          <FeatureCard
+            icon={PaymentIcon}
+            iconColor="blue"
+            title="Easy Payment"
+            description="Multiple payment options including cards, digital wallets, and cash."
+          />
         </div>
       </section>
     </main>

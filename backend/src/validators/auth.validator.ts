@@ -1,5 +1,5 @@
 import { BadRequestError } from '../utils/errors';
-import { RegisterDto, RegisterRestaurantDto, LoginDto } from '../types';
+import { Register, RegisterRestaurant, Login } from '../types';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
@@ -16,7 +16,7 @@ export const validatePassword = (password: string): void => {
   }
 };
 
-export const validateRegister = (data: RegisterDto): void => {
+export const validateRegister = (data: Register): void => {
   const { email, password, firstName, lastName } = data;
 
   if (!email || !password || !firstName || !lastName) {
@@ -27,7 +27,7 @@ export const validateRegister = (data: RegisterDto): void => {
   validatePassword(password);
 };
 
-export const validateRegisterRestaurant = (data: RegisterRestaurantDto): void => {
+export const validateRegisterRestaurant = (data: RegisterRestaurant): void => {
   validateRegister(data);
 
   const { restaurantName, address, city, country } = data;
@@ -37,7 +37,7 @@ export const validateRegisterRestaurant = (data: RegisterRestaurantDto): void =>
   }
 };
 
-export const validateLogin = (data: LoginDto): void => {
+export const validateLogin = (data: Login): void => {
   const { email, password } = data;
 
   if (!email || !password) {

@@ -43,7 +43,7 @@ The authentication system uses:
 | POST | `/api/auth/login` | User login | 5/15min |
 | POST | `/api/auth/logout` | Logout current session | - |
 | POST | `/api/auth/logout-all` | Logout all sessions | - |
-| POST | `/api/auth/refresh` | Refresh access token | - |
+| POST | `/api/auth/refresh` | Refresh access token | 5/15min |
 | GET | `/api/auth/me` | Get current user | - |
 
 ### Email Verification

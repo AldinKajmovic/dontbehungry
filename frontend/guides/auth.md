@@ -75,9 +75,8 @@ const { login } = useAuth()
 const handleLogin = async (data: { email: string; password: string }) => {
   try {
     await login(data)
-    // User is redirected automatically:
-    // - To /auth/verification-sent if email not verified
-    // - To / if email verified
+    // User is redirected to home page (/)
+    // Unverified users see EmailVerificationBanner on protected pages
   } catch (error) {
     // Handle error (show message to user)
   }
@@ -97,8 +96,11 @@ const handleRegister = async (data) => {
       email: 'john@example.com',
       password: 'password123',
       phone: '+1234567890', // optional
+      address: '123 Main St', // optional
+      city: 'New York',       // optional (required if address is set)
+      country: 'USA',         // optional (required if address is set)
     })
-    // Redirects to /auth/verification-sent
+    // Redirects to home page (/)
   } catch (error) {
     // Handle error
   }
@@ -119,9 +121,9 @@ await logoutAll()
 
 ## Route Protection
 
-### Next.js Middleware (`middleware.ts`)
+### Next.js Proxy (`proxy.ts`)
 
-The middleware automatically protects routes based on authentication status.
+The proxy automatically protects routes based on authentication status. (Note: In Next.js 16, `middleware.ts` was renamed to `proxy.ts` to clarify its role at the network boundary.)
 
 **Protected Routes** (require authentication):
 - `/dashboard`
@@ -143,13 +145,14 @@ The middleware automatically protects routes based on authentication status.
 
 ### Protecting Custom Routes
 
-Add routes to the arrays in `middleware.ts`:
+Add routes to the arrays in `proxy.ts`:
 
 ```typescript
 const PROTECTED_ROUTES = [
   '/dashboard',
   '/orders',
   '/profile',
+  '/my-profile',
   '/settings',
   '/my-new-route', // Add your route
 ]

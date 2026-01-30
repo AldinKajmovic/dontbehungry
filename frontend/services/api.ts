@@ -30,6 +30,16 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
+// Helper to extract user-friendly error message
+function extractErrorMessage(error: AxiosError<{ error?: string; details?: string }>): string {
+  return (
+    error.response?.data?.details ||
+    error.response?.data?.error ||
+    error.message ||
+    'An unexpected error occurred'
+  )
+}
+
 // Response interceptor - handle errors and auto-refresh
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
@@ -43,7 +53,7 @@ api.interceptors.response.use(
                             originalRequest.url?.includes('/api/auth/register')
 
       if (isAuthEndpoint) {
-        return Promise.reject(error)
+        return Promise.reject(new Error(extractErrorMessage(error)))
       }
 
       if (isRefreshing) {
@@ -82,13 +92,7 @@ api.interceptors.response.use(
       }
     }
 
-    const message =
-      error.response?.data?.details ||
-      error.response?.data?.error ||
-      error.message ||
-      'An unexpected error occurred'
-
-    return Promise.reject(new Error(message))
+    return Promise.reject(new Error(extractErrorMessage(error)))
   }
 )
 

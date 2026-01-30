@@ -14,7 +14,7 @@ router.post('/login', authLimiter, authController.login)
 router.post('/google', authLimiter, authController.googleAuth)
 
 // Token refresh
-router.post('/refresh', authController.refresh)
+router.post('/refresh', authLimiter, authController.refresh)
 
 // Logout
 router.post('/logout', authController.logout)

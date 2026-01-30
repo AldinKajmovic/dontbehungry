@@ -84,7 +84,17 @@ export default function VerificationSentPage() {
         )}
 
         <div className="w-full space-y-3">
+          {isAuthenticated && (
+            <Button
+              onClick={() => router.push('/')}
+              className="w-full"
+            >
+              Continue to App
+            </Button>
+          )}
+
           <Button
+            variant="secondary"
             onClick={handleResend}
             isLoading={isResending}
             disabled={isResending}

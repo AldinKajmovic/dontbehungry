@@ -6,7 +6,7 @@ import { findUserByEmail, findUserById, userExists } from './user.service'
 import { generateTokenPair, revokeRefreshToken, revokeAllUserTokens, rotateRefreshToken } from './token.service'
 import { createVerificationToken, verifyEmailToken, verifyPasswordResetToken, consumePasswordResetToken } from './verification.service'
 import { sendVerificationEmail, sendPasswordResetEmail } from './email.service'
-import { RegisterDto, RegisterRestaurantDto, LoginDto, userSelectFields, UserResponse, JwtPayload } from '../types'
+import { Register, RegisterRestaurant, Login, userSelectFields, UserResponse, JwtPayload } from '../types'
 
 interface AuthResult {
   user: UserResponse
@@ -20,8 +20,8 @@ interface TokenRefreshResult {
   user: UserResponse
 }
 
-export async function register(data: RegisterDto): Promise<AuthResult> {
-  const { email, password, firstName, lastName, phone } = data
+export async function register(data: Register): Promise<AuthResult> {
+  const { email, password, firstName, lastName, phone, address, city, country } = data
 
   if (await userExists(email)) {
     throw new ConflictError('User already exists', 'An account with this email already exists')
@@ -29,15 +29,37 @@ export async function register(data: RegisterDto): Promise<AuthResult> {
 
   const passwordHash = await hashPassword(password)
 
-  const user = await prisma.user.create({
-    data: {
-      email: email.toLowerCase(),
-      passwordHash,
-      firstName,
-      lastName,
-      phone: phone || null,
-    },
-    select: userSelectFields,
+  const user = await prisma.$transaction(async (tx) => {
+    const newUser = await tx.user.create({
+      data: {
+        email: email.toLowerCase(),
+        passwordHash,
+        firstName,
+        lastName,
+        phone: phone || null,
+      },
+      select: userSelectFields,
+    })
+
+    if (address && city && country) {
+      const place = await tx.place.create({
+        data: {
+          address,
+          city,
+          country,
+        },
+      })
+
+      await tx.userAddress.create({
+        data: {
+          userId: newUser.id,
+          placeId: place.id,
+          isDefault: true,
+        },
+      })
+    }
+
+    return newUser
   })
 
   const payload: JwtPayload = { userId: user.id, email: user.email, role: user.role }
@@ -50,7 +72,7 @@ export async function register(data: RegisterDto): Promise<AuthResult> {
   return { user, accessToken, refreshToken }
 }
 
-export async function registerRestaurant(data: RegisterRestaurantDto): Promise<AuthResult> {
+export async function registerRestaurant(data: RegisterRestaurant): Promise<AuthResult> {
   const {
     email,
     password,
@@ -119,7 +141,7 @@ export async function registerRestaurant(data: RegisterRestaurantDto): Promise<A
   return { user, accessToken, refreshToken }
 }
 
-export async function login(data: LoginDto): Promise<AuthResult> {
+export async function login(data: Login): Promise<AuthResult> {
   const { email, password } = data
 
   const user = await findUserByEmail(email)

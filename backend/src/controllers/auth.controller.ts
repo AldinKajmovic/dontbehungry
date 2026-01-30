@@ -2,12 +2,12 @@ import { Request, Response, NextFunction } from 'express'
 import * as authService from '../services/auth.service'
 import * as userService from '../services/user.service'
 import { validateRegister, validateRegisterRestaurant, validateLogin, validatePassword, validateEmail } from '../validators/auth.validator'
-import { BadRequestError, NotFoundError } from '../utils/errors'
-import { AuthenticatedRequest, RegisterDto, RegisterRestaurantDto, LoginDto } from '../types'
+import { BadRequestError, NotFoundError, UnauthorizedError } from '../utils/errors'
+import { AuthenticatedRequest, Register, RegisterRestaurant, Login } from '../types'
 import { setAuthCookies, clearAuthCookies, getRefreshTokenFromCookie } from '../utils/cookies'
 
 export async function register(
-  req: Request<object, object, RegisterDto>,
+  req: Request<object, object, Register>,
   res: Response,
   next: NextFunction
 ): Promise<void> {
@@ -27,7 +27,7 @@ export async function register(
 }
 
 export async function registerRestaurant(
-  req: Request<object, object, RegisterRestaurantDto>,
+  req: Request<object, object, RegisterRestaurant>,
   res: Response,
   next: NextFunction
 ): Promise<void> {
@@ -47,7 +47,7 @@ export async function registerRestaurant(
 }
 
 export async function login(
-  req: Request<object, object, LoginDto>,
+  req: Request<object, object, Login>,
   res: Response,
   next: NextFunction
 ): Promise<void> {
@@ -134,7 +134,9 @@ export async function me(
     const user = await userService.findUserById(req.user!.userId)
 
     if (!user) {
-      throw new NotFoundError('User not found', 'User no longer exists')
+      // Return 401 so frontend clears cookies and logs out properly
+      clearAuthCookies(res)
+      throw new UnauthorizedError('Session invalid', 'User no longer exists')
     }
 
     res.json({ user })

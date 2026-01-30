@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { signIn } from 'next-auth/react'
-import { Input, Button, Alert, AuthLayout } from '@/components/ui'
+import { Input, Button, Alert, AuthLayout, Divider } from '@/components/ui'
 import { loginSchema, extractZodErrors, LoginForm } from '@/services/validation'
 import { useFormValidation } from '@/hooks/useFormValidation'
 import { useAuth } from '@/hooks/useAuth'
@@ -105,15 +105,7 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      {/* Divider */}
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200" />
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-white text-gray-500">or continue with</span>
-        </div>
-      </div>
+      <Divider text="or continue with" />
 
       {/* Social login buttons */}
       <div className="grid grid-cols-2 gap-3">

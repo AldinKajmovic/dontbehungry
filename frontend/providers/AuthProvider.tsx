@@ -15,6 +15,7 @@ interface AuthContextType {
   logoutAll: () => Promise<void>
   refreshUser: () => Promise<void>
   resendVerification: () => Promise<void>
+  updateUser: (user: User) => void
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -67,27 +68,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [])
 
+  const updateUser = useCallback((updatedUser: User) => {
+    setUser(updatedUser)
+  }, [])
+
   const login = useCallback(async (data: LoginData) => {
     const response = await authService.login(data)
     setUser(response.user)
-
-    // Redirect based on email verification status
-    if (!response.user.emailVerified) {
-      router.push('/auth/verification-sent')
-    } else {
-      router.push('/')
-    }
+    router.push('/')
   }, [router])
 
   const register = useCallback(async (data: RegisterUserData) => {
     const response = await authService.register(data)
     setUser(response.user)
+    // Show verification page after registration, but user can continue to app
     router.push('/auth/verification-sent')
   }, [router])
 
   const registerRestaurant = useCallback(async (data: RegisterRestaurantData) => {
     const response = await authService.registerRestaurant(data)
     setUser(response.user)
+    // Show verification page after registration, but user can continue to app
     router.push('/auth/verification-sent')
   }, [router])
 
@@ -144,6 +145,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     logoutAll,
     refreshUser,
     resendVerification,
+    updateUser,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

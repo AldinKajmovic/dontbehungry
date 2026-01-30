@@ -6,6 +6,9 @@ export interface RegisterUserData {
   email: string
   password: string
   phone?: string
+  address?: string
+  city?: string
+  country?: string
 }
 
 export interface RegisterRestaurantData extends RegisterUserData {

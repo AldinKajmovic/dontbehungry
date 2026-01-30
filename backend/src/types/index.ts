@@ -11,15 +11,18 @@ export interface AuthenticatedRequest extends Request {
   user?: JwtPayload;
 }
 
-export interface RegisterDto {
+export interface Register {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
   phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
 }
 
-export interface RegisterRestaurantDto extends RegisterDto {
+export interface RegisterRestaurant extends Register {
   restaurantName: string;
   restaurantDescription?: string;
   restaurantPhone?: string;
@@ -30,9 +33,21 @@ export interface RegisterRestaurantDto extends RegisterDto {
   postalCode?: string;
 }
 
-export interface LoginDto {
+export interface Login {
   email: string;
   password: string;
+}
+
+export interface UpdateProfile {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  email?: string;
+}
+
+export interface ChangePassword {
+  currentPassword: string;
+  newPassword: string;
 }
 
 export interface UserResponse {

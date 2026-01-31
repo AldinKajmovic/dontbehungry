@@ -34,4 +34,9 @@ router.delete('/my-restaurants/:restaurantId/menu-items/:itemId', profileControl
 // Categories for dropdown
 router.get('/categories', profileController.getCategories)
 
+// Order history endpoints
+router.get('/my-orders', profileController.getMyOrderHistory)
+router.get('/driver-orders', profileController.getDriverOrderHistory)
+router.get('/my-restaurants/:restaurantId/orders', profileController.getRestaurantOrders)
+
 export default router

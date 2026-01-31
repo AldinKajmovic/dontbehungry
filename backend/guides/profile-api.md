@@ -322,6 +322,231 @@ Deletes a restaurant owned by the authenticated user.
 
 ---
 
+### Get Restaurant Orders
+
+Returns paginated orders for a specific restaurant owned by the authenticated user.
+
+**Endpoint:** `GET /api/profile/my-restaurants/:restaurantId/orders`
+
+**Authentication:** Required (must have RESTAURANT_OWNER role)
+
+**Query Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `status` | string | Filter by order status (PENDING, CONFIRMED, PREPARING, READY_FOR_PICKUP, OUT_FOR_DELIVERY, DELIVERED, CANCELLED) |
+| `createdAtFrom` | ISO date string | Filter orders created on or after this date |
+| `createdAtTo` | ISO date string | Filter orders created on or before this date |
+| `page` | integer | Page number (default: 1) |
+| `limit` | integer | Items per page (default: 10, max: 100) |
+
+**Example Request:**
+```
+GET /api/profile/my-restaurants/abc123/orders?status=PENDING&page=1&limit=5
+```
+
+**Response:**
+```json
+{
+  "orders": [
+    {
+      "id": "uuid",
+      "status": "PENDING",
+      "totalAmount": "45.99",
+      "createdAt": "2025-06-15T14:30:00.000Z",
+      "deliveredAt": null,
+      "restaurant": {
+        "id": "uuid",
+        "name": "My Restaurant"
+      },
+      "deliveryPlace": {
+        "address": "123 Main Street",
+        "city": "New York"
+      },
+      "orderItems": [
+        {
+          "name": "Margherita Pizza",
+          "quantity": 2,
+          "unitPrice": "15.99"
+        }
+      ],
+      "payment": {
+        "status": "COMPLETED",
+        "method": "CREDIT_CARD"
+      },
+      "customerName": "John Doe",
+      "customerPhone": "+1234567890"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 5,
+    "total": 25,
+    "totalPages": 5
+  }
+}
+```
+
+**Error Responses:**
+- `400 Bad Request` - Invalid date format or status value
+- `403 Forbidden` - User is not a restaurant owner
+- `404 Not Found` - Restaurant not found or not owned by user
+
+---
+
+## Menu Items Endpoints (Restaurant Owners)
+
+These endpoints allow restaurant owners to manage menu items for their restaurants.
+
+### Get Menu Items
+
+Returns all menu items for a specific restaurant.
+
+**Endpoint:** `GET /api/profile/my-restaurants/:restaurantId/menu-items`
+
+**Authentication:** Required
+
+**Response:**
+```json
+{
+  "items": [
+    {
+      "id": "uuid",
+      "name": "Margherita Pizza",
+      "description": "Classic pizza with tomato and mozzarella",
+      "price": "15.99",
+      "imageUrl": "https://example.com/pizza.jpg",
+      "isAvailable": true,
+      "preparationTime": 20,
+      "category": {
+        "id": "uuid",
+        "name": "Pizza"
+      }
+    }
+  ]
+}
+```
+
+---
+
+### Create Menu Item
+
+Creates a new menu item for a restaurant.
+
+**Endpoint:** `POST /api/profile/my-restaurants/:restaurantId/menu-items`
+
+**Authentication:** Required
+
+**Request Body:**
+```json
+{
+  "name": "string (required)",
+  "description": "string (optional)",
+  "price": "number (required)",
+  "imageUrl": "string (optional)",
+  "categoryId": "string (optional)",
+  "isAvailable": "boolean (optional, default: true)",
+  "preparationTime": "number (optional, minutes)"
+}
+```
+
+**Validation Rules:**
+- `name`: Required, non-empty
+- `price`: Required, must be a non-negative number
+- `preparationTime`: Must be a non-negative integer if provided
+
+**Response:**
+```json
+{
+  "message": "Menu item created successfully",
+  "item": { ... }
+}
+```
+
+**Error Responses:**
+- `404 Not Found` - Restaurant or category not found
+
+---
+
+### Update Menu Item
+
+Updates an existing menu item.
+
+**Endpoint:** `PATCH /api/profile/my-restaurants/:restaurantId/menu-items/:itemId`
+
+**Authentication:** Required
+
+**Request Body:**
+```json
+{
+  "name": "string (optional)",
+  "description": "string | null (optional)",
+  "price": "number (optional)",
+  "imageUrl": "string | null (optional)",
+  "categoryId": "string | null (optional)",
+  "isAvailable": "boolean (optional)",
+  "preparationTime": "number | null (optional)"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Menu item updated successfully",
+  "item": { ... }
+}
+```
+
+**Error Responses:**
+- `404 Not Found` - Restaurant, menu item, or category not found
+
+---
+
+### Delete Menu Item
+
+Deletes a menu item from a restaurant.
+
+**Endpoint:** `DELETE /api/profile/my-restaurants/:restaurantId/menu-items/:itemId`
+
+**Authentication:** Required
+
+**Response:**
+```json
+{
+  "message": "Menu item deleted successfully"
+}
+```
+
+**Error Responses:**
+- `404 Not Found` - Restaurant or menu item not found
+
+---
+
+### Get Categories
+
+Returns all available categories for menu items.
+
+**Endpoint:** `GET /api/profile/categories`
+
+**Authentication:** Required
+
+**Response:**
+```json
+{
+  "categories": [
+    {
+      "id": "uuid",
+      "name": "Pizza"
+    },
+    {
+      "id": "uuid",
+      "name": "Burgers"
+    }
+  ]
+}
+```
+
+---
+
 ## Address Management API
 
 ### Get All Addresses
@@ -410,6 +635,142 @@ Deletes a restaurant owned by the authenticated user.
 }
 ```
 
+## Order History Endpoints
+
+These endpoints allow users to view their order history.
+
+### Get My Order History (Customers)
+
+Returns paginated order history for the authenticated user.
+
+**Endpoint:** `GET /api/profile/my-orders`
+
+**Authentication:** Required
+
+**Query Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `createdAtFrom` | ISO date string | Filter orders created on or after this date |
+| `createdAtTo` | ISO date string | Filter orders created on or before this date |
+| `page` | integer | Page number (default: 1) |
+| `limit` | integer | Items per page (default: 10, max: 100) |
+
+**Example Request:**
+```
+GET /api/profile/my-orders?createdAtFrom=2025-01-01&createdAtTo=2025-12-31&page=1&limit=5
+```
+
+**Response:**
+```json
+{
+  "orders": [
+    {
+      "id": "uuid",
+      "status": "DELIVERED",
+      "totalAmount": "45.99",
+      "createdAt": "2025-06-15T14:30:00.000Z",
+      "deliveredAt": "2025-06-15T15:15:00.000Z",
+      "restaurant": {
+        "id": "uuid",
+        "name": "Pizza Palace"
+      },
+      "deliveryPlace": {
+        "address": "123 Main Street",
+        "city": "New York"
+      },
+      "orderItems": [
+        {
+          "name": "Margherita Pizza",
+          "quantity": 2,
+          "unitPrice": "15.99"
+        }
+      ],
+      "payment": {
+        "status": "COMPLETED",
+        "method": "CREDIT_CARD"
+      }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 5,
+    "total": 25,
+    "totalPages": 5
+  }
+}
+```
+
+---
+
+### Get Driver Order History (Delivery Drivers)
+
+Returns paginated order history for assigned deliveries.
+
+**Endpoint:** `GET /api/profile/driver-orders`
+
+**Authentication:** Required (must have DELIVERY_DRIVER role)
+
+**Query Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `status` | string | Filter by order status (PENDING, CONFIRMED, PREPARING, READY_FOR_PICKUP, OUT_FOR_DELIVERY, DELIVERED, CANCELLED) |
+| `createdAtFrom` | ISO date string | Filter orders created on or after this date |
+| `createdAtTo` | ISO date string | Filter orders created on or before this date |
+| `page` | integer | Page number (default: 1) |
+| `limit` | integer | Items per page (default: 10, max: 100) |
+
+**Example Request:**
+```
+GET /api/profile/driver-orders?status=DELIVERED&page=1&limit=5
+```
+
+**Response:**
+```json
+{
+  "orders": [
+    {
+      "id": "uuid",
+      "status": "DELIVERED",
+      "totalAmount": "45.99",
+      "createdAt": "2025-06-15T14:30:00.000Z",
+      "deliveredAt": "2025-06-15T15:15:00.000Z",
+      "restaurant": {
+        "id": "uuid",
+        "name": "Pizza Palace"
+      },
+      "deliveryPlace": {
+        "address": "123 Main Street",
+        "city": "New York"
+      },
+      "orderItems": [
+        {
+          "name": "Margherita Pizza",
+          "quantity": 2,
+          "unitPrice": "15.99"
+        }
+      ],
+      "payment": {
+        "status": "COMPLETED",
+        "method": "CREDIT_CARD"
+      },
+      "customerFirstName": "John"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 5,
+    "total": 50,
+    "totalPages": 10
+  }
+}
+```
+
+**Error Responses:**
+- `400 Bad Request` - Invalid date format or status value
+- `403 Forbidden` - User is not a delivery driver
+
+---
+
 ## File Structure
 
 ```
@@ -495,6 +856,21 @@ await addressService.addAddress({
 
 await addressService.setDefaultAddress(addressId)
 await addressService.deleteAddress(addressId)
+
+// Order history (for customers)
+const orderHistory = await profileService.getMyOrderHistory({
+  createdAtFrom: '2025-01-01',
+  createdAtTo: '2025-12-31',
+  page: 1,
+  limit: 10
+})
+
+// Driver deliveries (for delivery drivers)
+const driverDeliveries = await profileService.getDriverOrderHistory({
+  status: 'DELIVERED',
+  page: 1,
+  limit: 10
+})
 ```
 
 ---

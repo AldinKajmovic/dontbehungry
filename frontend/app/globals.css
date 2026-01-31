@@ -31,6 +31,7 @@
   --animate-slide-in-right: slideInRight 0.3s ease-out;
   --animate-bounce-subtle: bounceSubtle 2s infinite;
   --animate-pulse-subtle: pulseSubtle 2s infinite;
+  --animate-modal-in: modalIn 0.2s ease-out;
 
   @keyframes fadeIn {
     0% { opacity: 0; }
@@ -56,6 +57,11 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0.8; }
   }
+
+  @keyframes modalIn {
+    0% { opacity: 0; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+  }
 }
 
 @layer base {
@@ -73,7 +79,7 @@
   }
 
   .btn-primary {
-    @apply w-full py-3 px-6 rounded-xl font-semibold text-white
+    @apply w-full py-3 px-6 rounded-xl font-semibold text-white cursor-pointer
            bg-gradient-to-r from-primary-500 to-primary-600
            hover:from-primary-600 hover:to-primary-700
            transform transition-all duration-200 ease-out
@@ -83,7 +89,7 @@
   }
 
   .btn-secondary {
-    @apply w-full py-3 px-6 rounded-xl font-semibold
+    @apply w-full py-3 px-6 rounded-xl font-semibold cursor-pointer
            bg-gray-100 text-gray-700
            hover:bg-gray-200
            transform transition-all duration-200 ease-out

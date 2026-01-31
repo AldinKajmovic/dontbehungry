@@ -75,7 +75,7 @@ const { login } = useAuth()
 const handleLogin = async (data: { email: string; password: string }) => {
   try {
     await login(data)
-    // User is redirected to home page (/)
+    // User is redirected to restaurants page (/restaurants)
     // Unverified users see EmailVerificationBanner on protected pages
   } catch (error) {
     // Handle error (show message to user)
@@ -100,7 +100,7 @@ const handleRegister = async (data) => {
       city: 'New York',       // optional (required if address is set)
       country: 'USA',         // optional (required if address is set)
     })
-    // Redirects to home page (/)
+    // Redirects to verification-sent page, then to restaurants page after verification
   } catch (error) {
     // Handle error
   }
@@ -126,10 +126,13 @@ await logoutAll()
 The proxy automatically protects routes based on authentication status. (Note: In Next.js 16, `middleware.ts` was renamed to `proxy.ts` to clarify its role at the network boundary.)
 
 **Protected Routes** (require authentication):
-- `/dashboard`
 - `/orders`
+- `/dashboard`
 - `/profile`
 - `/settings`
+
+**Public Routes with Auth-Aware Features**:
+- `/restaurants` - Public, but "add to cart" button only visible when logged in
 
 **Auth Routes** (redirect to home if authenticated):
 - `/auth/login`

@@ -3,7 +3,6 @@ import { verifyToken } from '../utils/jwt'
 import { UnauthorizedError } from '../utils/errors'
 import { AuthenticatedRequest } from '../types'
 import { getAccessTokenFromCookie } from '../utils/cookies'
-import { error } from 'console'
 
 export function authenticate(
   req: AuthenticatedRequest,
@@ -27,7 +26,7 @@ export function authenticate(
   next()
 }
 
-// Used ofr public content with personalized features
+// Used for public content with personalized features
 // Users can see the site without logging in(some features)
 export function optionalAuth(
   req: AuthenticatedRequest,
@@ -48,7 +47,6 @@ export function optionalAuth(
       req.user = verifyToken(token)
     } catch {
       // Token is invalid but we don't throw - just proceed without user
-      console.debug('Optional auth token invalid:', error instanceof Error ? error.message : 'Unknown error') 
     }
   }
 

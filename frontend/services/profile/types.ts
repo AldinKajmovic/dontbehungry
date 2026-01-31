@@ -106,3 +106,53 @@ export interface Category {
   id: string
   name: string
 }
+
+// Order History Types
+
+export interface OrderHistoryFilters {
+  createdAtFrom?: string
+  createdAtTo?: string
+  status?: string
+  page?: number
+  limit?: number
+}
+
+export interface OrderHistoryItem {
+  id: string
+  status: string
+  totalAmount: string
+  createdAt: string
+  deliveredAt: string | null
+  restaurant: { id: string; name: string }
+  deliveryPlace: { address: string; city: string }
+  orderItems: Array<{ name: string; quantity: number; unitPrice: string }>
+  payment: { status: string; method: string } | null
+  customerFirstName?: string // Only for driver orders
+}
+
+export interface OrderHistoryResponse {
+  orders: OrderHistoryItem[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
+
+// Restaurant Orders (for restaurant owners)
+
+export interface RestaurantOrderItem extends OrderHistoryItem {
+  customerName: string
+  customerPhone: string | null
+}
+
+export interface RestaurantOrdersResponse {
+  orders: RestaurantOrderItem[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}

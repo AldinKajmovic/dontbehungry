@@ -510,3 +510,278 @@ export async function getCategories(): Promise<{ id: string; name: string }[]> {
     orderBy: { name: 'asc' },
   })
 }
+
+export interface OrderHistoryFilters {
+  createdAtFrom?: Date
+  createdAtTo?: Date
+  status?: string
+  page?: number
+  limit?: number
+}
+
+export interface OrderHistoryItem {
+  id: string
+  status: string
+  totalAmount: string
+  createdAt: string
+  deliveredAt: string | null
+  restaurant: { id: string; name: string }
+  deliveryPlace: { address: string; city: string }
+  orderItems: Array<{ name: string; quantity: number; unitPrice: string }>
+  payment: { status: string; method: string } | null
+}
+
+export interface OrderHistoryResponse {
+  orders: OrderHistoryItem[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
+
+const orderHistorySelect = {
+  id: true,
+  status: true,
+  totalAmount: true,
+  createdAt: true,
+  deliveredAt: true,
+  restaurant: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  deliveryPlace: {
+    select: {
+      address: true,
+      city: true,
+    },
+  },
+  orderItems: {
+    select: {
+      quantity: true,
+      unitPrice: true,
+      menuItem: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  },
+  payment: {
+    select: {
+      status: true,
+      method: true,
+    },
+  },
+}
+
+function formatOrderHistoryItem(order: {
+  id: string
+  status: string
+  totalAmount: { toString(): string }
+  createdAt: Date
+  deliveredAt: Date | null
+  restaurant: { id: string; name: string }
+  deliveryPlace: { address: string; city: string }
+  orderItems: Array<{ quantity: number; unitPrice: { toString(): string }; menuItem: { name: string } }>
+  payment: { status: string; method: string } | null
+}): OrderHistoryItem {
+  return {
+    id: order.id,
+    status: order.status,
+    totalAmount: order.totalAmount.toString(),
+    createdAt: order.createdAt.toISOString(),
+    deliveredAt: order.deliveredAt?.toISOString() ?? null,
+    restaurant: order.restaurant,
+    deliveryPlace: order.deliveryPlace,
+    orderItems: order.orderItems.map((item) => ({
+      name: item.menuItem.name,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice.toString(),
+    })),
+    payment: order.payment,
+  }
+}
+
+export async function getMyOrderHistory(userId: string, filters: OrderHistoryFilters): Promise<OrderHistoryResponse> {
+  const page = filters.page || 1
+  const limit = filters.limit || 10
+
+  const where: Record<string, unknown> = { userId }
+
+  if (filters.status) {
+    where.status = filters.status
+  }
+
+  if (filters.createdAtFrom || filters.createdAtTo) {
+    where.createdAt = {}
+    if (filters.createdAtFrom) {
+      (where.createdAt as Record<string, Date>).gte = filters.createdAtFrom
+    }
+    if (filters.createdAtTo) {
+      (where.createdAt as Record<string, Date>).lte = filters.createdAtTo
+    }
+  }
+
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      select: orderHistorySelect,
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.order.count({ where }),
+  ])
+
+  return {
+    orders: orders.map(formatOrderHistoryItem),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  }
+}
+
+export async function getDriverOrderHistory(driverId: string, filters: OrderHistoryFilters): Promise<OrderHistoryResponse> {
+  const page = filters.page || 1
+  const limit = filters.limit || 10
+
+  const where: Record<string, unknown> = { driverId }
+
+  if (filters.status) {
+    where.status = filters.status
+  }
+
+  if (filters.createdAtFrom || filters.createdAtTo) {
+    where.createdAt = {}
+    if (filters.createdAtFrom) {
+      (where.createdAt as Record<string, Date>).gte = filters.createdAtFrom
+    }
+    if (filters.createdAtTo) {
+      (where.createdAt as Record<string, Date>).lte = filters.createdAtTo
+    }
+  }
+
+  const driverOrderSelect = {
+    ...orderHistorySelect,
+    user: {
+      select: {
+        firstName: true,
+      },
+    },
+  }
+
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      select: driverOrderSelect,
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.order.count({ where }),
+  ])
+
+  return {
+    orders: orders.map((order) => ({
+      ...formatOrderHistoryItem(order),
+      customerFirstName: order.user.firstName,
+    })),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  }
+}
+
+export interface RestaurantOrderItem extends OrderHistoryItem {
+  customerName: string
+  customerPhone: string | null
+}
+
+export interface RestaurantOrdersResponse {
+  orders: RestaurantOrderItem[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
+
+export async function getRestaurantOrders(
+  ownerId: string,
+  restaurantId: string,
+  filters: OrderHistoryFilters
+): Promise<RestaurantOrdersResponse> {
+  const restaurant = await prisma.restaurant.findFirst({
+    where: { id: restaurantId, ownerId },
+  })
+
+  if (!restaurant) {
+    throw new NotFoundError('Restaurant not found', 'You do not own this restaurant')
+  }
+
+  const page = filters.page || 1
+  const limit = filters.limit || 10
+
+  const where: Record<string, unknown> = { restaurantId }
+
+  if (filters.status) {
+    where.status = filters.status
+  }
+
+  if (filters.createdAtFrom || filters.createdAtTo) {
+    where.createdAt = {}
+    if (filters.createdAtFrom) {
+      (where.createdAt as Record<string, Date>).gte = filters.createdAtFrom
+    }
+    if (filters.createdAtTo) {
+      (where.createdAt as Record<string, Date>).lte = filters.createdAtTo
+    }
+  }
+
+  const restaurantOrderSelect = {
+    ...orderHistorySelect,
+    user: {
+      select: {
+        firstName: true,
+        lastName: true,
+        phone: true,
+      },
+    },
+  }
+
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      select: restaurantOrderSelect,
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.order.count({ where }),
+  ])
+
+  return {
+    orders: orders.map((order) => ({
+      ...formatOrderHistoryItem(order),
+      customerName: `${order.user.firstName} ${order.user.lastName}`,
+      customerPhone: order.user.phone,
+    })),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  }
+}

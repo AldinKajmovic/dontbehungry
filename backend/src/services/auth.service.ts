@@ -67,7 +67,11 @@ export async function register(data: Register): Promise<AuthResult> {
 
   createVerificationToken(user.id, TokenType.EMAIL_VERIFICATION)
     .then((verificationToken) => sendVerificationEmail(user.email, user.firstName, verificationToken))
-    .catch((err) => console.error('Failed to send verification email:', err.message))
+    .catch((err) => console.error('Failed to send verification email:', {
+      userId: user.id,
+      email: user.email,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }))
 
   return { user, accessToken, refreshToken }
 }
@@ -136,7 +140,11 @@ export async function registerRestaurant(data: RegisterRestaurant): Promise<Auth
 
   createVerificationToken(user.id, TokenType.EMAIL_VERIFICATION)
     .then((verificationToken) => sendVerificationEmail(user.email, user.firstName, verificationToken))
-    .catch((err) => console.error('Failed to send verification email:', err.message))
+    .catch((err) => console.error('Failed to send verification email:', {
+      userId: user.id,
+      email: user.email,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }))
 
   return { user, accessToken, refreshToken }
 }

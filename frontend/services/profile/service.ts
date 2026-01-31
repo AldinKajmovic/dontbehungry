@@ -14,6 +14,9 @@ import {
   CreateMyMenuItemData,
   UpdateMyMenuItemData,
   Category,
+  OrderHistoryFilters,
+  OrderHistoryResponse,
+  RestaurantOrdersResponse,
 } from './types'
 
 const BASE_PATH = '/api/profile'
@@ -113,6 +116,52 @@ class ProfileService {
   // Categories
   async getCategories(): Promise<{ categories: Category[] }> {
     const response = await api.get<{ categories: Category[] }>(`${BASE_PATH}/categories`)
+    return response.data
+  }
+
+  // Order History
+  async getMyOrderHistory(filters: OrderHistoryFilters = {}): Promise<OrderHistoryResponse> {
+    const params = new URLSearchParams()
+    if (filters.status) params.append('status', filters.status)
+    if (filters.createdAtFrom) params.append('createdAtFrom', filters.createdAtFrom)
+    if (filters.createdAtTo) params.append('createdAtTo', filters.createdAtTo)
+    if (filters.page) params.append('page', filters.page.toString())
+    if (filters.limit) params.append('limit', filters.limit.toString())
+
+    const queryString = params.toString()
+    const url = `${BASE_PATH}/my-orders${queryString ? `?${queryString}` : ''}`
+    const response = await api.get<OrderHistoryResponse>(url)
+    return response.data
+  }
+
+  async getDriverOrderHistory(filters: OrderHistoryFilters = {}): Promise<OrderHistoryResponse> {
+    const params = new URLSearchParams()
+    if (filters.status) params.append('status', filters.status)
+    if (filters.createdAtFrom) params.append('createdAtFrom', filters.createdAtFrom)
+    if (filters.createdAtTo) params.append('createdAtTo', filters.createdAtTo)
+    if (filters.page) params.append('page', filters.page.toString())
+    if (filters.limit) params.append('limit', filters.limit.toString())
+
+    const queryString = params.toString()
+    const url = `${BASE_PATH}/driver-orders${queryString ? `?${queryString}` : ''}`
+    const response = await api.get<OrderHistoryResponse>(url)
+    return response.data
+  }
+
+  async getRestaurantOrders(
+    restaurantId: string,
+    filters: OrderHistoryFilters = {}
+  ): Promise<RestaurantOrdersResponse> {
+    const params = new URLSearchParams()
+    if (filters.status) params.append('status', filters.status)
+    if (filters.createdAtFrom) params.append('createdAtFrom', filters.createdAtFrom)
+    if (filters.createdAtTo) params.append('createdAtTo', filters.createdAtTo)
+    if (filters.page) params.append('page', filters.page.toString())
+    if (filters.limit) params.append('limit', filters.limit.toString())
+
+    const queryString = params.toString()
+    const url = `${BASE_PATH}/my-restaurants/${restaurantId}/orders${queryString ? `?${queryString}` : ''}`
+    const response = await api.get<RestaurantOrdersResponse>(url)
     return response.data
   }
 }

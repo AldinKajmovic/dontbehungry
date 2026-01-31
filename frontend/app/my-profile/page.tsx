@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Input, Button, Alert, EmailVerificationBanner, Section, Modal } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
-import { profileService, UpdateProfileData, ChangePasswordData, MyRestaurant, MyMenuItem, Category } from '@/services/profile'
+import { profileService, UpdateProfileData, ChangePasswordData, MyRestaurant, MyMenuItem, Category, OrderHistoryItem, RestaurantOrderItem } from '@/services/profile'
 import { addressService, Address } from '@/services/address'
 
 // Icons
@@ -128,6 +128,35 @@ export default function MyProfilePage() {
   const [deletingRestaurant, setDeletingRestaurant] = useState<MyRestaurant | null>(null)
   const [deleteRestaurantLoading, setDeleteRestaurantLoading] = useState(false)
 
+  // Order history state (for customers)
+  const [showOrderHistory, setShowOrderHistory] = useState(false)
+  const [orderHistory, setOrderHistory] = useState<OrderHistoryItem[]>([])
+  const [orderHistoryLoading, setOrderHistoryLoading] = useState(false)
+  const [orderHistoryPage, setOrderHistoryPage] = useState(1)
+  const [orderHistoryTotalPages, setOrderHistoryTotalPages] = useState(1)
+  const [orderHistoryTotal, setOrderHistoryTotal] = useState(0)
+  const [orderHistoryFromDate, setOrderHistoryFromDate] = useState('')
+  const [orderHistoryToDate, setOrderHistoryToDate] = useState('')
+
+  // Driver deliveries state
+  const [showDriverDeliveries, setShowDriverDeliveries] = useState(false)
+  const [driverDeliveries, setDriverDeliveries] = useState<OrderHistoryItem[]>([])
+  const [driverDeliveriesLoading, setDriverDeliveriesLoading] = useState(false)
+  const [driverDeliveriesPage, setDriverDeliveriesPage] = useState(1)
+  const [driverDeliveriesTotalPages, setDriverDeliveriesTotalPages] = useState(1)
+  const [driverDeliveriesTotal, setDriverDeliveriesTotal] = useState(0)
+  const [driverDeliveriesStatus, setDriverDeliveriesStatus] = useState('')
+
+  // Restaurant orders state (for restaurant owners)
+  const [showRestaurantOrders, setShowRestaurantOrders] = useState(false)
+  const [restaurantOrders, setRestaurantOrders] = useState<RestaurantOrderItem[]>([])
+  const [restaurantOrdersLoading, setRestaurantOrdersLoading] = useState(false)
+  const [restaurantOrdersPage, setRestaurantOrdersPage] = useState(1)
+  const [restaurantOrdersTotalPages, setRestaurantOrdersTotalPages] = useState(1)
+  const [restaurantOrdersTotal, setRestaurantOrdersTotal] = useState(0)
+  const [restaurantOrdersStatus, setRestaurantOrdersStatus] = useState('')
+  const [restaurantOrdersError, setRestaurantOrdersError] = useState('')
+
   // Menu items pagination and search state
   const [menuItemsPage, setMenuItemsPage] = useState(1)
   const [menuItemsPerPage, setMenuItemsPerPage] = useState(5)
@@ -171,6 +200,128 @@ export default function MyProfilePage() {
       setRestaurantsLoading(false)
     }
   }
+
+  // Order history functions
+  const loadOrderHistory = async (page = 1) => {
+    try {
+      setOrderHistoryLoading(true)
+      const result = await profileService.getMyOrderHistory({
+        page,
+        limit: 5,
+        createdAtFrom: orderHistoryFromDate || undefined,
+        createdAtTo: orderHistoryToDate || undefined,
+      })
+      setOrderHistory(result.orders)
+      setOrderHistoryPage(result.pagination.page)
+      setOrderHistoryTotalPages(result.pagination.totalPages)
+      setOrderHistoryTotal(result.pagination.total)
+    } catch {
+      // Ignore errors
+    } finally {
+      setOrderHistoryLoading(false)
+    }
+  }
+
+  const handleOrderHistoryFilter = () => {
+    setOrderHistoryPage(1)
+    loadOrderHistory(1)
+  }
+
+  const handleClearOrderHistoryFilter = () => {
+    setOrderHistoryFromDate('')
+    setOrderHistoryToDate('')
+    setOrderHistoryPage(1)
+    // Load without filters
+    profileService.getMyOrderHistory({ page: 1, limit: 5 }).then((result) => {
+      setOrderHistory(result.orders)
+      setOrderHistoryPage(result.pagination.page)
+      setOrderHistoryTotalPages(result.pagination.totalPages)
+      setOrderHistoryTotal(result.pagination.total)
+    })
+  }
+
+  // Driver deliveries functions
+  const loadDriverDeliveries = async (page = 1) => {
+    try {
+      setDriverDeliveriesLoading(true)
+      const result = await profileService.getDriverOrderHistory({
+        page,
+        limit: 5,
+        status: driverDeliveriesStatus || undefined,
+      })
+      setDriverDeliveries(result.orders)
+      setDriverDeliveriesPage(result.pagination.page)
+      setDriverDeliveriesTotalPages(result.pagination.totalPages)
+      setDriverDeliveriesTotal(result.pagination.total)
+    } catch {
+      // Ignore errors
+    } finally {
+      setDriverDeliveriesLoading(false)
+    }
+  }
+
+  const handleDriverDeliveriesStatusChange = (status: string) => {
+    setDriverDeliveriesStatus(status)
+    setDriverDeliveriesPage(1)
+  }
+
+  // Load driver deliveries when status changes
+  useEffect(() => {
+    if (showDriverDeliveries && user?.role === 'DELIVERY_DRIVER') {
+      loadDriverDeliveries(1)
+    }
+  }, [driverDeliveriesStatus, showDriverDeliveries, user?.role])
+
+  // Restaurant orders functions (for restaurant owners)
+  const loadRestaurantOrders = async (restaurantId: string, page = 1) => {
+    try {
+      setRestaurantOrdersLoading(true)
+      setRestaurantOrdersError('')
+      const result = await profileService.getRestaurantOrders(restaurantId, {
+        page,
+        limit: 5,
+        status: restaurantOrdersStatus || undefined,
+      })
+      setRestaurantOrders(result.orders)
+      setRestaurantOrdersPage(result.pagination.page)
+      setRestaurantOrdersTotalPages(result.pagination.totalPages)
+      setRestaurantOrdersTotal(result.pagination.total)
+    } catch (err) {
+      setRestaurantOrdersError(err instanceof Error ? err.message : 'Failed to load orders')
+      setRestaurantOrders([])
+    } finally {
+      setRestaurantOrdersLoading(false)
+    }
+  }
+
+  const openRestaurantOrdersModal = () => {
+    if (!viewingRestaurant) return
+    setShowRestaurantOrders(true)
+    setRestaurantOrdersStatus('')
+    setRestaurantOrdersPage(1)
+    setRestaurantOrdersError('')
+    loadRestaurantOrders(viewingRestaurant.id, 1)
+  }
+
+  const closeRestaurantOrdersModal = () => {
+    setShowRestaurantOrders(false)
+    setRestaurantOrders([])
+    setRestaurantOrdersPage(1)
+    setRestaurantOrdersStatus('')
+    setRestaurantOrdersError('')
+  }
+
+  const handleRestaurantOrdersStatusChange = (status: string) => {
+    setRestaurantOrdersStatus(status)
+    setRestaurantOrdersPage(1)
+  }
+
+  // Load restaurant orders when status changes
+  useEffect(() => {
+    if (showRestaurantOrders && viewingRestaurant) {
+      loadRestaurantOrders(viewingRestaurant.id, 1)
+    }
+  }, [restaurantOrdersStatus, showRestaurantOrders, viewingRestaurant?.id])
 
   const handleRestaurantChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -688,6 +839,31 @@ export default function MyProfilePage() {
   const isRestaurantOwner = user?.role === 'RESTAURANT_OWNER'
   const isGoogleUser = !user?.phone && user?.avatarUrl?.includes('google')
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN'
+  const isDeliveryDriver = user?.role === 'DELIVERY_DRIVER'
+
+  // Order status color mapping
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      PENDING: 'bg-yellow-100 text-yellow-800',
+      CONFIRMED: 'bg-blue-100 text-blue-800',
+      PREPARING: 'bg-purple-100 text-purple-800',
+      READY_FOR_PICKUP: 'bg-indigo-100 text-indigo-800',
+      OUT_FOR_DELIVERY: 'bg-cyan-100 text-cyan-800',
+      DELIVERED: 'bg-green-100 text-green-800',
+      CANCELLED: 'bg-red-100 text-red-800',
+    }
+    return colors[status] || 'bg-gray-100 text-gray-800'
+  }
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
 
   if (isLoading) {
     return (
@@ -966,6 +1142,189 @@ export default function MyProfilePage() {
             </div>
           )}
         </Section>
+
+        {/* Order History Section - Link to dedicated page (not for admins or restaurant owners) */}
+        {!isAdmin && !isRestaurantOwner && (
+          <Section
+            title="Order History"
+            description="View and track your past orders"
+          >
+            <a
+              href="/orders"
+              className="flex items-center justify-between p-4 rounded-xl border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors group cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">View All Orders</p>
+                  <p className="text-sm text-gray-500">Filter by status, date range, and more</p>
+                </div>
+              </div>
+              <svg className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </Section>
+        )}
+
+        {/* My Deliveries Section - Only for Delivery Drivers */}
+        {isDeliveryDriver && (
+          <Section
+            title="My Deliveries"
+            description="View your assigned deliveries"
+            headerAction={
+              <Button
+                type="button"
+                variant="secondary"
+                className="!w-auto !py-2 !px-4 text-sm"
+                onClick={() => {
+                  setShowDriverDeliveries(!showDriverDeliveries)
+                  if (!showDriverDeliveries && driverDeliveries.length === 0) {
+                    loadDriverDeliveries(1)
+                  }
+                }}
+              >
+                <span className="flex items-center gap-2">
+                  {showDriverDeliveries ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  )}
+                  {showDriverDeliveries ? 'Hide' : 'Show'} Deliveries
+                </span>
+              </Button>
+            }
+          >
+            {showDriverDeliveries && (
+              <div className="space-y-4">
+                {/* Status Filter */}
+                <div className="flex flex-wrap gap-3 items-center">
+                  <label htmlFor="driverDeliveriesStatus" className="text-sm font-medium text-gray-700">
+                    Filter by status:
+                  </label>
+                  <select
+                    id="driverDeliveriesStatus"
+                    value={driverDeliveriesStatus}
+                    onChange={(e) => handleDriverDeliveriesStatusChange(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="CONFIRMED">Confirmed</option>
+                    <option value="PREPARING">Preparing</option>
+                    <option value="READY_FOR_PICKUP">Ready for Pickup</option>
+                    <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+                    <option value="DELIVERED">Delivered</option>
+                    <option value="CANCELLED">Cancelled</option>
+                  </select>
+                </div>
+
+                {driverDeliveriesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin h-6 w-6 border-2 border-primary-500 border-t-transparent rounded-full" />
+                  </div>
+                ) : driverDeliveries.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                      </svg>
+                    </div>
+                    <p className="text-gray-500">No deliveries found</p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm text-gray-500">{driverDeliveriesTotal} delivery{driverDeliveriesTotal !== 1 ? '' : ''} found</p>
+                    <div className="space-y-3">
+                      {driverDeliveries.map((delivery) => (
+                        <div
+                          key={delivery.id}
+                          className="p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-3 mb-2">
+                                <p className="font-medium text-gray-900">
+                                  Order for {delivery.customerFirstName || 'Customer'}
+                                </p>
+                                <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(delivery.status)}`}>
+                                  {delivery.status.replace(/_/g, ' ')}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-600 mb-1">
+                                From: <span className="font-medium">{delivery.restaurant.name}</span>
+                              </p>
+                              <p className="text-sm text-gray-500 mb-2">
+                                {formatDate(delivery.createdAt)}
+                              </p>
+                              <div className="flex items-start gap-2 text-sm text-gray-600">
+                                <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <p>{delivery.deliveryPlace.address}, {delivery.deliveryPlace.city}</p>
+                              </div>
+                              <div className="text-sm text-gray-600 mt-2">
+                                <p className="font-medium">Items: {delivery.orderItems.length}</p>
+                              </div>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <p className="font-semibold text-primary-600">${delivery.totalAmount}</p>
+                              {delivery.deliveredAt && (
+                                <p className="text-xs text-green-600 mt-1">
+                                  Delivered: {formatDate(delivery.deliveredAt)}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Pagination */}
+                    {driverDeliveriesTotalPages > 1 && (
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <p className="text-sm text-gray-500">
+                          Page {driverDeliveriesPage} of {driverDeliveriesTotalPages}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => loadDriverDeliveries(driverDeliveriesPage - 1)}
+                            disabled={driverDeliveriesPage === 1 || driverDeliveriesLoading}
+                            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => loadDriverDeliveries(driverDeliveriesPage + 1)}
+                            disabled={driverDeliveriesPage >= driverDeliveriesTotalPages || driverDeliveriesLoading}
+                            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </Section>
+        )}
 
         {/* Change Password Section - Hidden for Google-only users */}
         {!isGoogleUser && (
@@ -1664,6 +2023,21 @@ export default function MyProfilePage() {
                 type="button"
                 variant="secondary"
                 className="flex-1"
+                onClick={openRestaurantOrdersModal}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                  </svg>
+                  View Orders
+                </span>
+              </Button>
+            </div>
+            <div className="flex gap-3 mt-3">
+              <Button
+                type="button"
+                variant="secondary"
+                className="flex-1"
                 onClick={() => {
                   closeViewRestaurantModal()
                   openEditRestaurantModal(viewingRestaurant)
@@ -1679,6 +2053,181 @@ export default function MyProfilePage() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Restaurant Orders Modal */}
+      <Modal
+        isOpen={showRestaurantOrders}
+        onClose={closeRestaurantOrdersModal}
+        title={`Orders - ${viewingRestaurant?.name || ''}`}
+        icon={
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          </svg>
+        }
+        iconColor="primary"
+        size="lg"
+      >
+        <div className="space-y-4">
+          {/* Back button */}
+          <button
+            type="button"
+            onClick={closeRestaurantOrdersModal}
+            className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Restaurant
+          </button>
+
+          {/* Status Filter */}
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => handleRestaurantOrdersStatusChange('')}
+              className={`px-3 py-1 text-xs rounded-full transition-colors ${
+                restaurantOrdersStatus === ''
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              All
+            </button>
+            {['PENDING', 'CONFIRMED', 'PREPARING', 'READY_FOR_PICKUP', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'].map((status) => (
+              <button
+                key={status}
+                type="button"
+                onClick={() => handleRestaurantOrdersStatusChange(status)}
+                className={`px-3 py-1 text-xs rounded-full transition-colors ${
+                  restaurantOrdersStatus === status
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {status.replace(/_/g, ' ')}
+              </button>
+            ))}
+          </div>
+
+          {/* Orders count */}
+          <div className="text-sm text-gray-500">
+            {restaurantOrdersTotal} order{restaurantOrdersTotal !== 1 ? 's' : ''} found
+          </div>
+
+          {/* Orders List */}
+          {restaurantOrdersError && (
+            <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm mb-4">
+              {restaurantOrdersError}
+            </div>
+          )}
+
+          {restaurantOrdersLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin h-6 w-6 border-2 border-primary-500 border-t-transparent rounded-full" />
+            </div>
+          ) : restaurantOrders.length === 0 && !restaurantOrdersError ? (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <p className="text-gray-500">No orders found</p>
+            </div>
+          ) : restaurantOrders.length > 0 ? (
+            <div className="space-y-3 max-h-[400px] overflow-y-auto">
+              {restaurantOrders.map((order) => (
+                <div key={order.id} className="p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="font-medium text-gray-900">Order #{order.id.slice(-6)}</p>
+                      <p className="text-sm text-gray-500">{order.customerName}</p>
+                      {order.customerPhone && (
+                        <p className="text-xs text-gray-400">{order.customerPhone}</p>
+                      )}
+                    </div>
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${
+                        order.status === 'DELIVERED'
+                          ? 'bg-green-100 text-green-700'
+                          : order.status === 'CANCELLED'
+                          ? 'bg-red-100 text-red-700'
+                          : order.status === 'PENDING'
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-blue-100 text-blue-700'
+                      }`}
+                    >
+                      {order.status.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600 mb-2">
+                    <p>Delivery: {order.deliveryPlace.address}, {order.deliveryPlace.city}</p>
+                    <p className="text-xs text-gray-400">
+                      {new Date(order.createdAt).toLocaleDateString()} at{' '}
+                      {new Date(order.createdAt).toLocaleTimeString()}
+                    </p>
+                  </div>
+                  <div className="border-t border-gray-100 pt-2">
+                    <p className="text-xs text-gray-500 mb-1">Items:</p>
+                    <ul className="text-sm text-gray-600">
+                      {order.orderItems.map((item, idx) => (
+                        <li key={idx} className="flex justify-between">
+                          <span>{item.quantity}x {item.name}</span>
+                          <span>${(parseFloat(item.unitPrice) * item.quantity).toFixed(2)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex justify-between mt-2 pt-2 border-t border-gray-100 font-medium">
+                      <span>Total</span>
+                      <span>${parseFloat(order.totalAmount).toFixed(2)}</span>
+                    </div>
+                  </div>
+                  {order.payment && (
+                    <div className="mt-2 text-xs text-gray-500">
+                      Payment: {order.payment.method} ({order.payment.status})
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {/* Pagination */}
+          {restaurantOrdersTotalPages > 1 && (
+            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+              <Button
+                type="button"
+                variant="secondary"
+                className="!w-auto !py-2 !px-4 text-sm"
+                disabled={restaurantOrdersPage === 1 || restaurantOrdersLoading}
+                onClick={() => {
+                  if (viewingRestaurant) {
+                    loadRestaurantOrders(viewingRestaurant.id, restaurantOrdersPage - 1)
+                  }
+                }}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-gray-500">
+                Page {restaurantOrdersPage} of {restaurantOrdersTotalPages}
+              </span>
+              <Button
+                type="button"
+                variant="secondary"
+                className="!w-auto !py-2 !px-4 text-sm"
+                disabled={restaurantOrdersPage === restaurantOrdersTotalPages || restaurantOrdersLoading}
+                onClick={() => {
+                  if (viewingRestaurant) {
+                    loadRestaurantOrders(viewingRestaurant.id, restaurantOrdersPage + 1)
+                  }
+                }}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </div>
       </Modal>
 
       {/* Menu Items Modal */}

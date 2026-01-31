@@ -43,7 +43,7 @@ export function adminOnly(
   next: NextFunction
 ): void {
   if (!req.user) {
-    throw new UnauthorizedError()
+    throw new UnauthorizedError('Unauthorized', 'Authentication required')
   }
 
   if (req.user.role !== UserRole.ADMIN && req.user.role !== UserRole.SUPER_ADMIN) {
@@ -59,7 +59,7 @@ export function superAdminOnly(
   next: NextFunction
 ): void {
   if (!req.user) {
-    throw new UnauthorizedError()
+    throw new UnauthorizedError('Unauthorized', 'Authentication required')
   }
 
   if (req.user.role !== UserRole.SUPER_ADMIN) {
@@ -75,7 +75,7 @@ export function restaurantOwnerOnly(
   next: NextFunction
 ): void {
   if (!req.user) {
-    throw new UnauthorizedError()
+    throw new UnauthorizedError('Unauthorized', 'Authentication required')
   }
 
   const allowedRoles: UserRole[] = [UserRole.RESTAURANT_OWNER, UserRole.ADMIN, UserRole.SUPER_ADMIN]
@@ -92,7 +92,7 @@ export function driverOnly(
   next: NextFunction
 ): void {
   if (!req.user) {
-    throw new UnauthorizedError()
+    throw new UnauthorizedError('Unauthorized', 'Authentication required')
   }
 
   const allowedRoles: UserRole[] = [UserRole.DELIVERY_DRIVER, UserRole.ADMIN, UserRole.SUPER_ADMIN]
@@ -109,7 +109,7 @@ export function customerOnly(
   next: NextFunction
 ): void {
   if (!req.user) {
-    throw new UnauthorizedError()
+    throw new UnauthorizedError('Unauthorized', 'Authentication required')
   }
 
   const allowedRoles: UserRole[] = [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.SUPER_ADMIN]
@@ -127,7 +127,7 @@ export function ownsResource(checkOwnership: ResourceOwnerCheck) {
     next: NextFunction
   ): Promise<void> => {
     if (!req.user) {
-      throw new UnauthorizedError()
+      throw new UnauthorizedError('Unauthorized', 'Authentication required')
     }
 
     if (req.user.role === UserRole.ADMIN || req.user.role === UserRole.SUPER_ADMIN) {

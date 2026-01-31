@@ -28,7 +28,21 @@ The My Profile page (`/my-profile`) allows authenticated users to manage their a
    - Delete addresses
    - Shows address details with notes
 
-4. **Change Password** (hidden for Google OAuth users)
+4. **Order History**
+   - Expandable section (click to show/hide)
+   - Date range filter (from/to date inputs)
+   - Paginated list of past orders
+   - Order card displays:
+     - Restaurant name
+     - Status badge with color coding
+     - Order date and time
+     - Items summary (first 3 items, then "+X more")
+     - Delivery address
+     - Total amount
+     - Payment method
+   - Previous/Next pagination controls
+
+5. **Change Password** (hidden for Google OAuth users)
    - Current password required
    - New password confirmation
    - Minimum 8 characters
@@ -128,6 +142,40 @@ Modal form for creating or editing menu items:
 - **Image**:
   - Image URL input or upload button (placeholder for future)
 
+### Delivery Drivers Only
+
+**My Deliveries Section**
+
+Delivery drivers can view their assigned deliveries:
+
+- **Expandable Section**: Click button to show/hide deliveries
+- **Status Filter**: Dropdown to filter by order status
+  - All Statuses (default)
+  - Pending, Confirmed, Preparing
+  - Ready for Pickup, Out for Delivery
+  - Delivered, Cancelled
+- **Delivery Cards**: Display assigned orders with:
+  - Customer first name
+  - Restaurant name
+  - Status badge with color coding
+  - Order date and time
+  - Delivery address with location icon
+  - Items count
+  - Total amount
+  - Delivered date (if applicable)
+- **Pagination**: Previous/Next navigation
+
+**Status Color Coding:**
+| Status | Color |
+|--------|-------|
+| PENDING | Yellow |
+| CONFIRMED | Blue |
+| PREPARING | Purple |
+| READY_FOR_PICKUP | Indigo |
+| OUT_FOR_DELIVERY | Cyan |
+| DELIVERED | Green |
+| CANCELLED | Red |
+
 ### Admin Users Only
 
 **Administration Section**
@@ -201,6 +249,19 @@ const [restaurantForm, setRestaurantForm] = useState({
   deliveryFee: '',
   images: [] as string[],  // Gallery images array
 })
+
+// Order history state (for customers)
+const [showOrderHistory, setShowOrderHistory] = useState(false)
+const [orderHistory, setOrderHistory] = useState<OrderHistoryItem[]>([])
+const [orderHistoryLoading, setOrderHistoryLoading] = useState(false)
+const [orderHistoryPage, setOrderHistoryPage] = useState(1)
+const [orderHistoryFromDate, setOrderHistoryFromDate] = useState('')
+const [orderHistoryToDate, setOrderHistoryToDate] = useState('')
+
+// Driver deliveries state
+const [showDriverDeliveries, setShowDriverDeliveries] = useState(false)
+const [driverDeliveries, setDriverDeliveries] = useState<OrderHistoryItem[]>([])
+const [driverDeliveriesStatus, setDriverDeliveriesStatus] = useState('')
 ```
 
 When profile updates succeed, `updateUser()` is called to sync the auth context.
@@ -333,6 +394,15 @@ const paginatedMenuItems = filteredMenuItems.slice(
 const isRestaurantOwner = user?.role === 'RESTAURANT_OWNER'
 const isGoogleUser = !user?.phone && user?.avatarUrl?.includes('google')
 const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN'
+const isDeliveryDriver = user?.role === 'DELIVERY_DRIVER'
+
+// Order history section shown for all users
+<Section title="Order History">...</Section>
+
+// Driver deliveries section only shown for delivery drivers
+{isDeliveryDriver && (
+  <Section title="My Deliveries">...</Section>
+)}
 
 // Restaurant section only shown for restaurant owners
 {isRestaurantOwner && (
@@ -371,6 +441,8 @@ const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN'
 | Create menu item | `/api/profile/my-restaurants/:id/menu-items` | POST |
 | Update menu item | `/api/profile/my-restaurants/:id/menu-items/:itemId` | PATCH |
 | Delete menu item | `/api/profile/my-restaurants/:id/menu-items/:itemId` | DELETE |
+| Get order history | `/api/profile/my-orders` | GET |
+| Get driver orders | `/api/profile/driver-orders` | GET |
 
 ## Styling
 

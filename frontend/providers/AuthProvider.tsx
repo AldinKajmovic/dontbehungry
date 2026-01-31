@@ -25,6 +25,8 @@ interface AuthProviderProps {
 }
 
 const PUBLIC_PATHS = [
+  '/',
+  '/restaurants',
   '/auth/login',
   '/auth/register',
   '/auth/register-restaurant',
@@ -40,7 +42,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter()
   const pathname = usePathname()
 
-  const isPublicPath = PUBLIC_PATHS.some((path) => pathname?.startsWith(path))
+  const isPublicPath = PUBLIC_PATHS.some((path) =>
+    path === '/' ? pathname === '/' : pathname?.startsWith(path)
+  )
 
   const checkAuth = useCallback(async (skipOnPublic = false) => {
     // Skip auth check on public pages to avoid unnecessary 401 errors
@@ -75,7 +79,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = useCallback(async (data: LoginData) => {
     const response = await authService.login(data)
     setUser(response.user)
-    router.push('/')
+    if (response.user.role === 'RESTAURANT_OWNER' || response.user.role === 'ADMIN' || response.user.role === 'SUPER_ADMIN') {
+      router.push('/my-profile')
+    } else {
+      router.push('/restaurants')
+    }
   }, [router])
 
   const register = useCallback(async (data: RegisterUserData) => {

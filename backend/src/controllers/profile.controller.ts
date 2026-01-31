@@ -432,3 +432,218 @@ export async function getCategories(
     next(error)
   }
 }
+
+const VALID_ORDER_STATUSES = [
+  'PENDING',
+  'CONFIRMED',
+  'PREPARING',
+  'READY_FOR_PICKUP',
+  'OUT_FOR_DELIVERY',
+  'DELIVERED',
+  'CANCELLED',
+]
+
+export async function getMyOrderHistory(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    if (!req.user) {
+      throw new BadRequestError('Unauthorized', 'User not authenticated')
+    }
+
+    const { createdAtFrom, createdAtTo, page, limit, status } = req.query
+
+    const filters: profileService.OrderHistoryFilters = {}
+
+    if (status) {
+      const statusStr = status as string
+      if (!VALID_ORDER_STATUSES.includes(statusStr)) {
+        throw new BadRequestError('Invalid status', `status must be one of: ${VALID_ORDER_STATUSES.join(', ')}`)
+      }
+      filters.status = statusStr
+    }
+
+    if (createdAtFrom) {
+      const fromDate = new Date(createdAtFrom as string)
+      if (isNaN(fromDate.getTime())) {
+        throw new BadRequestError('Invalid date', 'createdAtFrom must be a valid date')
+      }
+      filters.createdAtFrom = fromDate
+    }
+
+    if (createdAtTo) {
+      const toDate = new Date(createdAtTo as string)
+      if (isNaN(toDate.getTime())) {
+        throw new BadRequestError('Invalid date', 'createdAtTo must be a valid date')
+      }
+      // Set to end of day
+      toDate.setHours(23, 59, 59, 999)
+      filters.createdAtTo = toDate
+    }
+
+    if (page) {
+      const pageNum = parseInt(page as string, 10)
+      if (isNaN(pageNum) || pageNum < 1) {
+        throw new BadRequestError('Invalid page', 'page must be a positive integer')
+      }
+      filters.page = pageNum
+    }
+
+    if (limit) {
+      const limitNum = parseInt(limit as string, 10)
+      if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
+        throw new BadRequestError('Invalid limit', 'limit must be between 1 and 100')
+      }
+      filters.limit = limitNum
+    }
+
+    const result = await profileService.getMyOrderHistory(req.user.userId, filters)
+
+    res.json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function getDriverOrderHistory(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    if (!req.user) {
+      throw new BadRequestError('Unauthorized', 'User not authenticated')
+    }
+
+    if (req.user.role !== 'DELIVERY_DRIVER') {
+      throw new BadRequestError('Forbidden', 'Only delivery drivers can access this endpoint')
+    }
+
+    const { status, createdAtFrom, createdAtTo, page, limit } = req.query
+
+    const filters: profileService.OrderHistoryFilters = {}
+
+    if (status) {
+      const statusStr = (status as string).toUpperCase()
+      if (!VALID_ORDER_STATUSES.includes(statusStr)) {
+        throw new BadRequestError('Invalid status', `status must be one of: ${VALID_ORDER_STATUSES.join(', ')}`)
+      }
+      filters.status = statusStr
+    }
+
+    if (createdAtFrom) {
+      const fromDate = new Date(createdAtFrom as string)
+      if (isNaN(fromDate.getTime())) {
+        throw new BadRequestError('Invalid date', 'createdAtFrom must be a valid date')
+      }
+      filters.createdAtFrom = fromDate
+    }
+
+    if (createdAtTo) {
+      const toDate = new Date(createdAtTo as string)
+      if (isNaN(toDate.getTime())) {
+        throw new BadRequestError('Invalid date', 'createdAtTo must be a valid date')
+      }
+      // Set to end of day
+      toDate.setHours(23, 59, 59, 999)
+      filters.createdAtTo = toDate
+    }
+
+    if (page) {
+      const pageNum = parseInt(page as string, 10)
+      if (isNaN(pageNum) || pageNum < 1) {
+        throw new BadRequestError('Invalid page', 'page must be a positive integer')
+      }
+      filters.page = pageNum
+    }
+
+    if (limit) {
+      const limitNum = parseInt(limit as string, 10)
+      if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
+        throw new BadRequestError('Invalid limit', 'limit must be between 1 and 100')
+      }
+      filters.limit = limitNum
+    }
+
+    const result = await profileService.getDriverOrderHistory(req.user.userId, filters)
+
+    res.json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function getRestaurantOrders(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    if (!req.user) {
+      throw new BadRequestError('Unauthorized', 'User not authenticated')
+    }
+
+    if (req.user.role !== 'RESTAURANT_OWNER') {
+      throw new BadRequestError('Forbidden', 'Only restaurant owners can access this endpoint')
+    }
+
+    const { restaurantId: rawRestaurantId } = req.params
+    const restaurantId = Array.isArray(rawRestaurantId) ? rawRestaurantId[0] : rawRestaurantId
+
+    if (!restaurantId) {
+      throw new BadRequestError('Invalid ID', 'Restaurant ID is required')
+    }
+    const { status, createdAtFrom, createdAtTo, page, limit } = req.query
+
+    const filters: profileService.OrderHistoryFilters = {}
+
+    if (status) {
+      const statusStr = (status as string).toUpperCase()
+      if (!VALID_ORDER_STATUSES.includes(statusStr)) {
+        throw new BadRequestError('Invalid status', `status must be one of: ${VALID_ORDER_STATUSES.join(', ')}`)
+      }
+      filters.status = statusStr
+    }
+
+    if (createdAtFrom) {
+      const fromDate = new Date(createdAtFrom as string)
+      if (isNaN(fromDate.getTime())) {
+        throw new BadRequestError('Invalid date', 'createdAtFrom must be a valid date')
+      }
+      filters.createdAtFrom = fromDate
+    }
+
+    if (createdAtTo) {
+      const toDate = new Date(createdAtTo as string)
+      if (isNaN(toDate.getTime())) {
+        throw new BadRequestError('Invalid date', 'createdAtTo must be a valid date')
+      }
+      toDate.setHours(23, 59, 59, 999)
+      filters.createdAtTo = toDate
+    }
+
+    if (page) {
+      const pageNum = parseInt(page as string, 10)
+      if (isNaN(pageNum) || pageNum < 1) {
+        throw new BadRequestError('Invalid page', 'page must be a positive integer')
+      }
+      filters.page = pageNum
+    }
+
+    if (limit) {
+      const limitNum = parseInt(limit as string, 10)
+      if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
+        throw new BadRequestError('Invalid limit', 'limit must be between 1 and 100')
+      }
+      filters.limit = limitNum
+    }
+
+    const result = await profileService.getRestaurantOrders(req.user.userId, restaurantId, filters)
+
+    res.json(result)
+  } catch (error) {
+    next(error)
+  }
+}

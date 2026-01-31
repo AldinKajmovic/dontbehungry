@@ -11,6 +11,9 @@ This guide documents the reusable UI components in `/components/ui/` designed to
 | StatusMessage | Success/error/loading states | forgot-password, verify-email |
 | FeatureCard | Feature display cards | home page |
 | Divider | Text-centered divider lines | login, register |
+| RestaurantCard | Restaurant listing card | restaurants page |
+| CategoryIcon | Category filter button | restaurants page |
+| MealModal | Meal details modal | restaurants page |
 
 ---
 

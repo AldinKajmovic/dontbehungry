@@ -42,6 +42,8 @@ export default function RegisterRestaurantPage() {
       city: '',
       country: '',
       postalCode: '',
+      minOrderAmount: '',
+      deliveryFee: '',
     },
     phoneFields: [
       { field: 'phone', countryState: () => selectedCountry },
@@ -87,6 +89,8 @@ export default function RegisterRestaurantPage() {
         city: formData.city,
         country: formData.country,
         postalCode: formData.postalCode || undefined,
+        minOrderAmount: formData.minOrderAmount ? parseFloat(formData.minOrderAmount) : undefined,
+        deliveryFee: formData.deliveryFee ? parseFloat(formData.deliveryFee) : undefined,
       })
       // Redirect is handled by AuthProvider
     } catch (err) {
@@ -277,6 +281,39 @@ export default function RegisterRestaurantPage() {
               error={getFieldError('restaurantEmail')}
               placeholder="contact@restaurant.com"
             />
+
+            <p className="text-sm text-gray-600 font-medium mt-6 mb-4">Delivery Settings</p>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                label="Min order amount"
+                hint="(optional)"
+                type="number"
+                step="0.01"
+                min="0"
+                id="minOrderAmount"
+                name="minOrderAmount"
+                value={formData.minOrderAmount}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={getFieldError('minOrderAmount')}
+                placeholder="0.00"
+              />
+              <Input
+                label="Delivery fee"
+                hint="(optional)"
+                type="number"
+                step="0.01"
+                min="0"
+                id="deliveryFee"
+                name="deliveryFee"
+                value={formData.deliveryFee}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={getFieldError('deliveryFee')}
+                placeholder="0.00"
+              />
+            </div>
 
             <p className="text-sm text-gray-600 font-medium mt-6 mb-4">Restaurant Address</p>
 

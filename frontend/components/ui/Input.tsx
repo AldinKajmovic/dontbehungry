@@ -7,10 +7,11 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   hint?: string;
   showPasswordToggle?: boolean;
+  prefix?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, hint, showPasswordToggle, className = '', type, ...props }, ref) => {
+  ({ label, error, hint, showPasswordToggle, prefix, className = '', type, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
     const isPassword = type === 'password';
     const inputType = isPassword && showPassword ? 'text' : type;
@@ -24,10 +25,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           </label>
         )}
         <div className="relative">
+          {prefix && (
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">{prefix}</span>
+          )}
           <input
             ref={ref}
             type={inputType}
-            className={`input-field ${isPassword && showPasswordToggle ? 'pr-12' : ''} ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : ''} ${className}`}
+            className={`input-field ${prefix ? 'pl-8' : ''} ${isPassword && showPasswordToggle ? 'pr-12' : ''} ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : ''} ${className}`}
             {...props}
           />
           {isPassword && showPasswordToggle && (

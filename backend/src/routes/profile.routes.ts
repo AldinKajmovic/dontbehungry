@@ -19,4 +19,19 @@ router.patch('/avatar', profileController.updateAvatar)
 // Delete account
 router.delete('/', profileController.deleteAccount)
 
+// Restaurant owner endpoints
+router.get('/my-restaurants', profileController.getMyRestaurants)
+router.post('/my-restaurants', profileController.createMyRestaurant)
+router.patch('/my-restaurants/:id', profileController.updateMyRestaurant)
+router.delete('/my-restaurants/:id', profileController.deleteMyRestaurant)
+
+// Menu items for restaurant owners
+router.get('/my-restaurants/:restaurantId/menu-items', profileController.getMyMenuItems)
+router.post('/my-restaurants/:restaurantId/menu-items', profileController.createMyMenuItem)
+router.patch('/my-restaurants/:restaurantId/menu-items/:itemId', profileController.updateMyMenuItem)
+router.delete('/my-restaurants/:restaurantId/menu-items/:itemId', profileController.deleteMyMenuItem)
+
+// Categories for dropdown
+router.get('/categories', profileController.getCategories)
+
 export default router

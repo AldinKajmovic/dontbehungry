@@ -5,6 +5,7 @@ import { ReactNode } from 'react';
 interface AlertProps {
   type: 'error' | 'success' | 'warning' | 'info';
   children: ReactNode;
+  className?: string;
 }
 
 const styles = {
@@ -37,9 +38,9 @@ const icons = {
   ),
 };
 
-export function Alert({ type, children }: AlertProps) {
+export function Alert({ type, children, className = '' }: AlertProps) {
   return (
-    <div className={`p-4 rounded-xl border animate-slide-in-right ${styles[type]}`}>
+    <div className={`p-4 rounded-xl border animate-slide-in-right ${styles[type]} ${className}`}>
       <p className="text-sm flex items-center gap-2">
         {icons[type]}
         {children}

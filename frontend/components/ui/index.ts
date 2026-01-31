@@ -12,3 +12,5 @@ export { StatusMessage } from './StatusMessage';
 export type { StatusAction } from './StatusMessage';
 export { FeatureCard } from './FeatureCard';
 export { Divider } from './Divider';
+export { Select } from './Select';
+export { SearchableSelect } from './SearchableSelect';

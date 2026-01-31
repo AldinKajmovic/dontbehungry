@@ -73,3 +73,15 @@ export const userSelectFields = {
   phoneVerified: true,
   avatarUrl: true,
 } as const;
+
+export interface Pagination {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
+export interface PaginatedResponse<T> {
+  items: T[]
+  pagination: Pagination
+}

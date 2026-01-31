@@ -226,6 +226,7 @@ model Order {
   notes             String?
   estimatedDelivery DateTime?
   deliveredAt       DateTime?
+  createdAt         DateTime    @default(now())
 
   // Relations
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)

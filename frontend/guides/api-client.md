@@ -1,16 +1,66 @@
-# API Client (Axios)
+# API Client & Services
 
 ## Overview
 
-The frontend uses Axios for HTTP requests to the backend API. The client is configured with interceptors for authentication, automatic token refresh, and error handling.
+The frontend uses Axios for HTTP requests to the backend API. Services are organized in a modular structure with reusable patterns for CRUD operations.
 
-## Location
+## Service Structure
 
-`services/api.ts`
+```
+services/
+├── base/                    # Reusable utilities
+│   ├── types.ts            # Common types (PaginatedResponse, SelectOption, etc.)
+│   ├── crud.ts             # Generic CRUD helpers
+│   └── index.ts
+│
+├── admin/                   # Admin service
+│   ├── types.ts            # Admin-specific types
+│   ├── service.ts          # Admin API methods
+│   └── index.ts
+│
+├── auth/                    # Auth service
+│   ├── types.ts            # Auth types
+│   ├── service.ts          # Auth methods
+│   └── index.ts
+│
+├── address/                 # Address service
+│   ├── types.ts            # Address types
+│   ├── service.ts          # Address methods
+│   └── index.ts
+│
+├── profile/                 # Profile service
+│   ├── types.ts            # Profile types
+│   ├── service.ts          # Profile methods
+│   └── index.ts
+│
+├── validation/              # Validation utilities
+│   ├── schemas.ts          # Zod schemas
+│   ├── helpers.ts          # Validation helper functions
+│   └── index.ts
+│
+├── api.ts                   # Axios instance
+└── index.ts                 # Main re-export
+```
 
 ## Usage
 
-### Basic Usage
+### Import Services
+
+```typescript
+// Import from specific service
+import { authService } from '@/services/auth'
+import { profileService } from '@/services/profile'
+import { adminService } from '@/services/admin'
+
+// Import types
+import type { User, AuthResponse } from '@/services/auth'
+import type { AdminUser, PaginatedResponse } from '@/services/admin'
+
+// Import everything (not recommended for tree-shaking)
+import { authService, profileService, adminService } from '@/services'
+```
+
+### Basic API Usage
 
 ```typescript
 import api from '@/services/api'
@@ -45,6 +95,138 @@ const response = await api.get<Restaurant[]>('/api/restaurants')
 const restaurants: Restaurant[] = response.data
 ```
 
+## Base Utilities
+
+### Common Types
+
+```typescript
+import { PaginatedResponse, SelectOption, MessageResponse } from '@/services/base'
+
+interface PaginatedResponse<T> {
+  items: T[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
+
+interface SelectOption {
+  value: string
+  label: string
+}
+
+interface MessageResponse {
+  message: string
+}
+```
+
+### CRUD Helpers
+
+The base module provides reusable CRUD functions:
+
+```typescript
+import { createCrudService, createSelectLoader } from '@/services/base'
+
+// Create a reusable CRUD service
+const productsCrud = createCrudService<Product>('/api/products')
+
+// Use it
+const products = await productsCrud.getList({ page: 1, limit: 10, search: 'pizza' })
+const product = await productsCrud.getById('123')
+const newProduct = await productsCrud.create({ name: 'Pizza', price: 12.99 })
+await productsCrud.update('123', { price: 14.99 })
+await productsCrud.delete('123')
+
+// Create a select loader for SearchableSelect component
+const loadProducts = createSelectLoader(
+  productsCrud.getList,
+  (p) => p.id,
+  (p) => p.name
+)
+const options = await loadProducts('search term')
+```
+
+## Available Services
+
+| Service | Import | Purpose |
+|---------|--------|---------|
+| `authService` | `@/services/auth` | Authentication (login, register, logout, verify) |
+| `profileService` | `@/services/profile` | Profile management (update, password, avatar, restaurants) |
+| `addressService` | `@/services/address` | Address CRUD operations |
+| `adminService` | `@/services/admin` | Admin panel operations |
+
+## Service Examples
+
+### Auth Service
+
+```typescript
+import { authService } from '@/services/auth'
+
+// Login
+const { user } = await authService.login({ email, password })
+
+// Register
+const { user } = await authService.register({
+  firstName: 'John',
+  lastName: 'Doe',
+  email: 'john@example.com',
+  password: 'securepass123'
+})
+
+// Get current user
+const { user } = await authService.getCurrentUser()
+
+// Logout
+await authService.logout()
+
+// Password reset
+await authService.forgotPassword(email)
+await authService.resetPassword(token, newPassword)
+```
+
+### Profile Service
+
+```typescript
+import { profileService } from '@/services/profile'
+
+// Update profile
+const response = await profileService.updateProfile({
+  firstName: 'Jane',
+  email: 'newemail@example.com'
+})
+
+// Change password
+await profileService.changePassword({
+  currentPassword: 'oldpass',
+  newPassword: 'newpass123'
+})
+
+// Restaurant owner operations
+const { restaurants } = await profileService.getMyRestaurants()
+await profileService.createMyRestaurant({ name: 'My Restaurant', ... })
+await profileService.updateMyRestaurant(id, { name: 'Updated Name' })
+await profileService.deleteMyRestaurant(id)
+```
+
+### Admin Service
+
+```typescript
+import { adminService } from '@/services/admin'
+
+// CRUD operations (same pattern for all entities)
+const users = await adminService.getUsers(page, limit, search)
+const user = await adminService.getUserById(id)
+await adminService.createUser(data)
+await adminService.updateUser(id, data)
+await adminService.deleteUser(id)
+
+// Select helpers for dropdowns
+const userOptions = await adminService.getUsersForSelect(search)
+const restaurantOptions = await adminService.getRestaurantsForSelect(search)
+```
+
 ## Features
 
 ### Automatic Cookie Credentials
@@ -54,7 +236,6 @@ The client automatically sends HttpOnly cookies with all requests:
 ```typescript
 // Credentials are sent automatically - no manual token handling
 await api.get('/api/auth/me')
-// Cookies sent automatically with request
 ```
 
 ### Automatic Token Refresh
@@ -65,15 +246,6 @@ The response interceptor handles 401 errors by:
 3. Queuing concurrent requests while refresh is in progress
 4. Dispatching `auth:logout` event if refresh fails
 
-```typescript
-// If your access token expires during a request:
-// 1. API returns 401
-// 2. Interceptor calls /api/auth/refresh
-// 3. New tokens are set in cookies
-// 4. Original request is retried automatically
-await api.get('/api/orders')
-```
-
 ### Error Handling
 
 The response interceptor extracts user-friendly error messages:
@@ -83,7 +255,6 @@ try {
   await api.post('/api/orders', data)
 } catch (error) {
   // error.message contains the user-friendly API error message
-  // e.g., "Email already exists" instead of "Request failed with status 409"
   console.error(error.message)
 }
 ```
@@ -93,7 +264,6 @@ try {
 When token refresh fails (session expired), the client dispatches a custom event:
 
 ```typescript
-// AuthProvider listens for this event
 window.addEventListener('auth:logout', () => {
   // Clear user state and redirect to login
 })
@@ -109,60 +279,23 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 
 Default: `http://localhost:3001`
 
-## Integration with Services
-
-Services use the api client for all HTTP requests:
+## Validation Utilities
 
 ```typescript
-// services/auth.ts
-import api from './api'
+import { loginSchema, registerSchema, validateFieldValue } from '@/services/validation'
 
-class AuthService {
-  async login(data: LoginData): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/api/auth/login', data)
-    return response.data
-  }
+// Zod schema validation
+const result = loginSchema.safeParse({ email, password })
+if (!result.success) {
+  // Handle validation errors
 }
 
-// services/profile.ts
-import api from './api'
-
-export const profileService = {
-  async updateProfile(data: UpdateProfileData) {
-    const response = await api.patch('/api/profile', data)
-    return response.data
-  }
-}
-
-// services/address.ts
-import api from './api'
-
-export const addressService = {
-  async getAddresses() {
-    const response = await api.get('/api/addresses')
-    return response.data
-  }
+// Field validation helper
+const error = validateFieldValue('email', value)
+if (error) {
+  setFieldError(error)
 }
 ```
-
-## Available Services
-
-| Service | File | Purpose |
-|---------|------|---------|
-| `authService` | `services/auth.ts` | Authentication (login, register, logout) |
-| `profileService` | `services/profile.ts` | Profile management (update, password, avatar) |
-| `addressService` | `services/address.ts` | Address CRUD operations |
-
-## Why Axios?
-
-For a food delivery app, Axios provides:
-
-- **Request interceptors** - Configure credentials for all requests
-- **Response interceptors** - Automatic token refresh & centralized error handling
-- **Automatic JSON** - No manual `JSON.stringify()` or `.json()` calls
-- **Timeout support** - Important for payment and order endpoints
-- **Better error objects** - Access to response status, headers, and data
-- **Request queuing** - Queue requests during token refresh
 
 ## Security Notes
 

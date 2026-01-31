@@ -187,7 +187,19 @@ await authService.login({ email, password })
 await authService.register({ firstName, lastName, email, password, phone? })
 
 // Register restaurant
-await authService.registerRestaurant({ ...userData, ...restaurantData })
+await authService.registerRestaurant({
+  ...userData,
+  restaurantName: 'My Restaurant',
+  restaurantDescription: 'Optional description',
+  restaurantPhone: '+1234567890',
+  restaurantEmail: 'contact@restaurant.com',
+  address: '123 Main St',
+  city: 'New York',
+  country: 'USA',
+  postalCode: '10001',
+  minOrderAmount: 15.00, // optional
+  deliveryFee: 2.50,     // optional
+})
 
 // Logout
 await authService.logout()
@@ -334,6 +346,52 @@ export function NavBar() {
   )
 }
 ```
+
+## Profile Service (`services/profile.ts`)
+
+Manage user profile and restaurant settings:
+
+```typescript
+import { profileService } from '@/services/profile'
+
+// Update user profile
+await profileService.updateProfile({
+  firstName: 'John',
+  lastName: 'Doe',
+  phone: '+1234567890',
+  email: 'john@example.com',
+})
+
+// Change password
+await profileService.changePassword({
+  currentPassword: 'old-password',
+  newPassword: 'new-password',
+})
+
+// Delete account
+await profileService.deleteAccount()
+
+// Get restaurant (for restaurant owners)
+const { restaurant } = await profileService.getMyRestaurant()
+
+// Update restaurant settings (for restaurant owners)
+await profileService.updateMyRestaurant({
+  name: 'Updated Restaurant Name',
+  description: 'New description',
+  phone: '+1234567890',
+  email: 'contact@restaurant.com',
+  minOrderAmount: 20.00,
+  deliveryFee: 3.00,
+})
+```
+
+### Restaurant Settings in My Profile
+
+Restaurant owners see an additional "Restaurant Settings" section in the my-profile page where they can:
+- Update restaurant name and description
+- Update restaurant contact information
+- Set minimum order amount
+- Set delivery fee
 
 ## Environment Variables
 

@@ -36,4 +36,7 @@ export const config = {
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     callbackUrl: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3001/api/oauth/google/callback',
   },
+  admin: {
+    whitelistedIPs: process.env.ADMIN_WHITELISTED_IPS?.split(',').map(ip => ip.trim()).filter(Boolean) || [],
+  },
 } as const

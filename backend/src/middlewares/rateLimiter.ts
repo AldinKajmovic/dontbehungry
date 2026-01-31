@@ -15,7 +15,7 @@ export const authLimiter = rateLimit({
 
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, 
-  max: 50, 
+  max: 100, 
   message: {
     error: 'Too many requests',
     details: 'You have exceeded the rate limit. Please try again later.',
@@ -38,11 +38,22 @@ export const sensitiveOpLimiter = rateLimit({
 
 
 export const resendVerificationLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, 
-  max: 2, 
+  windowMs: 5 * 60 * 1000,
+  max: 2,
   message: {
     error: 'Too many requests',
     details: 'Please wait before requesting another verification email.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+export const adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: {
+    error: 'Too many requests',
+    details: 'You have exceeded the admin rate limit. Please try again later.',
   },
   standardHeaders: true,
   legacyHeaders: false,

@@ -51,10 +51,10 @@ export default function Home() {
             <>
               <span className="text-gray-700">Hi, {user?.firstName}</span>
               <Link
-                href="/my-profile"
+                href="/restaurants"
                 className="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-xl transition-all hover:scale-105 active:scale-95"
               >
-                My Profile
+                Browse Restaurants
               </Link>
             </>
           ) : (

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Input, Button, Alert, EmailVerificationBanner, Section, Modal } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
+import { NotificationBell } from '@/components/notifications'
 import { profileService, UpdateProfileData, ChangePasswordData, MyRestaurant, MyMenuItem, Category, OrderHistoryItem, RestaurantOrderItem } from '@/services/profile'
 import { addressService, Address } from '@/services/address'
 
@@ -314,6 +315,25 @@ export default function MyProfilePage() {
   const handleRestaurantOrdersStatusChange = (status: string) => {
     setRestaurantOrdersStatus(status)
     setRestaurantOrdersPage(1)
+  }
+
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
+    if (!viewingRestaurant) return
+
+    try {
+      await profileService.updateRestaurantOrderStatus(viewingRestaurant.id, orderId, {
+        status: newStatus,
+      })
+
+      // Update the order in the local state
+      setRestaurantOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId ? { ...order, status: newStatus } : order
+        )
+      )
+    } catch (err) {
+      setRestaurantOrdersError(err instanceof Error ? err.message : 'Failed to update order status')
+    }
   }
 
   // Load restaurant orders when status changes
@@ -885,17 +905,21 @@ export default function MyProfilePage() {
         <div className="max-w-4xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link
-                href="/"
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-              </Link>
+              {/* Only show back button for customers */}
+              {user.role === 'CUSTOMER' && (
+                <Link
+                  href="/restaurants"
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                </Link>
+              )}
               <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
             </div>
             <div className="flex items-center gap-3">
+              <NotificationBell />
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
                 {user.role.replace('_', ' ')}
               </span>
@@ -1033,10 +1057,11 @@ export default function MyProfilePage() {
           </form>
         </Section>
 
-        {/* Addresses Section */}
-        <Section
-          title="My Addresses"
-          description="Manage your delivery addresses"
+        {/* Addresses Section - Hidden for delivery drivers (they use separate customer accounts to order) */}
+        {!isDeliveryDriver && (
+          <Section
+            title="My Addresses"
+            description="Manage your delivery addresses"
           headerAction={
             <Button
               type="button"
@@ -1142,9 +1167,10 @@ export default function MyProfilePage() {
             </div>
           )}
         </Section>
+        )}
 
-        {/* Order History Section - Link to dedicated page (not for admins or restaurant owners) */}
-        {!isAdmin && !isRestaurantOwner && (
+        {/* Order History Section - Link to dedicated page (not for admins, restaurant owners, or delivery drivers) */}
+        {!isAdmin && !isRestaurantOwner && !isDeliveryDriver && (
           <Section
             title="Order History"
             description="View and track your past orders"
@@ -1214,7 +1240,7 @@ export default function MyProfilePage() {
                     id="driverDeliveriesStatus"
                     value={driverDeliveriesStatus}
                     onChange={(e) => handleDriverDeliveriesStatusChange(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent min-w-[180px]"
                   >
                     <option value="">All Statuses</option>
                     <option value="PENDING">Pending</option>
@@ -2082,32 +2108,25 @@ export default function MyProfilePage() {
           </button>
 
           {/* Status Filter */}
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => handleRestaurantOrdersStatusChange('')}
-              className={`px-3 py-1 text-xs rounded-full transition-colors ${
-                restaurantOrdersStatus === ''
-                  ? 'bg-primary-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+          <div className="flex flex-wrap gap-3 items-center">
+            <label htmlFor="restaurantOrdersStatusFilter" className="text-sm font-medium text-gray-700">
+              Filter by status:
+            </label>
+            <select
+              id="restaurantOrdersStatusFilter"
+              value={restaurantOrdersStatus}
+              onChange={(e) => handleRestaurantOrdersStatusChange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent min-w-[180px]"
             >
-              All
-            </button>
-            {['PENDING', 'CONFIRMED', 'PREPARING', 'READY_FOR_PICKUP', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'].map((status) => (
-              <button
-                key={status}
-                type="button"
-                onClick={() => handleRestaurantOrdersStatusChange(status)}
-                className={`px-3 py-1 text-xs rounded-full transition-colors ${
-                  restaurantOrdersStatus === status
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {status.replace(/_/g, ' ')}
-              </button>
-            ))}
+              <option value="">All Statuses</option>
+              <option value="PENDING">Pending</option>
+              <option value="CONFIRMED">Confirmed</option>
+              <option value="PREPARING">Preparing</option>
+              <option value="READY_FOR_PICKUP">Ready for Pickup</option>
+              <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+              <option value="DELIVERED">Delivered</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
           </div>
 
           {/* Orders count */}
@@ -2147,19 +2166,28 @@ export default function MyProfilePage() {
                         <p className="text-xs text-gray-400">{order.customerPhone}</p>
                       )}
                     </div>
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
+                    <select
+                      value={order.status}
+                      onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                      className={`px-2 py-1 text-xs rounded-lg border cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                         order.status === 'DELIVERED'
-                          ? 'bg-green-100 text-green-700'
+                          ? 'bg-green-100 text-green-700 border-green-200'
                           : order.status === 'CANCELLED'
-                          ? 'bg-red-100 text-red-700'
+                          ? 'bg-red-100 text-red-700 border-red-200'
                           : order.status === 'PENDING'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : 'bg-blue-100 text-blue-700'
+                          ? 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                          : 'bg-blue-100 text-blue-700 border-blue-200'
                       }`}
+                      disabled={order.status === 'DELIVERED' || order.status === 'CANCELLED'}
                     >
-                      {order.status.replace(/_/g, ' ')}
-                    </span>
+                      <option value="PENDING">PENDING</option>
+                      <option value="CONFIRMED">CONFIRMED</option>
+                      <option value="PREPARING">PREPARING</option>
+                      <option value="READY_FOR_PICKUP">READY FOR PICKUP</option>
+                      <option value="OUT_FOR_DELIVERY">OUT FOR DELIVERY</option>
+                      <option value="DELIVERED">DELIVERED</option>
+                      <option value="CANCELLED">CANCELLED</option>
+                    </select>
                   </div>
                   <div className="text-sm text-gray-600 mb-2">
                     <p>Delivery: {order.deliveryPlace.address}, {order.deliveryPlace.city}</p>

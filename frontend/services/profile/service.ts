@@ -17,6 +17,10 @@ import {
   OrderHistoryFilters,
   OrderHistoryResponse,
   RestaurantOrdersResponse,
+  CreateOrderData,
+  CreateOrderResponse,
+  UpdateOrderStatusData,
+  UpdateOrderStatusResponse,
 } from './types'
 
 const BASE_PATH = '/api/profile'
@@ -162,6 +166,23 @@ class ProfileService {
     const queryString = params.toString()
     const url = `${BASE_PATH}/my-restaurants/${restaurantId}/orders${queryString ? `?${queryString}` : ''}`
     const response = await api.get<RestaurantOrdersResponse>(url)
+    return response.data
+  }
+
+  async createOrder(data: CreateOrderData): Promise<CreateOrderResponse> {
+    const response = await api.post<CreateOrderResponse>(`${BASE_PATH}/orders`, data)
+    return response.data
+  }
+
+  async updateRestaurantOrderStatus(
+    restaurantId: string,
+    orderId: string,
+    data: UpdateOrderStatusData
+  ): Promise<UpdateOrderStatusResponse> {
+    const response = await api.patch<UpdateOrderStatusResponse>(
+      `${BASE_PATH}/my-restaurants/${restaurantId}/orders/${orderId}`,
+      data
+    )
     return response.data
   }
 }

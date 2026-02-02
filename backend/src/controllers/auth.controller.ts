@@ -231,6 +231,29 @@ export async function resetPassword(
   }
 }
 
+export async function getSocketToken(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    if (!req.user) {
+      throw new BadRequestError('Unauthorized', 'User not authenticated')
+    }
+
+    // Don't issue socket tokens for admin users, too many notifications, spam
+    if (req.user.role === 'ADMIN' || req.user.role === 'SUPER_ADMIN') {
+      throw new BadRequestError('Not allowed', 'Admin users cannot connect to socket')
+    }
+
+    const token = await authService.generateSocketToken(req.user)
+
+    res.json({ token })
+  } catch (error) {
+    next(error)
+  }
+}
+
 interface GoogleAuthBody {
   email: string
   firstName: string

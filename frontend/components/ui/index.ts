@@ -5,6 +5,7 @@ export { Alert } from './Alert';
 export { PasswordStrength } from './PasswordStrength';
 export { AuthLayout } from './AuthLayout';
 export { EmailVerificationBanner } from './EmailVerificationBanner';
+export { GuestBanner } from './GuestBanner';
 export { Section } from './Section';
 export { Modal } from './Modal';
 export type { ModalAction } from './Modal';

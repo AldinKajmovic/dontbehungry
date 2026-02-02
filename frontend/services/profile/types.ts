@@ -156,3 +156,47 @@ export interface RestaurantOrdersResponse {
     totalPages: number
   }
 }
+
+// Order Status Update Types
+export interface UpdateOrderStatusData {
+  status: string
+  notes?: string
+}
+
+export interface UpdateOrderStatusResponse {
+  message: string
+  order: {
+    id: string
+    status: string
+  }
+}
+
+// Order Creation Types
+
+export interface CreateOrderData {
+  restaurantId: string
+  deliveryAddressId: string
+  paymentMethod: 'CASH' | 'CREDIT_CARD' | 'DIGITAL_WALLET'
+  notes?: string
+  items: Array<{
+    menuItemId: string
+    quantity: number
+    notes?: string
+  }>
+}
+
+export interface CreatedOrder {
+  id: string
+  status: string
+  totalAmount: string
+  createdAt: string
+  restaurant: { id: string; name: string }
+  deliveryPlace: { address: string; city: string }
+  orderItems: Array<{ name: string; quantity: number; unitPrice: string }>
+  payment: { status: string; method: string }
+}
+
+export interface CreateOrderResponse {
+  message: string
+  order: CreatedOrder
+}

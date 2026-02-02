@@ -46,17 +46,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     path === '/' ? pathname === '/' : pathname?.startsWith(path)
   )
 
-  const checkAuth = useCallback(async (skipOnPublic = false) => {
-    // Skip auth check on public pages to avoid unnecessary 401 errors
-    if (skipOnPublic) {
-      setIsLoading(false)
-      return
-    }
+  const checkAuth = useCallback(async () => {
 
     try {
       const { user } = await authService.getCurrentUser()
       setUser(user)
     } catch {
+      // User is not logged in - this is expected
       setUser(null)
     } finally {
       setIsLoading(false)
@@ -79,10 +75,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = useCallback(async (data: LoginData) => {
     const response = await authService.login(data)
     setUser(response.user)
-    if (response.user.role === 'RESTAURANT_OWNER' || response.user.role === 'ADMIN' || response.user.role === 'SUPER_ADMIN') {
-      router.push('/my-profile')
-    } else {
+    if (response.user.role === 'CUSTOMER') {
       router.push('/restaurants')
+    } else {
+      router.push('/my-profile')
     }
   }, [router])
 
@@ -124,23 +120,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await authService.resendVerification()
   }, [])
 
-  // Check auth on mount (skip on public pages to avoid 401 errors)
   useEffect(() => {
-    checkAuth(isPublicPath)
-  }, [checkAuth, isPublicPath])
+    checkAuth()
+  }, [checkAuth])
 
   // Listen for auth:logout event from api interceptor
   useEffect(() => {
     const handleLogout = () => {
-      setUser(null)
-      if (!isPublicPath) {
-        router.push('/auth/login')
-      }
+      setUser((currentUser) => {
+        if (currentUser) {
+
+          const currentPath = window.location.pathname
+          const isCurrentPathPublic = PUBLIC_PATHS.some((path) =>
+            path === '/' ? currentPath === '/' : currentPath.startsWith(path)
+          )
+          if (!isCurrentPathPublic) {
+            router.push('/auth/login')
+          }
+        }
+        return null
+      })
     }
 
     window.addEventListener('auth:logout', handleLogout)
     return () => window.removeEventListener('auth:logout', handleLogout)
-  }, [router, isPublicPath])
+  }, [router])
 
   const value: AuthContextType = {
     user,

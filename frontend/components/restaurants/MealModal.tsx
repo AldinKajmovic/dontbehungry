@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { PublicRestaurant, MenuCategory, publicService } from '@/services/public'
+import { PublicRestaurant, MenuCategory, MenuItem, publicService } from '@/services/public'
+import { useCart } from '@/hooks/useCart'
+import { useAuth } from '@/hooks/useAuth'
 
 interface MealModalProps {
   restaurant: PublicRestaurant | null
@@ -10,20 +12,40 @@ interface MealModalProps {
   showAddButton?: boolean
 }
 
+interface ItemQuantities {
+  [menuItemId: string]: number
+}
+
 export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }: MealModalProps) {
+  const { isAuthenticated } = useAuth()
+  const { addItem, isDifferentRestaurant, clearCart, openCart } = useCart()
+
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [itemQuantities, setItemQuantities] = useState<ItemQuantities>({})
+  const [showDifferentRestaurantModal, setShowDifferentRestaurantModal] = useState(false)
+  const [pendingItem, setPendingItem] = useState<MenuItem | null>(null)
+  const [addedItems, setAddedItems] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (isOpen && restaurant) {
       loadMenuItems()
+      setItemQuantities({})
+      setAddedItems(new Set())
     }
   }, [isOpen, restaurant])
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        if (showDifferentRestaurantModal) {
+          setShowDifferentRestaurantModal(false)
+          setPendingItem(null)
+        } else {
+          onClose()
+        }
+      }
     }
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
@@ -33,7 +55,7 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
       document.removeEventListener('keydown', handleEscape)
       document.body.style.overflow = ''
     }
-  }, [isOpen, onClose])
+  }, [isOpen, onClose, showDifferentRestaurantModal])
 
   const loadMenuItems = async () => {
     if (!restaurant) return
@@ -54,6 +76,87 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
   const formatPrice = (price: string | number): string => {
     const num = typeof price === 'string' ? parseFloat(price) : price
     return num.toFixed(2)
+  }
+
+  const getQuantity = (menuItemId: string): number => {
+    return itemQuantities[menuItemId] || 1
+  }
+
+  const setQuantity = (menuItemId: string, quantity: number) => {
+    if (quantity < 1) return
+    setItemQuantities((prev) => ({ ...prev, [menuItemId]: quantity }))
+  }
+
+  const handleAddToCart = (item: MenuItem) => {
+    if (!restaurant) return
+
+    // Check if adding from a different restaurant
+    if (isDifferentRestaurant(restaurant.id)) {
+      setPendingItem(item)
+      setShowDifferentRestaurantModal(true)
+      return
+    }
+
+    const quantity = getQuantity(item.id)
+    const success = addItem(item, restaurant, quantity)
+
+    if (success) {
+      // Show added feedback
+      setAddedItems((prev) => new Set(prev).add(item.id))
+      setTimeout(() => {
+        setAddedItems((prev) => {
+          const newSet = new Set(prev)
+          newSet.delete(item.id)
+          return newSet
+        })
+      }, 1500)
+
+      // Reset quantity for this item
+      setItemQuantities((prev) => {
+        const newQuantities = { ...prev }
+        delete newQuantities[item.id]
+        return newQuantities
+      })
+    }
+  }
+
+  const handleConfirmNewRestaurant = () => {
+    if (!pendingItem || !restaurant) return
+
+    // Clear cart and add new item
+    clearCart()
+    const quantity = getQuantity(pendingItem.id)
+    addItem(pendingItem, restaurant, quantity)
+
+    // Show added feedback
+    setAddedItems((prev) => new Set(prev).add(pendingItem.id))
+    setTimeout(() => {
+      setAddedItems((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(pendingItem.id)
+        return newSet
+      })
+    }, 1500)
+
+    // Reset quantity for this item
+    setItemQuantities((prev) => {
+      const newQuantities = { ...prev }
+      delete newQuantities[pendingItem.id]
+      return newQuantities
+    })
+
+    setShowDifferentRestaurantModal(false)
+    setPendingItem(null)
+  }
+
+  const handleCancelNewRestaurant = () => {
+    setShowDifferentRestaurantModal(false)
+    setPendingItem(null)
+  }
+
+  const handleViewCart = () => {
+    onClose()
+    openCart()
   }
 
   if (!isOpen || !restaurant) return null
@@ -99,6 +202,19 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
+
+            {/* View Cart Button */}
+            {isAuthenticated && (
+              <button
+                onClick={handleViewCart}
+                className="absolute top-4 right-16 px-4 py-2 rounded-full bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium flex items-center gap-2 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                View Cart
+              </button>
+            )}
 
             {/* Restaurant Info */}
             <div className="absolute bottom-4 left-4 right-4 flex items-end gap-4">
@@ -185,7 +301,7 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
                   .map((item) => (
                     <div
                       key={item.id}
-                      className="flex gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 cursor-pointer group"
+                      className="flex gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 group"
                     >
                       {/* Image */}
                       <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-200">
@@ -217,7 +333,7 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
                         )}
                         <div className="flex items-center justify-between">
                           <span className="font-bold text-primary-600 text-sm">
-                            {formatPrice(item.price)} KM
+                            ${formatPrice(item.price)}
                           </span>
                           {item.preparationTime && (
                             <span className="text-xs text-gray-400">
@@ -229,11 +345,49 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
 
                       {/* Add Button - Only show for authenticated users */}
                       {showAddButton && (
-                        <button className="self-center w-8 h-8 rounded-full bg-primary-500 hover:bg-primary-600 text-white flex items-center justify-center flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                          </svg>
-                        </button>
+                        <div className="self-center flex flex-col items-center gap-1 flex-shrink-0">
+                          {/* Quantity Selector */}
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => setQuantity(item.id, getQuantity(item.id) - 1)}
+                              className="w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-sm"
+                              disabled={getQuantity(item.id) <= 1}
+                            >
+                              -
+                            </button>
+                            <span className="w-6 text-center text-sm font-medium">
+                              {getQuantity(item.id)}
+                            </span>
+                            <button
+                              onClick={() => setQuantity(item.id, getQuantity(item.id) + 1)}
+                              className="w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-sm"
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          {/* Add Button */}
+                          <button
+                            onClick={() => handleAddToCart(item)}
+                            className={`
+                              w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all
+                              ${addedItems.has(item.id)
+                                ? 'bg-green-500 text-white'
+                                : 'bg-primary-500 hover:bg-primary-600 text-white opacity-0 group-hover:opacity-100'
+                              }
+                            `}
+                          >
+                            {addedItems.has(item.id) ? (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                            ) : (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                              </svg>
+                            )}
+                          </button>
+                        </div>
                       )}
                     </div>
                   ))}
@@ -242,6 +396,38 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
           </div>
         </div>
       </div>
+
+      {/* Different Restaurant Confirmation Modal */}
+      {showDifferentRestaurantModal && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={handleCancelNewRestaurant}
+          />
+          <div className="relative bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Start a new order?
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Your cart contains items from another restaurant. Would you like to clear your cart and start a new order from <strong>{restaurant.name}</strong>?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleCancelNewRestaurant}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Keep current cart
+              </button>
+              <button
+                onClick={handleConfirmNewRestaurant}
+                className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors"
+              >
+                Start new order
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

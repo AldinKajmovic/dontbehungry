@@ -85,7 +85,6 @@ Tracks order lifecycle.
 |-------|-------------|
 | `CASH` | Cash on delivery |
 | `CREDIT_CARD` | Credit card payment |
-| `DEBIT_CARD` | Debit card payment |
 | `DIGITAL_WALLET` | Apple Pay, Google Pay, etc. |
 
 ---

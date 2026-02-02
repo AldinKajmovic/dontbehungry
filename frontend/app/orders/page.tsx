@@ -1,9 +1,12 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { useSocket } from '@/providers/SocketProvider'
 import { profileService, OrderHistoryItem } from '@/services/profile'
+import { NotificationBell } from '@/components/notifications'
+import { Notification } from '@/services/notification'
 
 const ORDER_STATUSES = [
   { value: '', label: 'All Statuses' },
@@ -50,6 +53,7 @@ const formatDate = (dateString: string): string => {
 
 export default function OrdersPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth()
+  const { socket, isConnected } = useSocket()
   const router = useRouter()
 
   const [orders, setOrders] = useState<OrderHistoryItem[]>([])
@@ -57,11 +61,16 @@ export default function OrdersPage() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
 
   // Filters
   const [statusFilter, setStatusFilter] = useState('')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
+
+  // Ref to track current page for socket callback
+  const pageRef = useRef(page)
+  pageRef.current = page
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -70,8 +79,8 @@ export default function OrdersPage() {
     }
   }, [authLoading, isAuthenticated, router])
 
-  const loadOrders = useCallback(async (pageNum: number) => {
-    setIsLoading(true)
+  const loadOrders = useCallback(async (pageNum: number, silent = false) => {
+    if (!silent) setIsLoading(true)
     try {
       const result = await profileService.getMyOrderHistory({
         page: pageNum,
@@ -84,10 +93,11 @@ export default function OrdersPage() {
       setPage(result.pagination.page)
       setTotalPages(result.pagination.totalPages)
       setTotal(result.pagination.total)
+      setLastUpdate(new Date())
     } catch (error) {
       console.error('Failed to load orders:', error)
     } finally {
-      setIsLoading(false)
+      if (!silent) setIsLoading(false)
     }
   }, [statusFilter, fromDate, toDate])
 
@@ -97,6 +107,25 @@ export default function OrdersPage() {
       loadOrders(1)
     }
   }, [isAuthenticated, statusFilter, fromDate, toDate, loadOrders])
+
+  // Listen for real-time order status updates via socket
+  useEffect(() => {
+    if (!socket || !isConnected) return
+
+    const handleNotification = (notification: Notification) => {
+      // Refresh orders when we receive an order status notification
+      if (notification.type === 'ORDER_STATUS') {
+        // Silently refresh current page to update the status
+        loadOrders(pageRef.current, true)
+      }
+    }
+
+    socket.on('notification', handleNotification)
+
+    return () => {
+      socket.off('notification', handleNotification)
+    }
+  }, [socket, isConnected, loadOrders])
 
   const handlePageChange = (newPage: number) => {
     loadOrders(newPage)
@@ -131,7 +160,7 @@ export default function OrdersPage() {
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between">
             {/* Back Button */}
             <button
               onClick={() => router.push('/my-profile')}
@@ -142,6 +171,8 @@ export default function OrdersPage() {
               </svg>
               <span className="font-medium">Back to Profile</span>
             </button>
+
+            <NotificationBell />
           </div>
         </div>
       </header>
@@ -157,7 +188,7 @@ export default function OrdersPage() {
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
           <div className="flex flex-wrap gap-4 items-end">
             {/* Status Filter */}
-            <div className="flex-1 min-w-[200px]">
+            <div className="min-w-[180px]">
               <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-1">
                 Status
               </label>
@@ -249,10 +280,15 @@ export default function OrdersPage() {
           ) : (
             <>
               {/* Results count */}
-              <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+              <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
                 <p className="text-sm text-gray-600">
                   {total} order{total !== 1 ? 's' : ''} found
                 </p>
+                {lastUpdate && (
+                  <p className="text-xs text-gray-400">
+                    Updated {lastUpdate.toLocaleTimeString()}
+                  </p>
+                )}
               </div>
 
               {/* Orders */}

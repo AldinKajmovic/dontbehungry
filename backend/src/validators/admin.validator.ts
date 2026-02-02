@@ -519,6 +519,48 @@ export function validateCreateOrder(data: CreateOrderData): void {
   }
 }
 
+// ==================== ORDER ITEMS ====================
+
+export interface CreateOrderItemData {
+  menuItemId: string
+  quantity: number
+  notes?: string | null
+}
+
+export function validateCreateOrderItem(data: CreateOrderItemData): void {
+  const { menuItemId, quantity } = data
+
+  if (!menuItemId) {
+    throw new BadRequestError('Missing required fields', 'menuItemId is required')
+  }
+
+  if (quantity === undefined || typeof quantity !== 'number' || quantity < 1) {
+    throw new BadRequestError('Invalid quantity', 'Quantity must be a positive integer')
+  }
+
+  if (!Number.isInteger(quantity)) {
+    throw new BadRequestError('Invalid quantity', 'Quantity must be an integer')
+  }
+}
+
+export interface UpdateOrderItemData {
+  quantity?: number
+  notes?: string | null
+}
+
+export function validateUpdateOrderItem(data: UpdateOrderItemData): void {
+  const { quantity } = data
+
+  if (quantity !== undefined) {
+    if (typeof quantity !== 'number' || quantity < 1) {
+      throw new BadRequestError('Invalid quantity', 'Quantity must be a positive integer')
+    }
+    if (!Number.isInteger(quantity)) {
+      throw new BadRequestError('Invalid quantity', 'Quantity must be an integer')
+    }
+  }
+}
+
 export interface CreateReviewData {
   userId: string
   restaurantId: string

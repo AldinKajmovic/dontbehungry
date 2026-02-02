@@ -192,6 +192,32 @@ export interface UpdateMenuItemInput {
   preparationTime?: number | null
 }
 
+export interface AdminOrderItem {
+  id: string
+  orderId: string
+  menuItemId: string
+  quantity: number
+  unitPrice: string
+  totalPrice: string
+  notes: string | null
+  menuItem: {
+    id: string
+    name: string
+    price: string
+  }
+}
+
+export interface CreateOrderItemInput {
+  menuItemId: string
+  quantity: number
+  notes?: string | null
+}
+
+export interface UpdateOrderItemInput {
+  quantity?: number
+  notes?: string | null
+}
+
 // Order types
 export interface AdminOrder {
   id: string
@@ -222,6 +248,7 @@ export interface AdminOrder {
     lastName: string
   } | null
   payment: AdminPayment | null
+  orderItems?: AdminOrderItem[]
 }
 
 export interface CreateOrderInput {

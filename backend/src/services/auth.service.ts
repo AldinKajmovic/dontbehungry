@@ -7,6 +7,8 @@ import { generateTokenPair, revokeRefreshToken, revokeAllUserTokens, rotateRefre
 import { createVerificationToken, verifyEmailToken, verifyPasswordResetToken, consumePasswordResetToken } from './verification.service'
 import { sendVerificationEmail, sendPasswordResetEmail } from './email.service'
 import { Register, RegisterRestaurant, Login, userSelectFields, UserResponse, JwtPayload } from '../types'
+import { generateAccessToken } from '../utils/jwt'
+import { logger } from '../utils/logger'
 
 interface AuthResult {
   user: UserResponse
@@ -67,11 +69,7 @@ export async function register(data: Register): Promise<AuthResult> {
 
   createVerificationToken(user.id, TokenType.EMAIL_VERIFICATION)
     .then((verificationToken) => sendVerificationEmail(user.email, user.firstName, verificationToken))
-    .catch((err) => console.error('Failed to send verification email:', {
-      userId: user.id,
-      email: user.email,
-      error: err instanceof Error ? err.message : 'Unknown error',
-    }))
+    .catch((err) => logger.error('Failed to send verification email', err, { userId: user.id, email: user.email }))
 
   return { user, accessToken, refreshToken }
 }
@@ -140,11 +138,7 @@ export async function registerRestaurant(data: RegisterRestaurant): Promise<Auth
 
   createVerificationToken(user.id, TokenType.EMAIL_VERIFICATION)
     .then((verificationToken) => sendVerificationEmail(user.email, user.firstName, verificationToken))
-    .catch((err) => console.error('Failed to send verification email:', {
-      userId: user.id,
-      email: user.email,
-      error: err instanceof Error ? err.message : 'Unknown error',
-    }))
+    .catch((err) => logger.error('Failed to send verification email', err, { userId: user.id, email: user.email }))
 
   return { user, accessToken, refreshToken }
 }
@@ -346,4 +340,13 @@ export async function googleAuth(data: GoogleAuthData): Promise<AuthResult> {
   const { accessToken, refreshToken } = await generateTokenPair(payload)
 
   return { user, accessToken, refreshToken }
+}
+
+export function generateSocketToken(payload: JwtPayload): string {
+  const cleanPayload: JwtPayload = {
+    userId: payload.userId,
+    email: payload.email,
+    role: payload.role,
+  }
+  return generateAccessToken(cleanPayload)
 }

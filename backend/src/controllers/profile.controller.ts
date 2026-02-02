@@ -443,6 +443,69 @@ const VALID_ORDER_STATUSES = [
   'CANCELLED',
 ]
 
+const VALID_PAYMENT_METHODS = ['CASH', 'CREDIT_CARD', 'DIGITAL_WALLET']
+
+export async function createOrder(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    if (!req.user) {
+      throw new BadRequestError('Unauthorized', 'User not authenticated')
+    }
+
+    const { restaurantId, deliveryAddressId, paymentMethod, notes, items } = req.body
+
+    if (!restaurantId || typeof restaurantId !== 'string') {
+      throw new BadRequestError('Invalid restaurant', 'Restaurant ID is required')
+    }
+
+    if (!deliveryAddressId || typeof deliveryAddressId !== 'string') {
+      throw new BadRequestError('Invalid address', 'Delivery address ID is required')
+    }
+
+    if (!paymentMethod || !VALID_PAYMENT_METHODS.includes(paymentMethod)) {
+      throw new BadRequestError(
+        'Invalid payment method',
+        `Payment method must be one of: ${VALID_PAYMENT_METHODS.join(', ')}`
+      )
+    }
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      throw new BadRequestError('Invalid items', 'Order must contain at least one item')
+    }
+
+    for (const item of items) {
+      if (!item.menuItemId || typeof item.menuItemId !== 'string') {
+        throw new BadRequestError('Invalid item', 'Each item must have a valid menu item ID')
+      }
+      if (!item.quantity || typeof item.quantity !== 'number' || item.quantity < 1) {
+        throw new BadRequestError('Invalid quantity', 'Each item must have a quantity of at least 1')
+      }
+    }
+
+    const order = await profileService.createOrder(req.user.userId, {
+      restaurantId,
+      deliveryAddressId,
+      paymentMethod,
+      notes: notes?.trim() || undefined,
+      items: items.map((item: { menuItemId: string; quantity: number; notes?: string }) => ({
+        menuItemId: item.menuItemId,
+        quantity: item.quantity,
+        notes: item.notes?.trim() || undefined,
+      })),
+    })
+
+    res.status(201).json({
+      message: 'Order placed successfully',
+      order,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export async function getMyOrderHistory(
   req: AuthenticatedRequest,
   res: Response,
@@ -570,6 +633,57 @@ export async function getDriverOrderHistory(
     const result = await profileService.getDriverOrderHistory(req.user.userId, filters)
 
     res.json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function updateRestaurantOrderStatus(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    if (!req.user) {
+      throw new BadRequestError('Unauthorized', 'User not authenticated')
+    }
+
+    if (req.user.role !== 'RESTAURANT_OWNER') {
+      throw new BadRequestError('Forbidden', 'Only restaurant owners can access this endpoint')
+    }
+
+    const { restaurantId: rawRestaurantId, orderId: rawOrderId } = req.params
+    const restaurantId = Array.isArray(rawRestaurantId) ? rawRestaurantId[0] : rawRestaurantId
+    const orderId = Array.isArray(rawOrderId) ? rawOrderId[0] : rawOrderId
+
+    if (!restaurantId) {
+      throw new BadRequestError('Invalid ID', 'Restaurant ID is required')
+    }
+
+    if (!orderId) {
+      throw new BadRequestError('Invalid ID', 'Order ID is required')
+    }
+
+    const { status, notes } = req.body
+
+    if (!status || !VALID_ORDER_STATUSES.includes(status)) {
+      throw new BadRequestError(
+        'Invalid status',
+        `Status must be one of: ${VALID_ORDER_STATUSES.join(', ')}`
+      )
+    }
+
+    const updated = await profileService.updateRestaurantOrderStatus(
+      req.user.userId,
+      restaurantId,
+      orderId,
+      { status, notes }
+    )
+
+    res.json({
+      message: 'Order status updated successfully',
+      order: updated,
+    })
   } catch (error) {
     next(error)
   }

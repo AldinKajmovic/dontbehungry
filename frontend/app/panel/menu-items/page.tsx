@@ -334,7 +334,7 @@ export default function MenuItemsPage() {
             <select
               value={filters.isAvailable || ''}
               onChange={(e) => handleFilterChange('isAvailable', e.target.value)}
-              className="input-field text-sm h-10"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
             >
               {AVAILABILITY_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>

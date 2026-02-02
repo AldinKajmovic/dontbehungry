@@ -61,7 +61,7 @@ export function RangeFilter({
             min={min}
             max={max}
             step={step}
-            className={`input-field text-sm h-10 ${prefix ? 'pl-6' : ''}`}
+            className={`w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white ${prefix ? 'pl-6' : ''}`}
           />
         </div>
         <span className="text-gray-400">-</span>
@@ -81,7 +81,7 @@ export function RangeFilter({
             min={min}
             max={max}
             step={step}
-            className={`input-field text-sm h-10 ${prefix ? 'pl-6' : ''}`}
+            className={`w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white ${prefix ? 'pl-6' : ''}`}
           />
         </div>
       </div>

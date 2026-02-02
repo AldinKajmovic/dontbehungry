@@ -37,7 +37,6 @@ enum PaymentStatus {
 enum PaymentMethod {
   CASH
   CREDIT_CARD
-  DEBIT_CARD
   DIGITAL_WALLET
 }
 
@@ -75,6 +74,7 @@ model User {
   deliveries         Order[]             @relation("DeliveryDriver")
   refreshTokens      RefreshToken[]
   verificationTokens VerificationToken[]
+  notifications      Notification[]
 
   @@index([email])
   @@index([role])
@@ -290,6 +290,23 @@ model Review {
   @@index([userId])
   @@index([restaurantId])
   @@index([rating])
+}
+
+// ==================== NOTIFICATIONS ====================
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // ORDER_NEW, ORDER_STATUS, DELIVERY_ASSIGNED, DELIVERY_READY
+  title     String
+  message   String
+  data      Json?    // Additional data (orderId, restaurantId, etc.)
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
 }
 
 // ==================== AUTH TOKENS ====================

@@ -17,6 +17,8 @@ import {
   validateUpdateMenuItem,
   validateCreateOrder,
   validateUpdateOrder,
+  validateCreateOrderItem,
+  validateUpdateOrderItem,
   validateCreateReview,
   validateUpdateReview,
   validateCreatePlace,
@@ -399,6 +401,67 @@ export async function createOrder(
     validateCreateOrder(req.body)
     const order = await adminService.createOrder(req.body)
     res.status(201).json(order)
+  } catch (error) {
+    next(error)
+  }
+}
+
+// ==================== ORDER ITEMS ====================
+
+interface OrderItemParams {
+  orderId: string
+  itemId?: string
+}
+
+export async function getOrderItems(
+  req: Request<{ orderId: string }>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const items = await adminService.getOrderItems(req.params.orderId)
+    res.json(items)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function addOrderItem(
+  req: Request<{ orderId: string }>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    validateCreateOrderItem(req.body)
+    const item = await adminService.addOrderItem(req.params.orderId, req.body)
+    res.status(201).json(item)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function updateOrderItem(
+  req: Request<OrderItemParams>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    validateUpdateOrderItem(req.body)
+    const item = await adminService.updateOrderItem(req.params.itemId!, req.body)
+    res.json(item)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function deleteOrderItem(
+  req: Request<OrderItemParams>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    await adminService.deleteOrderItem(req.params.itemId!)
+    res.json({ message: 'Order item deleted successfully' })
   } catch (error) {
     next(error)
   }

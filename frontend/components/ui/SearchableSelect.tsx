@@ -12,7 +12,7 @@ interface SearchableSelectProps {
   hint?: string
   error?: string
   value: string
-  onChange: (value: string) => void
+  onChange: (value: string, label?: string) => void
   placeholder?: string
   required?: boolean
   disabled?: boolean
@@ -108,7 +108,7 @@ export function SearchableSelect({
   }, [])
 
   const handleSelect = (option: SelectOption) => {
-    onChange(option.value)
+    onChange(option.value, option.label)
     setSelectedLabel(option.label)
     setIsOpen(false)
     setSearch('')

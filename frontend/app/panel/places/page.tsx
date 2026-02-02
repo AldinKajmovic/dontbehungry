@@ -271,7 +271,7 @@ export default function PlacesPage() {
               value={filters.city || ''}
               onChange={(e) => handleFilterChange('city', e.target.value)}
               placeholder="Filter by city..."
-              className="input-field text-sm h-10"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
             />
           </div>
           <div className="min-w-[150px]">
@@ -281,7 +281,7 @@ export default function PlacesPage() {
               value={filters.state || ''}
               onChange={(e) => handleFilterChange('state', e.target.value)}
               placeholder="Filter by state..."
-              className="input-field text-sm h-10"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
             />
           </div>
           <div className="min-w-[150px]">
@@ -291,7 +291,7 @@ export default function PlacesPage() {
               value={filters.country || ''}
               onChange={(e) => handleFilterChange('country', e.target.value)}
               placeholder="Filter by country..."
-              className="input-field text-sm h-10"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
             />
           </div>
           <div className="min-w-[150px]">
@@ -301,7 +301,7 @@ export default function PlacesPage() {
               value={filters.postalCode || ''}
               onChange={(e) => handleFilterChange('postalCode', e.target.value)}
               placeholder="Filter by postal code..."
-              className="input-field text-sm h-10"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
             />
           </div>
           {hasActiveFilters && (

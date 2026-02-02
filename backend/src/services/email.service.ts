@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer'
 import { config } from '../config'
+import { logger } from '../utils/logger'
 
 interface EmailOptions {
   to: string
@@ -24,11 +25,10 @@ const transporter = nodemailer.createTransport({
 async function sendEmail(options: EmailOptions): Promise<void> {
 
   if (!config.isProduction && !config.smtp.user) {
-    console.log('=== Email (not sent - no SMTP configured) ===')
-    console.log(`To: ${options.to}`)
-    console.log(`Subject: ${options.subject}`)
-    console.log(`Body: ${options.text || options.html}`)
-    console.log('==============================================')
+    logger.debug('Email not sent - no SMTP configured', {
+      to: options.to,
+      subject: options.subject,
+    })
     return
   }
 

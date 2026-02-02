@@ -20,8 +20,11 @@ import {
   UpdateMenuItemInput,
   MenuItemFilters,
   AdminOrder,
+  AdminOrderItem,
   CreateOrderInput,
   UpdateOrderInput,
+  CreateOrderItemInput,
+  UpdateOrderItemInput,
   OrderFilters,
   AdminReview,
   CreateReviewInput,
@@ -138,6 +141,26 @@ class AdminService {
   updateOrder = ordersCrud.update
   deleteOrder = ordersCrud.delete
 
+  // ============ Order Items ============
+  async getOrderItems(orderId: string): Promise<AdminOrderItem[]> {
+    const res = await api.get<AdminOrderItem[]>(`${PATHS.orders}/${orderId}/items`)
+    return res.data
+  }
+
+  async addOrderItem(orderId: string, data: CreateOrderItemInput): Promise<AdminOrderItem> {
+    const res = await api.post<AdminOrderItem>(`${PATHS.orders}/${orderId}/items`, data)
+    return res.data
+  }
+
+  async updateOrderItem(orderId: string, itemId: string, data: UpdateOrderItemInput): Promise<AdminOrderItem> {
+    const res = await api.patch<AdminOrderItem>(`${PATHS.orders}/${orderId}/items/${itemId}`, data)
+    return res.data
+  }
+
+  async deleteOrderItem(orderId: string, itemId: string): Promise<void> {
+    await api.delete(`${PATHS.orders}/${orderId}/items/${itemId}`)
+  }
+
   // ============ Reviews ============
   getReviews = (page?: number, limit?: number, search?: string, filters?: ReviewFilters, sort?: SortParams) =>
     reviewsCrud.getList({ page, limit, search, filters, ...sort })
@@ -173,6 +196,15 @@ class AdminService {
     return response.items.map((user) => ({
       value: user.id,
       label: `${user.firstName} ${user.lastName}`,
+    }))
+  }
+
+  // Special case: Menu items filtered by restaurant
+  async getMenuItemsForSelect(restaurantId: string, search?: string): Promise<SelectOption[]> {
+    const response = await this.getMenuItems(1, 25, search, { restaurantId })
+    return response.items.map((item) => ({
+      value: item.id,
+      label: `${item.name} ($${parseFloat(item.price).toFixed(2)})`,
     }))
   }
 }

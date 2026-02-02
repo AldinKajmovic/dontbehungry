@@ -53,6 +53,12 @@ router.post('/orders', adminController.createOrder)
 router.patch('/orders/:id', adminController.updateOrder)
 router.delete('/orders/:id', adminController.deleteOrder)
 
+// Order Items CRUD
+router.get('/orders/:orderId/items', adminController.getOrderItems)
+router.post('/orders/:orderId/items', adminController.addOrderItem)
+router.patch('/orders/:orderId/items/:itemId', adminController.updateOrderItem)
+router.delete('/orders/:orderId/items/:itemId', adminController.deleteOrderItem)
+
 // Reviews CRUD
 router.get('/reviews', adminController.getReviews)
 router.get('/reviews/:id', adminController.getReviewById)

@@ -55,6 +55,12 @@ api.interceptors.response.use(
       if (isAuthEndpoint) {
         return Promise.reject(new Error(extractErrorMessage(error)))
       }
+      // Don't retry for silent endpoints
+      const isSilentEndpoint = originalRequest.url?.includes('/api/auth/socket-token') ||
+                               originalRequest.url?.includes('/api/auth/me')
+      if (isSilentEndpoint) {
+        return Promise.reject(new Error('Not authenticated'))
+      }
 
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -83,9 +89,11 @@ api.interceptors.response.use(
         notifySubscribers(false)
 
         // Refresh failed - dispatch event for AuthProvider to handle
-        // This is expected behavior when user isn't logged in
         if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('auth:logout'))
+          const isAuthPage = window.location.pathname.startsWith('/auth/')
+          if (!isAuthPage) {
+            window.dispatchEvent(new CustomEvent('auth:logout'))
+          }
         }
 
         return Promise.reject(error)

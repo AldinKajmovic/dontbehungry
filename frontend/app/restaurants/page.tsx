@@ -3,11 +3,16 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { useCart } from '@/hooks/useCart'
 import { publicService, PublicRestaurant, Category } from '@/services/public'
 import { RestaurantCard, CategoryIcon, MealModal } from '@/components/restaurants'
+import { GuestBanner } from '@/components/ui'
+import { CartDrawer } from '@/components/cart'
+import { NotificationBell } from '@/components/notifications'
 
 export default function RestaurantsPage() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
+  const { itemCount, openCart } = useCart()
 
   const [restaurants, setRestaurants] = useState<PublicRestaurant[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -90,19 +95,22 @@ export default function RestaurantsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Guest Banner */}
+      <GuestBanner />
+
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             {/* Logo */}
-            <a href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-xl">D</span>
               </div>
               <span className="text-xl font-bold text-gray-900 hidden sm:block">
                 Don&apos;t Be Hungry
               </span>
-            </a>
+            </Link>
 
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl">
@@ -130,10 +138,72 @@ export default function RestaurantsPage() {
               </div>
             </div>
 
-            {/* Search Button */}
-            <button className="btn-primary !w-auto !py-2.5 px-6 hidden md:flex items-center gap-2">
-              <span>Search</span>
-            </button>
+            {/* Auth-dependent UI - show nothing while loading to prevent flash */}
+            {authLoading ? (
+              <div className="w-24 h-10 bg-gray-100 rounded-lg animate-pulse" />
+            ) : isAuthenticated ? (
+              <div className="flex items-center gap-1">
+                <NotificationBell />
+                <button
+                  onClick={openCart}
+                  className="relative p-3 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label="Open cart"
+                >
+                  <svg
+                    className="w-6 h-6 text-gray-700"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                  {itemCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      {itemCount > 9 ? '9+' : itemCount}
+                    </span>
+                  )}
+                </button>
+                <Link
+                  href="/my-profile"
+                  className="p-3 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label="My Profile"
+                >
+                  <svg
+                    className="w-6 h-6 text-gray-700"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </Link>
+              </div>
+            ) : (
+              <div className="hidden md:flex items-center gap-2">
+                <Link
+                  href="/auth/login"
+                  className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
+                >
+                  Sign up
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -307,6 +377,9 @@ export default function RestaurantsPage() {
         onClose={handleCloseModal}
         showAddButton={isAuthenticated}
       />
+
+      {/* Cart Drawer */}
+      <CartDrawer />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import { AppError, UnauthorizedError } from '../utils/errors';
+import { logger } from '../utils/logger';
 
 export const errorHandler = (
   err: Error,
@@ -11,7 +12,7 @@ export const errorHandler = (
   // Only log unexpected errors (not auth errors which are expected during normal operation)
   const isExpectedAuthError = err instanceof UnauthorizedError || err instanceof JsonWebTokenError;
   if (!isExpectedAuthError) {
-    console.error('Error:', err.message);
+    logger.error('Request error', err);
   }
 
   if (err instanceof AppError) {

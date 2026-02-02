@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import * as authController from '../controllers/auth.controller'
 import { authenticate } from '../middlewares/auth.middleware'
-import { authLimiter, sensitiveOpLimiter, resendVerificationLimiter } from '../middlewares/rateLimiter'
+import { authLimiter, sensitiveOpLimiter, resendVerificationLimiter, socketTokenLimiter } from '../middlewares/rateLimiter'
 
 const router = Router()
 
@@ -30,5 +30,8 @@ router.post('/reset-password', sensitiveOpLimiter, authController.resetPassword)
 
 // Current user
 router.get('/me', authenticate, authController.me)
+
+// Socket token for real-time notifications
+router.get('/socket-token', authenticate, socketTokenLimiter, authController.getSocketToken)
 
 export default router

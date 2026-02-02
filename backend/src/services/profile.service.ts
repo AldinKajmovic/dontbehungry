@@ -8,6 +8,7 @@ import { sendVerificationEmail } from './email.service'
 import { notifyNewOrder, notifyOrderStatusChange, notifyDeliveryReady } from './notification.service'
 import { logger } from '../utils/logger'
 import { validateStatusTransition } from '../utils/orderStatus'
+import { revokeAllUserTokens } from './token.service'
 
 interface UpdateProfileResult {
   user: UserResponse
@@ -65,6 +66,13 @@ export async function updateProfile(userId: string, data: UpdateProfile): Promis
 
   let verificationEmailFailed = false
   if (emailChanged) {
+    // Security: Revoke all existing tokens when email changes to force re-authentication
+    try {
+      await revokeAllUserTokens(userId)
+    } catch (err) {
+      logger.error('Failed to revoke tokens on email change', err, { userId })
+    }
+
     try {
       const verificationToken = await createVerificationToken(userId, TokenType.EMAIL_VERIFICATION)
       await sendVerificationEmail(updatedUser.email, updatedUser.firstName, verificationToken)

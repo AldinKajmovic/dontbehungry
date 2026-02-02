@@ -4,9 +4,18 @@ if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required')
 }
 
+// Security: Fail loudly in production if critical env vars are missing
+if (isProduction) {
+  const requiredEnvVars = ['FRONTEND_URL', 'SMTP_HOST', 'SMTP_USER', 'SMTP_PASS']
+  const missing = requiredEnvVars.filter(v => !process.env[v])
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables in production: ${missing.join(', ')}`)
+  }
+}
+
 export const config = {
   port: parseInt(process.env.PORT || '3001', 10),
-  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+  frontendUrl: process.env.FRONTEND_URL || (isProduction ? '' : 'http://localhost:3000'),
   isProduction,
   jwt: {
     secret: process.env.JWT_SECRET,
@@ -34,7 +43,7 @@ export const config = {
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID || '',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    callbackUrl: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3001/api/oauth/google/callback',
+    callbackUrl: process.env.GOOGLE_CALLBACK_URL || (isProduction ? '' : 'http://localhost:3001/api/oauth/google/callback'),
   },
   admin: {
     whitelistedIPs: process.env.ADMIN_WHITELISTED_IPS?.split(',').map(ip => ip.trim()).filter(Boolean) || [],

@@ -60,6 +60,7 @@ Updates the user's basic profile information including email.
 
 **Email Change Behavior:**
 - When email is changed, `emailVerified` is set to `false`
+- **All existing sessions are revoked** (user must re-login)
 - A verification email is sent to the new email address
 - Response includes `emailChanged: true` to notify the frontend
 
@@ -118,6 +119,10 @@ Updates the user's avatar URL.
   "avatarUrl": "string | null"
 }
 ```
+
+**Validation Rules:**
+- `avatarUrl`: Must be a valid URL with `http://` or `https://` protocol
+- Other protocols (`javascript:`, `data:`, etc.) are rejected for security
 
 **Response:**
 ```json
@@ -793,12 +798,14 @@ backend/src/
 
 1. **Authentication**: All endpoints require a valid JWT access token
 2. **Rate Limiting**: Password change endpoint has additional rate limiting
-3. **Token Revocation**: Changing password revokes all refresh tokens
+3. **Token Revocation**: Changing password or email revokes all refresh tokens (forces re-login on all devices)
 4. **Input Validation**: All inputs are validated before processing
-5. **Input Sanitization**: Address fields are sanitized using `sanitize-html` library to prevent XSS attacks (strips all HTML tags)
-6. **Role Protection**: Users cannot change their own role through these endpoints
-7. **Ownership Check**: Restaurant and address operations verify ownership by the requesting user
-8. **Safe Deletion**: Place records are only deleted if no other entities reference them
+5. **Input Length Limits**: All string fields have maximum length limits to prevent DoS attacks
+6. **Input Sanitization**: Address fields are sanitized using `sanitize-html` library to prevent XSS attacks (strips all HTML tags)
+7. **URL Validation**: Avatar URLs are validated to only allow `http://` and `https://` protocols (prevents `javascript:` injection)
+8. **Role Protection**: Users cannot change their own role through these endpoints
+9. **Ownership Check**: Restaurant and address operations verify ownership by the requesting user
+10. **Safe Deletion**: Place records are only deleted if no other entities reference them
 
 ## Usage Example
 

@@ -78,6 +78,19 @@ export async function updateAvatar(
       throw new BadRequestError('Invalid avatar URL', 'Avatar URL must be a string or null')
     }
 
+    // Security: Validate URL scheme to prevent javascript: or data: injection
+    if (avatarUrl && typeof avatarUrl === 'string') {
+      try {
+        const url = new URL(avatarUrl)
+        if (!['http:', 'https:'].includes(url.protocol)) {
+          throw new BadRequestError('Invalid avatar URL', 'Avatar URL must use http or https protocol')
+        }
+      } catch (err) {
+        if (err instanceof BadRequestError) throw err
+        throw new BadRequestError('Invalid avatar URL', 'Avatar URL must be a valid URL')
+      }
+    }
+
     const user = await profileService.updateAvatar(req.user.userId, avatarUrl ?? null)
 
     res.json({

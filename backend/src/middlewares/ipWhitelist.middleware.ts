@@ -3,19 +3,14 @@ import { config } from '../config'
 import { ForbiddenError } from '../utils/errors'
 
 function getClientIP(req: Request): string {
-  // Check X-Forwarded-For header for proxied requests
-  const forwardedFor = req.headers['x-forwarded-for']
-  if (forwardedFor) {
-    const ips = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor.split(',')[0]
-    return normalizeIP(ips.trim())
+  if (req.app.get('trust proxy')) {
+    const expressIP = req.ip
+    if (expressIP) {
+      return normalizeIP(expressIP)
+    }
   }
 
-  const realIP = req.headers['x-real-ip']
-  if (realIP) {
-    return normalizeIP(Array.isArray(realIP) ? realIP[0] : realIP)
-  }
-
-  const remoteAddr = req.socket?.remoteAddress || req.ip || ''
+  const remoteAddr = req.socket?.remoteAddress || ''
   return normalizeIP(remoteAddr)
 }
 

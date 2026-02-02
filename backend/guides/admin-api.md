@@ -25,6 +25,17 @@ ADMIN_WHITELISTED_IPS=192.168.1.100,10.0.0.50,127.0.0.1
 
 If this variable is empty or not set, all IPs are allowed (development mode).
 
+**Security Note - Proxy Configuration:**
+
+The IP whitelist uses the direct TCP socket connection address by default, which cannot be spoofed. If your application is behind a reverse proxy (nginx, AWS ALB, Cloudflare), you must configure Express to trust the proxy:
+
+```typescript
+// In app.ts
+app.set('trust proxy', 1)  // Trust first proxy
+```
+
+Without this configuration, the middleware will see the proxy's IP, not the client's real IP. Only configure `trust proxy` when you're actually behind a trusted proxy.
+
 ## Base URL
 
 All admin endpoints are prefixed with `/api/admin`.

@@ -6,7 +6,12 @@ This folder contains documentation for the backend API.
 
 | Guide | Description |
 |-------|-------------|
+| [auth.md](./auth.md) | Authentication & authorization system |
+| [admin-api.md](./admin-api.md) | Admin API CRUD operations |
+| [profile-api.md](./profile-api.md) | User profile & restaurant owner endpoints |
 | [public-api.md](./public-api.md) | Public API endpoints (restaurants, categories, menu items) |
+| [reports.md](./reports.md) | Admin PDF report generation |
+| [database-seeding.md](./database-seeding.md) | Database seeding for development |
 
 ## Tech Stack
 
@@ -67,4 +72,4 @@ Create new `.md` files in this directory for:
 
 ---
 
-*Last updated: January 2026*
+*Last updated: February 2026*

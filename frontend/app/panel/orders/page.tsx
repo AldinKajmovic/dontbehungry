@@ -6,6 +6,8 @@ import { Pagination } from '@/components/admin/Pagination'
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal'
 import { RangeFilter } from '@/components/admin/RangeFilter'
 import { StatusSelect, ORDER_STATUS_OPTIONS } from '@/components/admin/StatusSelect'
+import { ReportButton } from '@/components/admin/ReportButton'
+import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Button, Alert, SearchableSelect } from '@/components/ui'
 import { adminService, AdminOrder, AdminOrderItem, PaginationInfo, OrderFilters, SortParams } from '@/services/admin'
 
@@ -40,6 +42,7 @@ export default function OrdersPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showEmailReportModal, setShowEmailReportModal] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null)
 
   // Form states
@@ -531,14 +534,21 @@ export default function OrdersPage() {
           <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
           <p className="text-gray-500 mt-1">Manage customer orders</p>
         </div>
-        <Button onClick={openCreateModal} className="!w-auto !px-4">
-          <span className="flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Create Order
-          </span>
-        </Button>
+        <div className="flex items-center gap-3">
+          <ReportButton
+            reportType="orders"
+            filters={filters}
+            onEmailClick={() => setShowEmailReportModal(true)}
+          />
+          <Button onClick={openCreateModal} className="!w-auto !px-4">
+            <span className="flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Create Order
+            </span>
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
@@ -1296,6 +1306,14 @@ export default function OrdersPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Email Report Modal */}
+      <EmailReportModal
+        isOpen={showEmailReportModal}
+        onClose={() => setShowEmailReportModal(false)}
+        reportType="orders"
+        filters={filters}
+      />
     </div>
   )
 }

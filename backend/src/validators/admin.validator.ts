@@ -3,6 +3,33 @@ import { BadRequestError } from '../utils/errors'
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const VALID_LIMITS = [5, 10, 25, 100]
 
+// Security: Maximum string lengths to prevent DoS and database issues
+const MAX_STRING_LENGTHS: Record<string, number> = {
+  name: 100,
+  firstName: 50,
+  lastName: 50,
+  email: 255,
+  phone: 20,
+  address: 500,
+  city: 100,
+  state: 100,
+  country: 100,
+  postalCode: 20,
+  description: 2000,
+  title: 200,
+  content: 5000,
+  notes: 1000,
+  default: 255,
+}
+
+function validateStringLength(value: string | undefined, field: string, maxLength?: number): void {
+  if (!value) return
+  const max = maxLength || MAX_STRING_LENGTHS[field] || MAX_STRING_LENGTHS.default
+  if (value.length > max) {
+    throw new BadRequestError(`${field} too long`, `${field} must be at most ${max} characters`)
+  }
+}
+
 export interface PaginationParams {
   page: number
   limit: number
@@ -332,6 +359,12 @@ export function validateCreateUser(data: CreateUserData): void {
     throw new BadRequestError('Missing required fields', 'Email, password, firstName, and lastName are required')
   }
 
+  // Security: Validate string lengths
+  validateStringLength(email, 'email')
+  validateStringLength(firstName, 'firstName')
+  validateStringLength(lastName, 'lastName')
+  validateStringLength(data.phone, 'phone')
+
   if (!EMAIL_REGEX.test(email)) {
     throw new BadRequestError('Invalid email', 'Please provide a valid email address')
   }
@@ -358,6 +391,12 @@ export interface UpdateUserData {
 
 export function validateUpdateUser(data: UpdateUserData): void {
   const { email, role } = data
+
+  // Security: Validate string lengths
+  validateStringLength(email, 'email')
+  validateStringLength(data.firstName, 'firstName')
+  validateStringLength(data.lastName, 'lastName')
+  validateStringLength(data.phone, 'phone')
 
   if (email && !EMAIL_REGEX.test(email)) {
     throw new BadRequestError('Invalid email', 'Please provide a valid email address')
@@ -387,6 +426,12 @@ export function validateCreateRestaurant(data: CreateRestaurantData): void {
     throw new BadRequestError('Missing required fields', 'Name, ownerId, and placeId are required')
   }
 
+  // Security: Validate string lengths
+  validateStringLength(name, 'name')
+  validateStringLength(data.description, 'description')
+  validateStringLength(data.phone, 'phone')
+  validateStringLength(email, 'email')
+
   if (email && !EMAIL_REGEX.test(email)) {
     throw new BadRequestError('Invalid email', 'Please provide a valid restaurant email address')
   }
@@ -406,6 +451,12 @@ export interface UpdateRestaurantData {
 export function validateUpdateRestaurant(data: UpdateRestaurantData): void {
   const { email } = data
 
+  // Security: Validate string lengths
+  validateStringLength(data.name, 'name')
+  validateStringLength(data.description, 'description')
+  validateStringLength(data.phone, 'phone')
+  validateStringLength(email, 'email')
+
   if (email && !EMAIL_REGEX.test(email)) {
     throw new BadRequestError('Invalid email', 'Please provide a valid restaurant email address')
   }
@@ -423,6 +474,10 @@ export function validateCreateCategory(data: CreateCategoryData): void {
   if (!name) {
     throw new BadRequestError('Missing required fields', 'Category name is required')
   }
+
+  // Security: Validate string lengths
+  validateStringLength(name, 'name')
+  validateStringLength(data.description, 'description')
 }
 
 export interface UpdateCategoryData {
@@ -450,6 +505,10 @@ export function validateCreateMenuItem(data: CreateMenuItemData): void {
     throw new BadRequestError('Missing required fields', 'Name, price, and restaurantId are required')
   }
 
+  // Security: Validate string lengths
+  validateStringLength(name, 'name')
+  validateStringLength(data.description, 'description')
+
   if (typeof price !== 'number' || price < 0) {
     throw new BadRequestError('Invalid price', 'Price must be a non-negative number')
   }
@@ -468,6 +527,10 @@ export interface UpdateMenuItemData {
 
 export function validateUpdateMenuItem(data: UpdateMenuItemData): void {
   const { price } = data
+
+  // Security: Validate string lengths
+  validateStringLength(data.name, 'name')
+  validateStringLength(data.description, 'description')
 
   if (price !== undefined && (typeof price !== 'number' || price < 0)) {
     throw new BadRequestError('Invalid price', 'Price must be a non-negative number')
@@ -576,6 +639,10 @@ export function validateCreateReview(data: CreateReviewData): void {
     throw new BadRequestError('Missing required fields', 'userId, restaurantId, and rating are required')
   }
 
+  // Security: Validate string lengths
+  validateStringLength(data.title, 'title')
+  validateStringLength(data.content, 'content')
+
   if (typeof rating !== 'number' || rating < 1 || rating > 5) {
     throw new BadRequestError('Invalid rating', 'Rating must be between 1 and 5')
   }
@@ -589,6 +656,10 @@ export interface UpdateReviewData {
 
 export function validateUpdateReview(data: UpdateReviewData): void {
   const { rating } = data
+
+  // Security: Validate string lengths
+  validateStringLength(data.title, 'title')
+  validateStringLength(data.content, 'content')
 
   if (rating !== undefined && (typeof rating !== 'number' || rating < 1 || rating > 5)) {
     throw new BadRequestError('Invalid rating', 'Rating must be between 1 and 5')
@@ -609,6 +680,13 @@ export function validateCreatePlace(data: CreatePlaceData): void {
   if (!address || !city || !country) {
     throw new BadRequestError('Missing required fields', 'Address, city, and country are required')
   }
+
+  // Security: Validate string lengths
+  validateStringLength(address, 'address')
+  validateStringLength(city, 'city')
+  validateStringLength(data.state, 'state')
+  validateStringLength(country, 'country')
+  validateStringLength(data.postalCode, 'postalCode')
 }
 
 export interface UpdatePlaceData {

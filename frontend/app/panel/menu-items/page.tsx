@@ -5,6 +5,8 @@ import { DataTable } from '@/components/admin/DataTable'
 import { Pagination } from '@/components/admin/Pagination'
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal'
 import { RangeFilter } from '@/components/admin/RangeFilter'
+import { ReportButton } from '@/components/admin/ReportButton'
+import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert, Select, SearchableSelect } from '@/components/ui'
 import { adminService, AdminMenuItem, PaginationInfo, MenuItemFilters, SortParams } from '@/services/admin'
 
@@ -27,6 +29,7 @@ export default function MenuItemsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showEmailReportModal, setShowEmailReportModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState<AdminMenuItem | null>(null)
 
   // Form states
@@ -287,14 +290,21 @@ export default function MenuItemsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Menu Items</h1>
           <p className="text-gray-500 mt-1">Manage restaurant menu items</p>
         </div>
-        <Button onClick={openCreateModal} className="!w-auto !px-4">
-          <span className="flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Add Item
-          </span>
-        </Button>
+        <div className="flex items-center gap-3">
+          <ReportButton
+            reportType="menuItems"
+            filters={filters}
+            onEmailClick={() => setShowEmailReportModal(true)}
+          />
+          <Button onClick={openCreateModal} className="!w-auto !px-4">
+            <span className="flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Item
+            </span>
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
@@ -637,6 +647,14 @@ export default function MenuItemsPage() {
         title="Delete Menu Item"
         message={`Are you sure you want to delete "${selectedItem?.name}"? This action cannot be undone.`}
         isLoading={formLoading}
+      />
+
+      {/* Email Report Modal */}
+      <EmailReportModal
+        isOpen={showEmailReportModal}
+        onClose={() => setShowEmailReportModal(false)}
+        reportType="menuItems"
+        filters={filters}
       />
     </div>
   )

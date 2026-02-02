@@ -26,7 +26,8 @@ export async function register(data: Register): Promise<AuthResult> {
   const { email, password, firstName, lastName, phone, address, city, country } = data
 
   if (await userExists(email)) {
-    throw new ConflictError('User already exists', 'An account with this email already exists')
+    // Security: Generic message to prevent email enumeration
+    throw new ConflictError('Registration failed', 'Unable to create account with this email')
   }
 
   const passwordHash = await hashPassword(password)
@@ -92,7 +93,8 @@ export async function registerRestaurant(data: RegisterRestaurant): Promise<Auth
   } = data
 
   if (await userExists(email)) {
-    throw new ConflictError('User already exists', 'An account with this email already exists')
+    // Security: Generic message to prevent email enumeration
+    throw new ConflictError('Registration failed', 'Unable to create account with this email')
   }
 
   const passwordHash = await hashPassword(password)

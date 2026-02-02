@@ -282,10 +282,13 @@ GOOGLE_CALLBACK_URL=http://localhost:3001/api/oauth/google/callback
 2. **SameSite=strict cookies** - Prevents CSRF attacks in production
 3. **Refresh token rotation** - Limits damage from token theft
 4. **Token reuse detection** - Revokes all tokens if theft suspected
-5. **Rate limiting** - Prevents brute force attacks
-6. **Password hashing with bcrypt** - 12 salt rounds
-7. **Input validation** - All inputs validated with Zod schemas
-8. **Security headers** - Helmet middleware enabled
+5. **Token revocation on sensitive changes** - All tokens revoked when email or password is changed
+6. **Rate limiting** - Prevents brute force attacks
+7. **Password hashing with bcrypt** - 12 salt rounds
+8. **Input validation** - All inputs validated with Zod schemas
+9. **Input length limits** - Maximum string lengths enforced to prevent DoS
+10. **Security headers** - Helmet middleware enabled
+11. **Generic error messages** - Registration/login errors don't reveal if email exists
 
 ## Testing Checklist
 

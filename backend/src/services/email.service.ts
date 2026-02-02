@@ -161,3 +161,92 @@ export async function sendPasswordResetEmail(
     text,
   })
 }
+
+export async function sendReportEmail(
+  email: string,
+  subject: string,
+  message: string,
+  pdfBuffer: Buffer,
+  filename: string
+): Promise<void> {
+  const timestamp = new Date().toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  })
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Admin Report</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #00A082 0%, #00C49A 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">DontBeHungry</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0; font-size: 14px;">Admin Report</p>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <h2 style="color: #333; margin-top: 0;">${subject}</h2>
+        ${message ? `<p style="color: #666;">${message}</p>` : ''}
+        <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+          <p style="margin: 0; color: #333;">
+            <strong>Attached:</strong> ${filename}
+          </p>
+          <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">
+            Please find your requested report attached to this email.
+          </p>
+        </div>
+        <p style="color: #666; font-size: 14px;">
+          This report was generated on ${timestamp}.
+        </p>
+      </div>
+      <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
+        <p>&copy; ${new Date().getFullYear()} DontBeHungry. All rights reserved.</p>
+        <p style="margin-top: 5px;">This is an automated email from the Admin Panel.</p>
+      </div>
+    </body>
+    </html>
+  `
+
+  const text = `
+    DontBeHungry Admin Report
+
+    ${subject}
+
+    ${message ? message + '\n\n' : ''}Attached: ${filename}
+
+    Please find your requested report attached to this email.
+
+    This report was generated on ${timestamp}.
+  `
+
+  if (!config.isProduction && !config.smtp.user) {
+    logger.debug('Report email not sent - no SMTP configured', {
+      to: email,
+      subject,
+      filename,
+      sizeBytes: pdfBuffer.length,
+    })
+    return
+  }
+
+  await transporter.sendMail({
+    from: config.smtp.from,
+    to: email,
+    subject,
+    html,
+    text,
+    attachments: [
+      {
+        filename,
+        content: pdfBuffer,
+        contentType: 'application/pdf',
+      },
+    ],
+  })
+}

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { config } from '../config'
 import { ForbiddenError } from '../utils/errors'
+import { logger } from '../utils/logger'
 
 function getClientIP(req: Request): string {
   if (req.app.get('trust proxy')) {
@@ -43,7 +44,11 @@ export function ipWhitelist(
     return next()
   }
 
-  console.warn(`[IP Whitelist] Access denied for IP: ${clientIP}. Requested: ${req.method} ${req.originalUrl}`)
+  logger.warn('IP Whitelist: Access denied', {
+    clientIP,
+    method: req.method,
+    url: req.originalUrl
+  })
 
   throw new ForbiddenError(
     'Access denied',

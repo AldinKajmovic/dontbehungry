@@ -3,20 +3,23 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { useLanguage } from '@/hooks/useLanguage'
 import { useSocket } from '@/providers/SocketProvider'
 import { profileService, OrderHistoryItem } from '@/services/profile'
 import { NotificationBell } from '@/components/notifications'
+import { LanguageToggle } from '@/components/ui'
 import { Notification } from '@/services/notification'
+import { logger } from '@/utils/logger'
 
-const ORDER_STATUSES = [
-  { value: '', label: 'All Statuses' },
-  { value: 'PENDING', label: 'Pending' },
-  { value: 'CONFIRMED', label: 'Confirmed' },
-  { value: 'PREPARING', label: 'Preparing' },
-  { value: 'READY_FOR_PICKUP', label: 'Ready for Pickup' },
-  { value: 'OUT_FOR_DELIVERY', label: 'Out for Delivery' },
-  { value: 'DELIVERED', label: 'Delivered' },
-  { value: 'CANCELLED', label: 'Cancelled' },
+const ORDER_STATUS_KEYS = [
+  { value: '', labelKey: 'orders.status.all' },
+  { value: 'PENDING', labelKey: 'orders.status.PENDING' },
+  { value: 'CONFIRMED', labelKey: 'orders.status.CONFIRMED' },
+  { value: 'PREPARING', labelKey: 'orders.status.PREPARING' },
+  { value: 'READY_FOR_PICKUP', labelKey: 'orders.status.READY_FOR_PICKUP' },
+  { value: 'OUT_FOR_DELIVERY', labelKey: 'orders.status.OUT_FOR_DELIVERY' },
+  { value: 'DELIVERED', labelKey: 'orders.status.DELIVERED' },
+  { value: 'CANCELLED', labelKey: 'orders.status.CANCELLED' },
 ]
 
 const getStatusColor = (status: string): string => {
@@ -53,6 +56,7 @@ const formatDate = (dateString: string): string => {
 
 export default function OrdersPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth()
+  const { t } = useLanguage()
   const { socket, isConnected } = useSocket()
   const router = useRouter()
 
@@ -95,7 +99,7 @@ export default function OrdersPage() {
       setTotal(result.pagination.total)
       setLastUpdate(new Date())
     } catch (error) {
-      console.error('Failed to load orders:', error)
+      logger.error('Failed to load orders', error)
     } finally {
       if (!silent) setIsLoading(false)
     }
@@ -144,7 +148,7 @@ export default function OrdersPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="w-12 h-12 border-3 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Loading...</p>
+          <p className="text-gray-500">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -169,10 +173,13 @@ export default function OrdersPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span className="font-medium">Back to Profile</span>
+              <span className="font-medium">{t('orders.backToProfile')}</span>
             </button>
 
-            <NotificationBell />
+            <div className="flex items-center gap-2">
+              <LanguageToggle />
+              <NotificationBell />
+            </div>
           </div>
         </div>
       </header>
@@ -180,8 +187,8 @@ export default function OrdersPage() {
       <main className="max-w-4xl mx-auto px-4 py-6">
         {/* Title */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Order History</h1>
-          <p className="text-gray-500 mt-1">View and track your past orders</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('orders.title')}</h1>
+          <p className="text-gray-500 mt-1">{t('orders.subtitle')}</p>
         </div>
 
         {/* Filters */}
@@ -190,7 +197,7 @@ export default function OrdersPage() {
             {/* Status Filter */}
             <div className="min-w-[180px]">
               <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-1">
-                Status
+                {t('orders.status.label')}
               </label>
               <select
                 id="statusFilter"
@@ -198,9 +205,9 @@ export default function OrdersPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
-                {ORDER_STATUSES.map((status) => (
+                {ORDER_STATUS_KEYS.map((status) => (
                   <option key={status.value} value={status.value}>
-                    {status.label}
+                    {t(status.labelKey)}
                   </option>
                 ))}
               </select>
@@ -209,7 +216,7 @@ export default function OrdersPage() {
             {/* From Date */}
             <div className="flex-1 min-w-[150px]">
               <label htmlFor="fromDate" className="block text-sm font-medium text-gray-700 mb-1">
-                From Date
+                {t('orders.filters.fromDate')}
               </label>
               <input
                 type="date"
@@ -223,7 +230,7 @@ export default function OrdersPage() {
             {/* To Date */}
             <div className="flex-1 min-w-[150px]">
               <label htmlFor="toDate" className="block text-sm font-medium text-gray-700 mb-1">
-                To Date
+                {t('orders.filters.toDate')}
               </label>
               <input
                 type="date"
@@ -240,7 +247,7 @@ export default function OrdersPage() {
                 onClick={handleClearFilters}
                 className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Clear Filters
+                {t('common.clearFilters')}
               </button>
             )}
           </div>
@@ -267,13 +274,13 @@ export default function OrdersPage() {
                   d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                 />
               </svg>
-              <p className="text-gray-500">No orders found</p>
+              <p className="text-gray-500">{t('orders.noOrders')}</p>
               {(statusFilter || fromDate || toDate) && (
                 <button
                   onClick={handleClearFilters}
                   className="mt-2 text-primary-600 hover:text-primary-700 text-sm font-medium"
                 >
-                  Clear filters to see all orders
+                  {t('orders.clearFiltersToSeeAll')}
                 </button>
               )}
             </div>
@@ -282,11 +289,11 @@ export default function OrdersPage() {
               {/* Results count */}
               <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
                 <p className="text-sm text-gray-600">
-                  {total} order{total !== 1 ? 's' : ''} found
+                  {t('orders.ordersFound', { count: total })}
                 </p>
                 {lastUpdate && (
                   <p className="text-xs text-gray-400">
-                    Updated {lastUpdate.toLocaleTimeString()}
+                    {t('orders.updated')} {lastUpdate.toLocaleTimeString()}
                   </p>
                 )}
               </div>
@@ -304,7 +311,7 @@ export default function OrdersPage() {
                         <div className="flex items-center gap-2 mb-1">
                           <p className="font-semibold text-gray-900">{order.restaurant.name}</p>
                           <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(order.status)}`}>
-                            {order.status.replace(/_/g, ' ')}
+                            {t(`orders.status.${order.status}`)}
                           </span>
                         </div>
                         <p className="text-sm text-gray-500 mb-2">{formatDate(order.createdAt)}</p>
@@ -317,13 +324,13 @@ export default function OrdersPage() {
                             </li>
                           ))}
                           {order.orderItems.length > 3 && (
-                            <li className="text-gray-400">+{order.orderItems.length - 3} more items</li>
+                            <li className="text-gray-400">{t('orders.moreItems', { count: order.orderItems.length - 3 })}</li>
                           )}
                         </ul>
 
                         {/* Delivery Address */}
                         <p className="text-xs text-gray-400">
-                          Delivery: {order.deliveryPlace.address}, {order.deliveryPlace.city}
+                          {t('orders.delivery')}: {order.deliveryPlace.address}, {order.deliveryPlace.city}
                         </p>
                       </div>
 
@@ -346,7 +353,7 @@ export default function OrdersPage() {
                 <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-600">
-                      Page {page} of {totalPages}
+                      {t('common.page')} {page} {t('common.of')} {totalPages}
                     </p>
                     <div className="flex gap-2">
                       <button
@@ -354,14 +361,14 @@ export default function OrdersPage() {
                         disabled={page === 1 || isLoading}
                         className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
                       >
-                        Previous
+                        {t('common.previous')}
                       </button>
                       <button
                         onClick={() => handlePageChange(page + 1)}
                         disabled={page >= totalPages || isLoading}
                         className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
                       >
-                        Next
+                        {t('common.next')}
                       </button>
                     </div>
                   </div>

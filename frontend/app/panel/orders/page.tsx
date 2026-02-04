@@ -5,31 +5,31 @@ import { DataTable } from '@/components/admin/DataTable'
 import { Pagination } from '@/components/admin/Pagination'
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal'
 import { RangeFilter } from '@/components/admin/RangeFilter'
-import { StatusSelect, ORDER_STATUS_OPTIONS } from '@/components/admin/StatusSelect'
+import { StatusSelect, ORDER_STATUS_COLORS, getOrderStatusOptions } from '@/components/admin/StatusSelect'
 import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Button, Alert, SearchableSelect } from '@/components/ui'
 import { adminService, AdminOrder, AdminOrderItem, PaginationInfo, OrderFilters, SortParams } from '@/services/admin'
-
-// Convert ORDER_STATUS_OPTIONS to a color map for table badges
-const STATUS_COLORS: Record<string, string> = Object.fromEntries(
-  ORDER_STATUS_OPTIONS.map((opt) => [opt.value, opt.colorClass])
-)
-
-const PAYMENT_STATUS_OPTIONS = [
-  { value: '', label: 'All Payments' },
-  { value: 'PENDING', label: 'Pending' },
-  { value: 'COMPLETED', label: 'Completed' },
-  { value: 'FAILED', label: 'Failed' },
-  { value: 'REFUNDED', label: 'Refunded' },
-]
-
-const STATUS_FILTER_OPTIONS = [
-  { value: '', label: 'All Statuses' },
-  ...ORDER_STATUS_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label })),
-]
+import { useLanguage } from '@/hooks/useLanguage'
 
 export default function OrdersPage() {
+  const { t } = useLanguage()
+
+  // Translated status options
+  const ORDER_STATUS_OPTIONS = getOrderStatusOptions(t)
+
+  const PAYMENT_STATUS_OPTIONS = [
+    { value: '', label: t('admin.paymentStatus.allPayments') },
+    { value: 'PENDING', label: t('admin.paymentStatus.PENDING') },
+    { value: 'COMPLETED', label: t('admin.paymentStatus.COMPLETED') },
+    { value: 'FAILED', label: t('admin.paymentStatus.FAILED') },
+    { value: 'REFUNDED', label: t('admin.paymentStatus.REFUNDED') },
+  ]
+
+  const STATUS_FILTER_OPTIONS = [
+    { value: '', label: t('admin.orderStatus.allStatuses') },
+    ...ORDER_STATUS_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label })),
+  ]
   const [orders, setOrders] = useState<AdminOrder[]>([])
   const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -440,7 +440,7 @@ export default function OrdersPage() {
   const columns = [
     {
       key: 'id',
-      header: 'Order',
+      header: t('admin.columns.order'),
       render: (order: AdminOrder) => (
         <div>
           <p className="font-medium text-gray-900 font-mono text-sm">{order.id.slice(0, 8)}...</p>
@@ -450,7 +450,7 @@ export default function OrdersPage() {
     },
     {
       key: 'user',
-      header: 'Customer',
+      header: t('admin.columns.customer'),
       render: (order: AdminOrder) => (
         <div>
           <p className="text-sm">{order.user.firstName} {order.user.lastName}</p>
@@ -460,26 +460,26 @@ export default function OrdersPage() {
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('admin.columns.status'),
       sortable: true,
       render: (order: AdminOrder) => (
-        <span className={`px-2 py-1 text-xs font-medium rounded-full ${STATUS_COLORS[order.status] || 'bg-gray-100 text-gray-700'}`}>
-          {order.status.replace(/_/g, ' ')}
+        <span className={`px-2 py-1 text-xs font-medium rounded-full ${ORDER_STATUS_COLORS[order.status] || 'bg-gray-100 text-gray-700'}`}>
+          {t(`admin.orderStatus.${order.status}`)}
         </span>
       ),
     },
     {
       key: 'items',
-      header: 'Items',
+      header: t('admin.columns.items'),
       render: (order: AdminOrder) => (
         <span className="text-sm text-gray-600">
-          {order.orderItems?.length || 0} item{(order.orderItems?.length || 0) !== 1 ? 's' : ''}
+          {order.orderItems?.length || 0} {t('admin.columns.items').toLowerCase()}
         </span>
       ),
     },
     {
       key: 'totalAmount',
-      header: 'Total',
+      header: t('admin.columns.total'),
       sortable: true,
       render: (order: AdminOrder) => (
         <span className="font-medium">${parseFloat(order.totalAmount).toFixed(2)}</span>
@@ -487,7 +487,7 @@ export default function OrdersPage() {
     },
     {
       key: 'payment',
-      header: 'Payment',
+      header: t('admin.columns.payment'),
       render: (order: AdminOrder) => (
         order.payment ? (
           <span className={`px-2 py-1 text-xs font-medium rounded-full ${
@@ -496,7 +496,7 @@ export default function OrdersPage() {
             order.payment.status === 'REFUNDED' ? 'bg-blue-100 text-blue-700' :
             'bg-red-100 text-red-700'
           }`}>
-            {order.payment.status}
+            {t(`admin.paymentStatus.${order.payment.status}`)}
           </span>
         ) : (
           <span className="text-gray-400">-</span>
@@ -505,18 +505,18 @@ export default function OrdersPage() {
     },
     {
       key: 'driver',
-      header: 'Driver',
+      header: t('admin.columns.driver'),
       render: (order: AdminOrder) => (
         order.driver ? (
           <span className="text-sm">{order.driver.firstName} {order.driver.lastName}</span>
         ) : (
-          <span className="text-gray-400">Unassigned</span>
+          <span className="text-gray-400">{t('admin.modals.unassigned')}</span>
         )
       ),
     },
     {
       key: 'createdAt',
-      header: 'Date',
+      header: t('admin.columns.date'),
       sortable: true,
       render: (order: AdminOrder) => (
         <span className="text-sm text-gray-500">
@@ -531,8 +531,8 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
-          <p className="text-gray-500 mt-1">Manage customer orders</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('admin.orders')}</h1>
+          <p className="text-gray-500 mt-1">{t('admin.manageCustomerOrders')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -545,7 +545,7 @@ export default function OrdersPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Create Order
+              {t('admin.createOrder')}
             </span>
           </Button>
         </div>
@@ -559,12 +559,12 @@ export default function OrdersPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by order ID or customer email..."
+              placeholder={t('admin.searchByOrderOrEmail')}
               className="input-field"
             />
           </div>
           <Button type="submit" variant="secondary" className="!w-auto !px-6">
-            Search
+            {t('common.search')}
           </Button>
         </div>
       </form>
@@ -574,17 +574,17 @@ export default function OrdersPage() {
         <div className="flex flex-wrap items-end gap-4">
           <div className="min-w-[200px]">
             <SearchableSelect
-              label="Customer"
+              label={t('admin.filters.customer')}
               id="filter-customer"
               value={filters.customerId || ''}
               onChange={(value) => handleFilterChange('customerId', value)}
               loadOptions={loadCustomerOptions}
-              placeholder="All Customers"
-              emptyMessage="No customers found"
+              placeholder={t('admin.filters.allCustomers')}
+              emptyMessage={t('admin.modals.noCustomersFound')}
             />
           </div>
           <div className="min-w-[180px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.columns.status')}</label>
             <select
               value={filters.status || ''}
               onChange={(e) => handleFilterChange('status', e.target.value)}
@@ -596,7 +596,7 @@ export default function OrdersPage() {
             </select>
           </div>
           <div className="min-w-[160px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Payment</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.paymentStatus.label')}</label>
             <select
               value={filters.paymentStatus || ''}
               onChange={(e) => handleFilterChange('paymentStatus', e.target.value)}
@@ -608,7 +608,7 @@ export default function OrdersPage() {
             </select>
           </div>
           <RangeFilter
-            label="Total Amount"
+            label={t('admin.filters.totalAmount')}
             minValue={filters.minTotalAmount || ''}
             maxValue={filters.maxTotalAmount || ''}
             onMinChange={(value) => handleFilterChange('minTotalAmount', value)}
@@ -619,7 +619,7 @@ export default function OrdersPage() {
             prefix="$"
           />
           <div className="min-w-[280px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Created Date</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.filters.createdDate')}</label>
             <div className="flex items-center gap-2">
               <input
                 type="date"
@@ -627,7 +627,7 @@ export default function OrdersPage() {
                 onChange={(e) => handleFilterChange('createdAtFrom', e.target.value)}
                 className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
               />
-              <span className="text-gray-400">to</span>
+              <span className="text-gray-400">{t('admin.ordersPage.to')}</span>
               <input
                 type="date"
                 value={filters.createdAtTo || ''}
@@ -638,13 +638,13 @@ export default function OrdersPage() {
           </div>
           <div className="min-w-[200px]">
             <SearchableSelect
-              label="Driver"
+              label={t('admin.filters.driver')}
               id="filter-driver"
               value={filters.driverId || ''}
               onChange={(value) => handleFilterChange('driverId', value)}
               loadOptions={loadDriverOptions}
-              placeholder="All Drivers"
-              emptyMessage="No drivers found"
+              placeholder={t('admin.filters.allDrivers')}
+              emptyMessage={t('admin.modals.noDriversFound')}
             />
           </div>
           {hasActiveFilters && (
@@ -652,7 +652,7 @@ export default function OrdersPage() {
               onClick={handleClearFilters}
               className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              Clear Filters
+              {t('admin.clearFilters')}
             </button>
           )}
         </div>
@@ -667,7 +667,7 @@ export default function OrdersPage() {
         data={orders}
         keyField="id"
         isLoading={isLoading}
-        emptyMessage="No orders found"
+        emptyMessage={t('admin.noOrdersFound')}
         sortConfig={sort.sortBy ? { key: sort.sortBy, direction: sort.sortOrder || 'asc' } : undefined}
         onSort={handleSort}
         actions={(order) => (
@@ -710,7 +710,7 @@ export default function OrdersPage() {
       <Modal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Edit Order"
+        title={t('admin.ordersPage.editOrder')}
         size="lg"
       >
         <form onSubmit={handleUpdate} className="space-y-4">
@@ -721,19 +721,19 @@ export default function OrdersPage() {
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-500">Order ID:</span>
+                  <span className="text-gray-500">{t('admin.ordersPage.orderId')}:</span>
                   <p className="font-mono">{selectedOrder.id}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Customer:</span>
+                  <span className="text-gray-500">{t('admin.ordersPage.customer')}:</span>
                   <p>{selectedOrder.user.firstName} {selectedOrder.user.lastName}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Restaurant:</span>
+                  <span className="text-gray-500">{t('admin.ordersPage.restaurant')}:</span>
                   <p>{selectedOrder.restaurant.name}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Total:</span>
+                  <span className="text-gray-500">{t('admin.ordersPage.total')}:</span>
                   <p className="font-medium">${parseFloat(selectedOrder.totalAmount).toFixed(2)}</p>
                 </div>
               </div>
@@ -744,7 +744,7 @@ export default function OrdersPage() {
           {selectedOrder && (
             <div className="border border-gray-200 rounded-lg p-4 mb-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium text-gray-900">Order Items</h3>
+                <h3 className="font-medium text-gray-900">{t('admin.ordersPage.orderItems')}</h3>
                 {!showAddItemForm && (
                   <button
                     type="button"
@@ -754,7 +754,7 @@ export default function OrdersPage() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    Add Item
+                    {t('admin.ordersPage.addItem')}
                   </button>
                 )}
               </div>
@@ -765,17 +765,17 @@ export default function OrdersPage() {
                   <div className="space-y-3">
                     <SearchableSelect
                       key={`menu-item-select-${selectedOrder?.restaurant.id}`}
-                      label="Menu Item"
+                      label={t('admin.ordersPage.menuItem')}
                       id="new-item-menuItemId"
                       value={newItemData.menuItemId}
                       onChange={(value) => setNewItemData({ ...newItemData, menuItemId: value })}
                       loadOptions={loadMenuItemOptions}
-                      placeholder="Select menu item..."
-                      emptyMessage="No menu items found for this restaurant"
+                      placeholder={t('admin.ordersPage.selectMenuItem')}
+                      emptyMessage={t('admin.ordersPage.noMenuItemsForRestaurant')}
                     />
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.ordersPage.quantity')}</label>
                         <input
                           type="number"
                           min="1"
@@ -785,13 +785,13 @@ export default function OrdersPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.ordersPage.notes')}</label>
                         <input
                           type="text"
                           value={newItemData.notes}
                           onChange={(e) => setNewItemData({ ...newItemData, notes: e.target.value })}
                           className="input-field"
-                          placeholder="Optional..."
+                          placeholder={t('admin.ordersPage.optional')}
                         />
                       </div>
                     </div>
@@ -802,7 +802,7 @@ export default function OrdersPage() {
                         disabled={orderItemsLoading || !newItemData.menuItemId}
                         className="px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
                       >
-                        {orderItemsLoading ? 'Adding...' : 'Add'}
+                        {orderItemsLoading ? t('admin.ordersPage.adding') : t('admin.buttons.add')}
                       </button>
                       <button
                         type="button"
@@ -812,7 +812,7 @@ export default function OrdersPage() {
                         }}
                         className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                     </div>
                   </div>
@@ -821,9 +821,9 @@ export default function OrdersPage() {
 
               {/* Items List */}
               {orderItemsLoading && orderItems.length === 0 ? (
-                <div className="text-center py-4 text-gray-500">Loading items...</div>
+                <div className="text-center py-4 text-gray-500">{t('admin.ordersPage.loadingItems')}</div>
               ) : orderItems.length === 0 ? (
-                <div className="text-center py-4 text-gray-400">No items in this order</div>
+                <div className="text-center py-4 text-gray-400">{t('admin.ordersPage.noItemsInOrder')}</div>
               ) : (
                 <div className="space-y-2">
                   {orderItems.map((item) => (
@@ -845,7 +845,7 @@ export default function OrdersPage() {
                             value={editItemData.notes}
                             onChange={(e) => setEditItemData({ ...editItemData, notes: e.target.value })}
                             className="w-32 px-2 py-1 text-sm border border-gray-200 rounded"
-                            placeholder="Notes..."
+                            placeholder={t('admin.ordersPage.notes')}
                           />
                           <button
                             type="button"
@@ -911,19 +911,19 @@ export default function OrdersPage() {
               {orderItems.length > 0 && selectedOrder && (
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Subtotal:</span>
+                    <span className="text-gray-500">{t('admin.ordersPage.subtotal')}:</span>
                     <span>${parseFloat(selectedOrder.subtotal).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Delivery Fee:</span>
+                    <span className="text-gray-500">{t('admin.ordersPage.deliveryFee')}:</span>
                     <span>${parseFloat(selectedOrder.deliveryFee).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Tax:</span>
+                    <span className="text-gray-500">{t('admin.ordersPage.tax')}:</span>
                     <span>${parseFloat(selectedOrder.tax).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between font-medium mt-1 pt-1 border-t border-gray-100">
-                    <span>Total:</span>
+                    <span>{t('admin.ordersPage.total')}:</span>
                     <span>${parseFloat(selectedOrder.totalAmount).toFixed(2)}</span>
                   </div>
                 </div>
@@ -932,7 +932,7 @@ export default function OrdersPage() {
           )}
 
           <StatusSelect
-            label="Status"
+            label={t('admin.ordersPage.status')}
             id="status"
             value={formData.status}
             onValueChange={(value) => setFormData({ ...formData, status: value })}
@@ -940,20 +940,20 @@ export default function OrdersPage() {
           />
 
           <SearchableSelect
-            label="Driver"
+            label={t('admin.ordersPage.driver')}
             id="driverId"
             value={formData.driverId}
             onChange={(value) => setFormData({ ...formData, driverId: value })}
             loadOptions={loadDriverOptions}
-            placeholder="Unassigned"
-            emptyMessage="No drivers found"
+            placeholder={t('admin.ordersPage.unassigned')}
+            emptyMessage={t('admin.ordersPage.noDriversFound')}
             initialLabel={selectedOrder?.driver && formData.driverId ? `${selectedOrder.driver.firstName} ${selectedOrder.driver.lastName}` : ''}
-            hint="(optional - leave empty for Unassigned)"
+            hint={t('admin.ordersPage.optionalUnassigned')}
           />
 
           <div>
             <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-              Notes <span className="text-gray-400 font-normal">(optional)</span>
+              {t('admin.ordersPage.notes')} <span className="text-gray-400 font-normal">({t('common.optional').toLowerCase()})</span>
             </label>
             <textarea
               id="notes"
@@ -961,16 +961,16 @@ export default function OrdersPage() {
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
               className="input-field resize-none"
-              placeholder="Order notes..."
+              placeholder={t('admin.ordersPage.orderNotes')}
             />
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowEditModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Save Changes
+              {t('admin.buttons.saveChanges')}
             </Button>
           </div>
         </form>
@@ -981,8 +981,8 @@ export default function OrdersPage() {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
-        title="Delete Order"
-        message={`Are you sure you want to delete order ${selectedOrder?.id.slice(0, 8)}...? This action cannot be undone.`}
+        title={t('admin.ordersPage.deleteOrder')}
+        message={t('admin.ordersPage.deleteOrderConfirm', { id: selectedOrder?.id.slice(0, 8) + '...' })}
         isLoading={formLoading}
       />
 
@@ -990,24 +990,24 @@ export default function OrdersPage() {
       <Modal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        title="Create Order"
+        title={t('admin.ordersPage.createOrder')}
         size="lg"
       >
         <form onSubmit={handleCreate} className="space-y-4">
           {formError && <Alert type="error">{formError}</Alert>}
 
           <SearchableSelect
-            label="Customer"
+            label={t('admin.ordersPage.customer')}
             id="create-userId"
             value={createFormData.userId}
             onChange={(value) => setCreateFormData({ ...createFormData, userId: value })}
             loadOptions={loadCustomerOptions}
-            placeholder="Select customer..."
-            emptyMessage="No customers found"
+            placeholder={t('admin.ordersPage.selectCustomer')}
+            emptyMessage={t('admin.ordersPage.noCustomersFound')}
           />
 
           <SearchableSelect
-            label="Restaurant"
+            label={t('admin.ordersPage.restaurant')}
             id="create-restaurantId"
             value={createFormData.restaurantId}
             onChange={(value) => {
@@ -1017,15 +1017,15 @@ export default function OrdersPage() {
               setShowCreateAddItemForm(false)
             }}
             loadOptions={loadRestaurantOptions}
-            placeholder="Select restaurant..."
-            emptyMessage="No restaurants found"
+            placeholder={t('admin.ordersPage.selectRestaurant')}
+            emptyMessage={t('admin.ordersPage.noRestaurantsFound')}
           />
 
           {/* Order Items Section - Only show when restaurant is selected */}
           {createFormData.restaurantId && (
             <div className="border border-gray-200 rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium text-gray-900">Order Items</h3>
+                <h3 className="font-medium text-gray-900">{t('admin.ordersPage.orderItems')}</h3>
                 {!showCreateAddItemForm && (
                   <button
                     type="button"
@@ -1035,7 +1035,7 @@ export default function OrdersPage() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    Add Item
+                    {t('admin.ordersPage.addItem')}
                   </button>
                 )}
               </div>
@@ -1046,17 +1046,17 @@ export default function OrdersPage() {
                   <div className="space-y-3">
                     <SearchableSelect
                       key={`create-menu-item-select-${createFormData.restaurantId}`}
-                      label="Menu Item"
+                      label={t('admin.ordersPage.menuItem')}
                       id="create-new-item-menuItemId"
                       value={createNewItemData.menuItemId}
                       onChange={(value, label) => setCreateNewItemData({ ...createNewItemData, menuItemId: value, menuItemLabel: label || '' })}
                       loadOptions={loadCreateMenuItemOptions}
-                      placeholder="Select menu item..."
-                      emptyMessage="No menu items found for this restaurant"
+                      placeholder={t('admin.ordersPage.selectMenuItem')}
+                      emptyMessage={t('admin.ordersPage.noMenuItemsForRestaurant')}
                     />
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.ordersPage.quantity')}</label>
                         <input
                           type="number"
                           min="1"
@@ -1066,13 +1066,13 @@ export default function OrdersPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.ordersPage.notes')}</label>
                         <input
                           type="text"
                           value={createNewItemData.notes}
                           onChange={(e) => setCreateNewItemData({ ...createNewItemData, notes: e.target.value })}
                           className="input-field"
-                          placeholder="Optional..."
+                          placeholder={t('admin.ordersPage.optional')}
                         />
                       </div>
                     </div>
@@ -1083,7 +1083,7 @@ export default function OrdersPage() {
                         disabled={!createNewItemData.menuItemId}
                         className="px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
                       >
-                        Add
+                        {t('admin.buttons.add')}
                       </button>
                       <button
                         type="button"
@@ -1093,7 +1093,7 @@ export default function OrdersPage() {
                         }}
                         className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                     </div>
                   </div>
@@ -1102,7 +1102,7 @@ export default function OrdersPage() {
 
               {/* Items List */}
               {createOrderItems.length === 0 ? (
-                <div className="text-center py-4 text-gray-400">No items added yet</div>
+                <div className="text-center py-4 text-gray-400">{t('admin.ordersPage.noItemsAddedYet')}</div>
               ) : (
                 <div className="space-y-2">
                   {createOrderItems.map((item) => (
@@ -1124,7 +1124,7 @@ export default function OrdersPage() {
                             value={createEditItemData.notes}
                             onChange={(e) => setCreateEditItemData({ ...createEditItemData, notes: e.target.value })}
                             className="w-32 px-2 py-1 text-sm border border-gray-200 rounded"
-                            placeholder="Notes..."
+                            placeholder={t('admin.ordersPage.notes')}
                           />
                           <button
                             type="button"
@@ -1188,7 +1188,7 @@ export default function OrdersPage() {
               {createOrderItems.length > 0 && (
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <div className="flex justify-between text-sm font-medium">
-                    <span>Items Subtotal:</span>
+                    <span>{t('admin.ordersPage.itemsSubtotal')}:</span>
                     <span>${createOrderSubtotal.toFixed(2)}</span>
                   </div>
                 </div>
@@ -1197,28 +1197,28 @@ export default function OrdersPage() {
           )}
 
           <SearchableSelect
-            label="Delivery Address"
+            label={t('admin.ordersPage.deliveryAddress')}
             id="create-deliveryPlaceId"
             value={createFormData.deliveryPlaceId}
             onChange={(value) => setCreateFormData({ ...createFormData, deliveryPlaceId: value })}
             loadOptions={loadPlaceOptions}
-            placeholder="Select delivery address..."
-            emptyMessage="No addresses found"
+            placeholder={t('admin.ordersPage.selectDeliveryAddress')}
+            emptyMessage={t('admin.ordersPage.noAddressesFound')}
           />
 
           <SearchableSelect
-            label="Driver"
+            label={t('admin.ordersPage.driver')}
             id="create-driverId"
             value={createFormData.driverId}
             onChange={(value) => setCreateFormData({ ...createFormData, driverId: value })}
             loadOptions={loadDriverOptions}
-            placeholder="Unassigned"
-            emptyMessage="No drivers found"
-            hint="(optional - leave empty for Unassigned)"
+            placeholder={t('admin.ordersPage.unassigned')}
+            emptyMessage={t('admin.ordersPage.noDriversFound')}
+            hint={t('admin.ordersPage.optionalUnassigned')}
           />
 
           <StatusSelect
-            label="Status"
+            label={t('admin.ordersPage.status')}
             id="create-status"
             value={createFormData.status}
             onValueChange={(value) => setCreateFormData({ ...createFormData, status: value })}
@@ -1228,7 +1228,7 @@ export default function OrdersPage() {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label htmlFor="create-subtotal" className="block text-sm font-medium text-gray-700 mb-2">
-                Subtotal
+                {t('admin.ordersPage.subtotal')}
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
@@ -1246,7 +1246,7 @@ export default function OrdersPage() {
             </div>
             <div>
               <label htmlFor="create-deliveryFee" className="block text-sm font-medium text-gray-700 mb-2">
-                Delivery Fee <span className="text-gray-400 font-normal">(opt)</span>
+                {t('admin.ordersPage.deliveryFee')} <span className="text-gray-400 font-normal">({t('common.optional').toLowerCase()})</span>
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
@@ -1264,7 +1264,7 @@ export default function OrdersPage() {
             </div>
             <div>
               <label htmlFor="create-tax" className="block text-sm font-medium text-gray-700 mb-2">
-                Tax <span className="text-gray-400 font-normal">(opt)</span>
+                {t('admin.ordersPage.tax')} <span className="text-gray-400 font-normal">({t('common.optional').toLowerCase()})</span>
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
@@ -1284,7 +1284,7 @@ export default function OrdersPage() {
 
           <div>
             <label htmlFor="create-notes" className="block text-sm font-medium text-gray-700 mb-2">
-              Notes <span className="text-gray-400 font-normal">(optional)</span>
+              {t('admin.ordersPage.notes')} <span className="text-gray-400 font-normal">({t('common.optional').toLowerCase()})</span>
             </label>
             <textarea
               id="create-notes"
@@ -1292,16 +1292,16 @@ export default function OrdersPage() {
               onChange={(e) => setCreateFormData({ ...createFormData, notes: e.target.value })}
               rows={3}
               className="input-field resize-none"
-              placeholder="Order notes..."
+              placeholder={t('admin.ordersPage.orderNotes')}
             />
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowCreateModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Create Order
+              {t('admin.ordersPage.createOrder')}
             </Button>
           </div>
         </form>

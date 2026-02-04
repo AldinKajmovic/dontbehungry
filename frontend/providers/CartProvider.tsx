@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useEffect, useState, ReactNode } from 'react'
 import { MenuItem, PublicRestaurant } from '@/services/public'
+import { logger } from '@/utils/logger'
 
 export interface CartItem {
   id: string
@@ -75,7 +76,7 @@ function loadCartFromStorage(): CartState {
       }
     }
   } catch {
-    console.warn('Failed to load cart from storage, using defaults')
+    logger.warn('Failed to load cart from storage, using defaults')
   }
 
   return { items: [], restaurant: null, paymentMethod: 'CASH' }
@@ -87,7 +88,7 @@ function saveCartToStorage(state: CartState): void {
   try {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state))
   } catch {
-    console.warn('Failed to save cart to storage')
+    logger.warn('Failed to save cart to storage')
   }
 }
 

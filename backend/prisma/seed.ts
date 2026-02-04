@@ -8,7 +8,10 @@ import {
 } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { faker } from '@faker-js/faker'
+import { fakerHR } from '@faker-js/faker'
 import bcrypt from 'bcryptjs'
+
+const localFaker = fakerHR
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -34,104 +37,123 @@ const SEED_CONFIG = {
 ========================= */
 
 const FOOD_CATEGORIES = [
-  { name: 'Pizza', description: 'Italian pizza', iconUrl: null },
-  { name: 'Burgers', description: 'Burgers & sandwiches', iconUrl: null },
-  { name: 'Sushi', description: 'Japanese sushi', iconUrl: null },
-  { name: 'Mexican', description: 'Mexican food', iconUrl: null },
-  { name: 'Chinese', description: 'Chinese cuisine', iconUrl: null },
-  { name: 'Indian', description: 'Indian dishes', iconUrl: null },
-  { name: 'Thai', description: 'Thai cuisine', iconUrl: null },
-  { name: 'Korean', description: 'Korean cuisine', iconUrl: null },
-  { name: 'Vietnamese', description: 'Vietnamese food', iconUrl: null },
-  { name: 'Mediterranean', description: 'Mediterranean cuisine', iconUrl: null },
-  { name: 'Greek', description: 'Greek dishes', iconUrl: null },
-  { name: 'Italian', description: 'Italian cuisine', iconUrl: null },
-  { name: 'French', description: 'French cuisine', iconUrl: null },
-  { name: 'BBQ', description: 'Grilled meats', iconUrl: null },
-  { name: 'Seafood', description: 'Fish & seafood', iconUrl: null },
-  { name: 'Salads', description: 'Healthy salads', iconUrl: null },
-  { name: 'Vegan', description: 'Plant based', iconUrl: null },
-  { name: 'Vegetarian', description: 'Vegetarian dishes', iconUrl: null },
-  { name: 'Breakfast', description: 'Morning meals', iconUrl: null },
-  { name: 'Brunch', description: 'Late morning meals', iconUrl: null },
-  { name: 'Desserts', description: 'Sweet desserts', iconUrl: null },
-  { name: 'Bakery', description: 'Baked goods', iconUrl: null },
-  { name: 'Drinks', description: 'Beverages', iconUrl: null },
-  { name: 'Coffee', description: 'Coffee & espresso', iconUrl: null },
-  { name: 'Street Food', description: 'Street-style food', iconUrl: null },
-  { name: 'Fast Food', description: 'Quick meals', iconUrl: null },
-  { name: 'Healthy', description: 'Low-calorie meals', iconUrl: null },
-  { name: 'Pasta', description: 'Pasta dishes', iconUrl: null },
-  { name: 'Ramen', description: 'Japanese ramen', iconUrl: null },
-  { name: 'Middle Eastern', description: 'Middle Eastern food', iconUrl: null },
+  { name: 'Pizza', description: 'Talijanska pizza', iconUrl: null },
+  { name: 'Burgeri', description: 'Burgeri i sendviči', iconUrl: null },
+  { name: 'Sushi', description: 'Japanski sushi', iconUrl: null },
+  { name: 'Meksička hrana', description: 'Meksička kuhinja', iconUrl: null },
+  { name: 'Kineska hrana', description: 'Kineska kuhinja', iconUrl: null },
+  { name: 'Indijska hrana', description: 'Indijska jela', iconUrl: null },
+  { name: 'Tajlandska hrana', description: 'Tajlandska kuhinja', iconUrl: null },
+  { name: 'Korejska hrana', description: 'Korejska kuhinja', iconUrl: null },
+  { name: 'Vijetnamska hrana', description: 'Vijetnamska kuhinja', iconUrl: null },
+  { name: 'Mediteranska hrana', description: 'Mediteranska kuhinja', iconUrl: null },
+  { name: 'Grčka hrana', description: 'Grčka jela', iconUrl: null },
+  { name: 'Talijanska hrana', description: 'Talijanska kuhinja', iconUrl: null },
+  { name: 'Francuska hrana', description: 'Francuska kuhinja', iconUrl: null },
+  { name: 'Roštilj', description: 'Roštiljano meso', iconUrl: null },
+  { name: 'Morski plodovi', description: 'Riba i morski plodovi', iconUrl: null },
+  { name: 'Salate', description: 'Zdrave salate', iconUrl: null },
+  { name: 'Veganska hrana', description: 'Biljna hrana', iconUrl: null },
+  { name: 'Vegetarijanska hrana', description: 'Vegetarijanska jela', iconUrl: null },
+  { name: 'Doručak', description: 'Jutarnji obroci', iconUrl: null },
+  { name: 'Kasni doručak', description: 'Brunch', iconUrl: null },
+  { name: 'Deserti', description: 'Slatki deserti', iconUrl: null },
+  { name: 'Pekara', description: 'Pekarski proizvodi', iconUrl: null },
+  { name: 'Pića', description: 'Napitci', iconUrl: null },
+  { name: 'Kafa', description: 'Kafa i espresso', iconUrl: null },
+  { name: 'Ulična hrana', description: 'Ulična jela', iconUrl: null },
+  { name: 'Brza hrana', description: 'Brzi obroci', iconUrl: null },
+  { name: 'Zdravo', description: 'Niskokalorični obroci', iconUrl: null },
+  { name: 'Tjestenina', description: 'Jela od tjestenine', iconUrl: null },
+  { name: 'Ramen', description: 'Japanski ramen', iconUrl: null },
+  { name: 'Bliskoistočna hrana', description: 'Bliskoistočna kuhinja', iconUrl: null },
+  { name: 'Ćevapi', description: 'Tradicionalni bosanski ćevapi', iconUrl: null },
+  { name: 'Bosanska kuhinja', description: 'Tradicionalna bosanska jela', iconUrl: null },
+  { name: 'Pite i bureci', description: 'Domaće pite i bureci', iconUrl: null },
 ]
 
 const MENU_ITEMS_BY_CATEGORY: Record<string, string[]> = {
-  Pizza: [
-    'Margherita', 'Pepperoni', 'Four Cheese', 'Diavola', 'Truffle',
-    'Prosciutto', 'Vegetarian', 'BBQ Chicken', 'Hawaiian', 'Buffalo'
+  'Pizza': [
+    'Margherita', 'Pepperoni', 'Quattro Formaggi', 'Diavola', 'Capricciosa',
+    'Prosciutto', 'Vegetarijanska', 'BBQ Piletina', 'Šunka i gljive', 'Tonno'
   ],
-  Burgers: [
-    'Classic', 'Cheeseburger', 'Bacon Burger', 'BBQ Burger', 'Smash Burger',
-    'Mushroom Swiss', 'Double Stack', 'Spicy Chicken', 'Veggie Burger'
+  'Burgeri': [
+    'Klasični burger', 'Cheeseburger', 'Bacon burger', 'BBQ burger', 'Smash burger',
+    'Burger sa gljivama', 'Dupli burger', 'Ljuti burger', 'Veggie burger'
   ],
-  Sushi: [
+  'Sushi': [
     'California Roll', 'Dragon Roll', 'Rainbow Roll', 'Spicy Tuna Roll',
     'Salmon Nigiri', 'Tuna Nigiri', 'Eel Roll', 'Tempura Roll'
   ],
-  Mexican: [
+  'Meksička hrana': [
     'Tacos', 'Burrito', 'Quesadilla', 'Nachos', 'Fajitas',
     'Enchiladas', 'Chimichanga', 'Taquitos'
   ],
-  Chinese: [
-    'Fried Rice', 'Chow Mein', 'Kung Pao Chicken', 'Sweet & Sour Pork',
-    'Mapo Tofu', 'Spring Rolls', 'Dumplings'
+  'Kineska hrana': [
+    'Pržena riža', 'Chow Mein', 'Kung Pao piletina', 'Slatko-kisela svinjetina',
+    'Mapo Tofu', 'Proljetne rolice', 'Knedle'
   ],
-  Indian: [
+  'Indijska hrana': [
     'Butter Chicken', 'Chicken Tikka Masala', 'Biryani', 'Dal Tadka',
     'Saag Paneer', 'Rogan Josh', 'Naan'
   ],
-  Thai: [
-    'Pad Thai', 'Pad See Ew', 'Green Curry', 'Red Curry',
-    'Massaman Curry', 'Tom Yum Soup'
+  'Tajlandska hrana': [
+    'Pad Thai', 'Pad See Ew', 'Zeleni curry', 'Crveni curry',
+    'Massaman curry', 'Tom Yum juha'
   ],
-  Korean: [
-    'Bibimbap', 'Bulgogi', 'Kimchi Fried Rice',
-    'Korean Fried Chicken', 'Japchae'
+  'Korejska hrana': [
+    'Bibimbap', 'Bulgogi', 'Kimchi pržena riža',
+    'Korejska pržena piletina', 'Japchae'
   ],
-  Vietnamese: [
-    'Pho Bo', 'Pho Ga', 'Banh Mi', 'Spring Rolls', 'Bun Cha'
+  'Vijetnamska hrana': [
+    'Pho Bo', 'Pho Ga', 'Banh Mi', 'Proljetne rolice', 'Bun Cha'
   ],
-  Mediterranean: [
-    'Gyros', 'Falafel', 'Hummus Plate', 'Shawarma', 'Grilled Halloumi'
+  'Mediteranska hrana': [
+    'Gyros', 'Falafel', 'Hummus tanjir', 'Shawarma', 'Grilovani Halloumi'
   ],
-  Pasta: [
-    'Spaghetti Bolognese', 'Carbonara', 'Alfredo',
-    'Pesto Pasta', 'Lasagna', 'Ravioli'
+  'Tjestenina': [
+    'Špageti Bolognese', 'Carbonara', 'Alfredo',
+    'Pesto tjestenina', 'Lazanje', 'Ravioli'
   ],
-  Ramen: [
+  'Ramen': [
     'Tonkotsu Ramen', 'Shoyu Ramen', 'Miso Ramen',
-    'Spicy Ramen', 'Chicken Ramen'
+    'Ljuti Ramen', 'Pileći Ramen'
   ],
-  Salads: [
-    'Caesar Salad', 'Greek Salad', 'Cobb Salad',
-    'Quinoa Salad', 'Kale Salad'
+  'Salate': [
+    'Caesar salata', 'Grčka salata', 'Šopska salata',
+    'Salata sa piletinom', 'Sezonska salata'
   ],
-  Desserts: [
-    'Cheesecake', 'Chocolate Brownie', 'Ice Cream',
-    'Tiramisu', 'Creme Brulee', 'Apple Pie'
+  'Deserti': [
+    'Čizkejk', 'Čokoladni brownie', 'Sladoled',
+    'Tiramisu', 'Baklava', 'Tufahije', 'Hurmašice'
   ],
-  Bakery: [
-    'Croissant', 'Pain au Chocolat', 'Bagel',
-    'Muffin', 'Sourdough Bread'
+  'Pekara': [
+    'Kroasan', 'Čokoladni kroasan', 'Kifla',
+    'Mafin', 'Somun', 'Lepinja'
   ],
-  Drinks: [
-    'Cola', 'Lemonade', 'Iced Tea',
-    'Sparkling Water', 'Milkshake'
+  'Pića': [
+    'Coca-Cola', 'Limunada', 'Ledeni čaj',
+    'Kisela voda', 'Milkshake', 'Cedevita'
   ],
-  Coffee: [
+  'Kafa': [
     'Espresso', 'Americano', 'Latte',
-    'Cappuccino', 'Flat White'
+    'Cappuccino', 'Bosanska kafa', 'Turska kafa'
+  ],
+  'Roštilj': [
+    'Ćevapi', 'Pljeskavica', 'Ražnjići', 'Kobasice',
+    'Piletina sa roštilja', 'Miješano meso'
+  ],
+  'Ćevapi': [
+    'Ćevapi 5 kom', 'Ćevapi 10 kom', 'Ćevapi u lepinji',
+    'Ćevapi u somunu', 'Ćevapi sa kajmakom'
+  ],
+  'Bosanska kuhinja': [
+    'Bosanski lonac', 'Begova čorba', 'Dolma', 'Sarma',
+    'Japrak', 'Klepe', 'Bamija'
+  ],
+  'Pite i bureci': [
+    'Burek sa mesom', 'Sirnica', 'Zeljanica', 'Krompiruša',
+    'Burek sa sirom', 'Pita sa jabukama'
   ],
 }
 
@@ -194,9 +216,9 @@ async function main() {
       data: {
         email: `user${i}@test.com`,
         passwordHash: customerHash,
-        firstName: faker.person.firstName(),
-        lastName: faker.person.lastName(),
-        phone: faker.phone.number(),
+        firstName: localFaker.person.firstName(),
+        lastName: localFaker.person.lastName(),
+        phone: localFaker.phone.number(),
         role: UserRole.CUSTOMER,
         emailVerified: true,
         phoneVerified: true,
@@ -213,8 +235,9 @@ async function main() {
         data: {
           email: `driver${i}@test.com`,
           passwordHash: driverHash,
-          firstName: faker.person.firstName(),
-          lastName: faker.person.lastName(),
+          firstName: localFaker.person.firstName(),
+          lastName: localFaker.person.lastName(),
+          phone: localFaker.phone.number(),
           role: UserRole.DELIVERY_DRIVER,
           emailVerified: true,
           phoneVerified: true,
@@ -232,8 +255,9 @@ async function main() {
       data: {
         email: `owner${i}@test.com`,
         passwordHash: ownerHash,
-        firstName: faker.person.firstName(),
-        lastName: faker.person.lastName(),
+        firstName: localFaker.person.firstName(),
+        lastName: localFaker.person.lastName(),
+        phone: localFaker.phone.number(),
         role: UserRole.RESTAURANT_OWNER,
         emailVerified: true,
         phoneVerified: true,
@@ -242,15 +266,15 @@ async function main() {
 
     const place = await prisma.place.create({
       data: {
-        address: faker.location.streetAddress(),
-        city: faker.location.city(),
-        country: faker.location.country(),
+        address: localFaker.location.streetAddress(),
+        city: localFaker.location.city(),
+        country: 'Bosna i Hercegovina',
       },
     })
 
     const restaurant = await prisma.restaurant.create({
       data: {
-        name: `${faker.company.name()} Restaurant`,
+        name: `${localFaker.company.name()} Restoran`,
         ownerId: owner.id,
         placeId: place.id,
         rating: faker.number.float({ min: 3, max: 5 }),
@@ -300,9 +324,9 @@ async function main() {
   for (const c of customers) {
     const place = await prisma.place.create({
       data: {
-        address: faker.location.streetAddress(),
-        city: faker.location.city(),
-        country: faker.location.country(),
+        address: localFaker.location.streetAddress(),
+        city: localFaker.location.city(),
+        country: 'Bosna i Hercegovina',
       },
     })
 
@@ -367,6 +391,78 @@ async function main() {
             status === OrderStatus.DELIVERED
               ? PaymentStatus.COMPLETED
               : PaymentStatus.PENDING,
+        },
+      })
+    }
+  }
+
+  /* REVIEWS */
+  const reviewTitles = [
+    'Amazing food!',
+    'Great experience',
+    'Will order again',
+    'Delicious meals',
+    'Fast delivery',
+    'Good quality',
+    'Highly recommend',
+    'Perfect dinner',
+    'Loved it!',
+    'Excellent service',
+    'Tasty and fresh',
+    'Best in town',
+    'Decent food',
+    'Not bad',
+    'Could be better',
+    'Average experience',
+    'Disappointing',
+  ]
+
+  const reviewContents = [
+    'The food was absolutely delicious and arrived hot. Will definitely order again!',
+    'Great portion sizes and authentic flavors. The delivery was quick too.',
+    'One of the best meals I\'ve had delivered. Everything was fresh and tasty.',
+    'Really enjoyed the food quality. The packaging kept everything in perfect condition.',
+    'Exceeded my expectations! The flavors were incredible and well-balanced.',
+    'Good food but delivery took a bit longer than expected. Still worth it though.',
+    'Solid choice for a weeknight dinner. Will be ordering from here regularly.',
+    'The dishes were flavorful and the portions were generous. Great value for money.',
+    'Fast delivery and the food was still hot when it arrived. Very satisfied!',
+    'Tried this place for the first time and was impressed. Great menu variety.',
+    'The food was okay but nothing special. Might try again with different items.',
+    'Decent quality but I\'ve had better. The delivery was prompt at least.',
+    'Not my favorite but the price was reasonable. Average overall experience.',
+  ]
+
+  for (const restaurant of restaurants) {
+    // Get customers who have ordered from this restaurant
+    const ordersFromRestaurant = await prisma.order.findMany({
+      where: { restaurantId: restaurant.id },
+      select: { userId: true },
+      distinct: ['userId'],
+      take: SEED_CONFIG.reviewsPerRestaurant,
+    })
+
+    for (const order of ordersFromRestaurant) {
+      const rating = faker.number.int({ min: 1, max: 5 })
+
+      // Higher ratings get positive titles/content, lower get negative
+      const titlePool = rating >= 4
+        ? reviewTitles.slice(0, 12)
+        : rating >= 3
+          ? reviewTitles.slice(10, 16)
+          : reviewTitles.slice(14)
+
+      const contentPool = rating >= 4
+        ? reviewContents.slice(0, 10)
+        : reviewContents.slice(10)
+
+      await prisma.review.create({
+        data: {
+          userId: order.userId,
+          restaurantId: restaurant.id,
+          rating,
+          title: faker.helpers.arrayElement(titlePool),
+          content: faker.helpers.arrayElement(contentPool),
         },
       })
     }

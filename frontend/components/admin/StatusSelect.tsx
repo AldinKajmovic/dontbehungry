@@ -114,7 +114,25 @@ export const StatusSelect = forwardRef<HTMLDivElement, StatusSelectProps>(
 
 StatusSelect.displayName = 'StatusSelect'
 
-// Pre-defined status options for orders
+// Base status data (colors only) - labels should be added by consuming components using translations
+export const ORDER_STATUS_COLORS: Record<string, string> = {
+  PENDING: 'bg-yellow-100 text-yellow-700',
+  CONFIRMED: 'bg-blue-100 text-blue-700',
+  PREPARING: 'bg-purple-100 text-purple-700',
+  READY_FOR_PICKUP: 'bg-indigo-100 text-indigo-700',
+  OUT_FOR_DELIVERY: 'bg-cyan-100 text-cyan-700',
+  DELIVERED: 'bg-green-100 text-green-700',
+  CANCELLED: 'bg-red-100 text-red-700',
+}
+
+export const PAYMENT_STATUS_COLORS: Record<string, string> = {
+  PENDING: 'bg-yellow-100 text-yellow-700',
+  COMPLETED: 'bg-green-100 text-green-700',
+  FAILED: 'bg-red-100 text-red-700',
+  REFUNDED: 'bg-blue-100 text-blue-700',
+}
+
+// Pre-defined status options for orders (with English labels for backwards compatibility)
 export const ORDER_STATUS_OPTIONS: StatusOption[] = [
   { value: 'PENDING', label: 'Pending', colorClass: 'bg-yellow-100 text-yellow-700' },
   { value: 'CONFIRMED', label: 'Confirmed', colorClass: 'bg-blue-100 text-blue-700' },
@@ -125,10 +143,28 @@ export const ORDER_STATUS_OPTIONS: StatusOption[] = [
   { value: 'CANCELLED', label: 'Cancelled', colorClass: 'bg-red-100 text-red-700' },
 ]
 
-// Pre-defined status options for payments
+// Pre-defined status options for payments (with English labels for backwards compatibility)
 export const PAYMENT_STATUS_OPTIONS: StatusOption[] = [
   { value: 'PENDING', label: 'Pending', colorClass: 'bg-yellow-100 text-yellow-700' },
   { value: 'COMPLETED', label: 'Completed', colorClass: 'bg-green-100 text-green-700' },
   { value: 'FAILED', label: 'Failed', colorClass: 'bg-red-100 text-red-700' },
   { value: 'REFUNDED', label: 'Refunded', colorClass: 'bg-blue-100 text-blue-700' },
+]
+
+// Helper function to get translated status options
+export const getOrderStatusOptions = (t: (key: string) => string): StatusOption[] => [
+  { value: 'PENDING', label: t('admin.orderStatus.PENDING'), colorClass: ORDER_STATUS_COLORS.PENDING },
+  { value: 'CONFIRMED', label: t('admin.orderStatus.CONFIRMED'), colorClass: ORDER_STATUS_COLORS.CONFIRMED },
+  { value: 'PREPARING', label: t('admin.orderStatus.PREPARING'), colorClass: ORDER_STATUS_COLORS.PREPARING },
+  { value: 'READY_FOR_PICKUP', label: t('admin.orderStatus.READY_FOR_PICKUP'), colorClass: ORDER_STATUS_COLORS.READY_FOR_PICKUP },
+  { value: 'OUT_FOR_DELIVERY', label: t('admin.orderStatus.OUT_FOR_DELIVERY'), colorClass: ORDER_STATUS_COLORS.OUT_FOR_DELIVERY },
+  { value: 'DELIVERED', label: t('admin.orderStatus.DELIVERED'), colorClass: ORDER_STATUS_COLORS.DELIVERED },
+  { value: 'CANCELLED', label: t('admin.orderStatus.CANCELLED'), colorClass: ORDER_STATUS_COLORS.CANCELLED },
+]
+
+export const getPaymentStatusOptions = (t: (key: string) => string): StatusOption[] => [
+  { value: 'PENDING', label: t('admin.paymentStatus.PENDING'), colorClass: PAYMENT_STATUS_COLORS.PENDING },
+  { value: 'COMPLETED', label: t('admin.paymentStatus.COMPLETED'), colorClass: PAYMENT_STATUS_COLORS.COMPLETED },
+  { value: 'FAILED', label: t('admin.paymentStatus.FAILED'), colorClass: PAYMENT_STATUS_COLORS.FAILED },
+  { value: 'REFUNDED', label: t('admin.paymentStatus.REFUNDED'), colorClass: PAYMENT_STATUS_COLORS.REFUNDED },
 ]

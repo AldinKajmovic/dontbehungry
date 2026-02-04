@@ -348,15 +348,15 @@ export interface CreateUserData {
   password: string
   firstName: string
   lastName: string
-  phone?: string
+  phone: string
   role?: string
 }
 
 export function validateCreateUser(data: CreateUserData): void {
-  const { email, password, firstName, lastName, role } = data
+  const { email, password, firstName, lastName, phone, role } = data
 
-  if (!email || !password || !firstName || !lastName) {
-    throw new BadRequestError('Missing required fields', 'Email, password, firstName, and lastName are required')
+  if (!email || !password || !firstName || !lastName || !phone) {
+    throw new BadRequestError('Missing required fields', 'Email, password, firstName, lastName, and phone are required')
   }
 
   // Security: Validate string lengths

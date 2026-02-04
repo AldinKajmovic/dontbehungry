@@ -9,39 +9,41 @@ import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert, Select } from '@/components/ui'
 import { adminService, AdminUser, PaginationInfo, UserFilters, SortParams } from '@/services/admin'
-
-const ROLE_OPTIONS = [
-  { value: 'CUSTOMER', label: 'Customer' },
-  { value: 'RESTAURANT_OWNER', label: 'Restaurant Owner' },
-  { value: 'DELIVERY_DRIVER', label: 'Delivery Driver' },
-  { value: 'ADMIN', label: 'Admin' },
-]
-
-const FILTER_CONFIG = [
-  {
-    key: 'role',
-    label: 'Role',
-    options: [
-      { value: 'CUSTOMER', label: 'Customer' },
-      { value: 'RESTAURANT_OWNER', label: 'Restaurant Owner' },
-      { value: 'DELIVERY_DRIVER', label: 'Delivery Driver' },
-      { value: 'ADMIN', label: 'Admin' },
-      { value: 'SUPER_ADMIN', label: 'Super Admin' },
-    ],
-    placeholder: 'All Roles',
-  },
-  {
-    key: 'emailVerified',
-    label: 'Status',
-    options: [
-      { value: 'true', label: 'Verified' },
-      { value: 'false', label: 'Pending' },
-    ],
-    placeholder: 'All Statuses',
-  },
-]
+import { useLanguage } from '@/hooks/useLanguage'
 
 export default function UsersPage() {
+  const { t } = useLanguage()
+
+  const ROLE_OPTIONS = [
+    { value: 'CUSTOMER', label: t('admin.roles.CUSTOMER') },
+    { value: 'RESTAURANT_OWNER', label: t('admin.roles.RESTAURANT_OWNER') },
+    { value: 'DELIVERY_DRIVER', label: t('admin.roles.DELIVERY_DRIVER') },
+    { value: 'ADMIN', label: t('admin.roles.ADMIN') },
+  ]
+
+  const FILTER_CONFIG = [
+    {
+      key: 'role',
+      label: t('admin.roles.label'),
+      options: [
+        { value: 'CUSTOMER', label: t('admin.roles.CUSTOMER') },
+        { value: 'RESTAURANT_OWNER', label: t('admin.roles.RESTAURANT_OWNER') },
+        { value: 'DELIVERY_DRIVER', label: t('admin.roles.DELIVERY_DRIVER') },
+        { value: 'ADMIN', label: t('admin.roles.ADMIN') },
+        { value: 'SUPER_ADMIN', label: t('admin.roles.SUPER_ADMIN') },
+      ],
+      placeholder: t('admin.roles.allRoles'),
+    },
+    {
+      key: 'emailVerified',
+      label: t('admin.status.label'),
+      options: [
+        { value: 'true', label: t('admin.status.verified') },
+        { value: 'false', label: t('admin.status.pending') },
+      ],
+      placeholder: t('admin.status.allStatuses'),
+    },
+  ]
   const [users, setUsers] = useState<AdminUser[]>([])
   const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -206,7 +208,7 @@ export default function UsersPage() {
         password: formData.password,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phone: formData.phone || undefined,
+        phone: formData.phone,
         role: formData.role,
       })
 
@@ -285,7 +287,7 @@ export default function UsersPage() {
   const columns = [
     {
       key: 'email',
-      header: 'Email',
+      header: t('admin.columns.email'),
       sortable: true,
       render: (user: AdminUser) => (
         <div>
@@ -296,19 +298,19 @@ export default function UsersPage() {
     },
     {
       key: 'firstName',
-      header: 'First Name',
+      header: t('admin.columns.firstName'),
       sortable: true,
       render: (user: AdminUser) => <span>{user.firstName}</span>,
     },
     {
       key: 'lastName',
-      header: 'Last Name',
+      header: t('admin.columns.lastName'),
       sortable: true,
       render: (user: AdminUser) => <span>{user.lastName}</span>,
     },
     {
       key: 'role',
-      header: 'Role',
+      header: t('admin.columns.role'),
       sortable: true,
       render: (user: AdminUser) => (
         <span className={`px-2 py-1 text-xs font-medium rounded-full ${
@@ -320,24 +322,24 @@ export default function UsersPage() {
             ? 'bg-green-100 text-green-700'
             : 'bg-gray-100 text-gray-700'
         }`}>
-          {user.role.replace('_', ' ')}
+          {t(`admin.roles.${user.role}`)}
         </span>
       ),
     },
     {
       key: 'emailVerified',
-      header: 'Status',
+      header: t('admin.columns.status'),
       sortable: true,
       render: (user: AdminUser) => (
         <div className="flex items-center gap-2">
           <span className={`w-2 h-2 rounded-full ${user.emailVerified ? 'bg-green-500' : 'bg-yellow-500'}`} />
-          <span className="text-sm">{user.emailVerified ? 'Verified' : 'Pending'}</span>
+          <span className="text-sm">{user.emailVerified ? t('admin.status.verified') : t('admin.status.pending')}</span>
         </div>
       ),
     },
     {
       key: 'phone',
-      header: 'Phone',
+      header: t('admin.columns.phone'),
       render: (user: AdminUser) => <span className="text-gray-500">{user.phone || '-'}</span>,
     },
   ]
@@ -347,8 +349,8 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-          <p className="text-gray-500 mt-1">Manage user accounts</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('admin.users')}</h1>
+          <p className="text-gray-500 mt-1">{t('admin.manageUsers')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -361,7 +363,7 @@ export default function UsersPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add User
+              {t('admin.addUser')}
             </span>
           </Button>
         </div>
@@ -375,12 +377,12 @@ export default function UsersPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by email or name..."
+              placeholder={t('admin.searchByEmailOrName')}
               className="input-field"
             />
           </div>
           <Button type="submit" variant="secondary" className="!w-auto !px-6">
-            Search
+            {t('common.search')}
           </Button>
         </div>
       </form>
@@ -404,7 +406,7 @@ export default function UsersPage() {
         data={users}
         keyField="id"
         isLoading={isLoading}
-        emptyMessage="No users found"
+        emptyMessage={t('admin.noUsersFound')}
         sortConfig={sort.sortBy ? { key: sort.sortBy, direction: sort.sortOrder || 'asc' } : undefined}
         onSort={handleSort}
         actions={(user) => (
@@ -447,7 +449,7 @@ export default function UsersPage() {
       <Modal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        title="Add New User"
+        title={t('admin.modals.addNewUser')}
         size="lg"
       >
         <form onSubmit={handleCreate} className="space-y-4">
@@ -455,14 +457,14 @@ export default function UsersPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="First Name"
+              label={t('admin.columns.firstName')}
               id="firstName"
               value={formData.firstName}
               onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
               required
             />
             <Input
-              label="Last Name"
+              label={t('admin.columns.lastName')}
               id="lastName"
               value={formData.lastName}
               onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
@@ -471,7 +473,7 @@ export default function UsersPage() {
           </div>
 
           <Input
-            label="Email"
+            label={t('admin.columns.email')}
             type="email"
             id="email"
             value={formData.email}
@@ -480,7 +482,7 @@ export default function UsersPage() {
           />
 
           <Input
-            label="Password"
+            label={t('auth.login.passwordLabel')}
             type="password"
             id="password"
             value={formData.password}
@@ -490,16 +492,16 @@ export default function UsersPage() {
           />
 
           <Input
-            label="Phone"
+            label={t('admin.columns.phone')}
             type="tel"
             id="phone"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            hint="(optional)"
+            required
           />
 
           <Select
-            label="Role"
+            label={t('admin.roles.label')}
             id="role"
             value={formData.role}
             onChange={(e) => setFormData({ ...formData, role: e.target.value })}
@@ -509,26 +511,26 @@ export default function UsersPage() {
           {/* Restaurant fields - shown when RESTAURANT_OWNER is selected */}
           {formData.role === 'RESTAURANT_OWNER' && (
             <div className="border-t border-gray-200 pt-4 mt-4 space-y-4">
-              <p className="text-sm font-medium text-gray-700">Restaurant Details</p>
+              <p className="text-sm font-medium text-gray-700">{t('admin.modals.restaurantDetails')}</p>
 
               <Input
-                label="Restaurant Name"
+                label={t('restaurant.name')}
                 id="restaurantName"
                 value={formData.restaurantName}
                 onChange={(e) => setFormData({ ...formData, restaurantName: e.target.value })}
-                placeholder="My Restaurant"
+                placeholder={t('restaurant.namePlaceholder')}
                 required
               />
 
               <div>
                 <label htmlFor="restaurantDescription" className="block text-sm font-medium text-gray-700 mb-2">
-                  Description <span className="text-gray-400 font-normal">(optional)</span>
+                  {t('restaurant.description')} <span className="text-gray-400 font-normal">({t('common.optional')})</span>
                 </label>
                 <textarea
                   id="restaurantDescription"
                   value={formData.restaurantDescription}
                   onChange={(e) => setFormData({ ...formData, restaurantDescription: e.target.value })}
-                  placeholder="Describe the restaurant..."
+                  placeholder={t('restaurant.descriptionPlaceholder')}
                   rows={2}
                   className="input-field resize-none"
                 />
@@ -536,70 +538,70 @@ export default function UsersPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label="Restaurant Phone"
+                  label={t('restaurant.phone')}
                   type="tel"
                   id="restaurantPhone"
                   value={formData.restaurantPhone}
                   onChange={(e) => setFormData({ ...formData, restaurantPhone: e.target.value })}
-                  hint="(optional)"
+                  hint={`(${t('common.optional')})`}
                 />
                 <Input
-                  label="Restaurant Email"
+                  label={t('restaurant.email')}
                   type="email"
                   id="restaurantEmail"
                   value={formData.restaurantEmail}
                   onChange={(e) => setFormData({ ...formData, restaurantEmail: e.target.value })}
-                  hint="(optional)"
+                  hint={`(${t('common.optional')})`}
                 />
               </div>
 
-              <p className="text-sm font-medium text-gray-700 mt-2">Location</p>
+              <p className="text-sm font-medium text-gray-700 mt-2">{t('admin.modals.location')}</p>
 
               <Input
-                label="Street Address"
+                label={t('address.streetAddress')}
                 id="restaurantAddress"
                 value={formData.restaurantAddress}
                 onChange={(e) => setFormData({ ...formData, restaurantAddress: e.target.value })}
-                placeholder="123 Main Street"
+                placeholder={t('address.streetAddressPlaceholder')}
                 required
               />
 
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label="City"
+                  label={t('address.city')}
                   id="restaurantCity"
                   value={formData.restaurantCity}
                   onChange={(e) => setFormData({ ...formData, restaurantCity: e.target.value })}
-                  placeholder="New York"
+                  placeholder={t('address.cityPlaceholder')}
                   required
                 />
                 <Input
-                  label="Country"
+                  label={t('address.country')}
                   id="restaurantCountry"
                   value={formData.restaurantCountry}
                   onChange={(e) => setFormData({ ...formData, restaurantCountry: e.target.value })}
-                  placeholder="USA"
+                  placeholder={t('address.countryPlaceholder')}
                   required
                 />
               </div>
 
               <Input
-                label="Postal Code"
+                label={t('address.postalCode')}
                 id="restaurantPostalCode"
                 value={formData.restaurantPostalCode}
                 onChange={(e) => setFormData({ ...formData, restaurantPostalCode: e.target.value })}
-                placeholder="10001"
-                hint="(optional)"
+                placeholder={t('address.postalCodePlaceholder')}
+                hint={`(${t('common.optional')})`}
               />
             </div>
           )}
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowCreateModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Create User
+              {t('admin.buttons.createUser')}
             </Button>
           </div>
         </form>
@@ -609,7 +611,7 @@ export default function UsersPage() {
       <Modal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Edit User"
+        title={t('admin.modals.editUser')}
         size="lg"
       >
         <form onSubmit={handleUpdate} className="space-y-4">
@@ -617,14 +619,14 @@ export default function UsersPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="First Name"
+              label={t('admin.columns.firstName')}
               id="edit-firstName"
               value={formData.firstName}
               onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
               required
             />
             <Input
-              label="Last Name"
+              label={t('admin.columns.lastName')}
               id="edit-lastName"
               value={formData.lastName}
               onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
@@ -633,7 +635,7 @@ export default function UsersPage() {
           </div>
 
           <Input
-            label="Email"
+            label={t('admin.columns.email')}
             type="email"
             id="edit-email"
             value={formData.email}
@@ -642,16 +644,16 @@ export default function UsersPage() {
           />
 
           <Input
-            label="Phone"
+            label={t('admin.columns.phone')}
             type="tel"
             id="edit-phone"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            hint="(optional)"
+            required
           />
 
           <Select
-            label="Role"
+            label={t('admin.roles.label')}
             id="edit-role"
             value={formData.role}
             onChange={(e) => setFormData({ ...formData, role: e.target.value })}
@@ -660,10 +662,10 @@ export default function UsersPage() {
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowEditModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Save Changes
+              {t('admin.buttons.saveChanges')}
             </Button>
           </div>
         </form>
@@ -674,8 +676,8 @@ export default function UsersPage() {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
-        title="Delete User"
-        message={`Are you sure you want to delete ${selectedUser?.firstName} ${selectedUser?.lastName}? This action cannot be undone.`}
+        title={t('admin.modals.deleteUser')}
+        message={t('admin.confirmDelete.user').replace('{name}', `${selectedUser?.firstName} ${selectedUser?.lastName}`)}
         isLoading={formLoading}
       />
 

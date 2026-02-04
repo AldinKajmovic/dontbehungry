@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
+import { useLanguage } from '@/hooks/useLanguage'
 
 interface Column<T> {
   key: string
@@ -63,6 +64,8 @@ export function DataTable<T extends Record<string, any>>({
   sortConfig,
   onSort,
 }: DataTableProps<T>) {
+  const { t } = useLanguage()
+
   const handleSort = (column: Column<T>) => {
     if (!column.sortable || !onSort) return
 
@@ -109,7 +112,7 @@ export function DataTable<T extends Record<string, any>>({
                 return (
                   <th
                     key={column.key}
-                    className={`px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider ${column.className || ''} ${column.sortable ? 'cursor-pointer hover:bg-gray-100 select-none' : ''}`}
+                    className={`px-4 py-3 text-left text-xs font-semibold text-gray-500 tracking-wider ${column.className || ''} ${column.sortable ? 'cursor-pointer hover:bg-gray-100 select-none' : ''}`}
                     onClick={() => handleSort(column)}
                   >
                     <span className="flex items-center">
@@ -125,8 +128,8 @@ export function DataTable<T extends Record<string, any>>({
                 )
               })}
               {actions && (
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Actions
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 tracking-wider">
+                  {t('admin.table.actions')}
                 </th>
               )}
             </tr>

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import type { Socket } from 'socket.io-client'
 import { useAuth } from '@/hooks/useAuth'
 import api from '@/services/api'
+import { logger } from '@/utils/logger'
 
 interface SocketContextType {
   socket: Socket | null
@@ -35,7 +36,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
         const response = await api.get<{ token: string }>('/api/auth/socket-token')
         return response.data.token
       } catch (error) {
-        console.error(`Failed to get socket token (attempt ${attempt}/${retries}):`, error)
+        logger.error(`Failed to get socket token (attempt ${attempt}/${retries})`, error)
         if (attempt < retries) {
           await new Promise(resolve => setTimeout(resolve, 500 * attempt))
         }
@@ -82,7 +83,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
       const token = await getSocketToken()
 
       if (!token) {
-        console.error('No socket token available')
+        logger.error('No socket token available')
         return
       }
 
@@ -104,7 +105,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
       })
 
       newSocket.on('connect_error', (error) => {
-        console.error('Socket connection error:', error.message)
+        logger.error('Socket connection error', error)
         setIsConnected(false)
       })
 

@@ -15,3 +15,4 @@ export { FeatureCard } from './FeatureCard';
 export { Divider } from './Divider';
 export { Select } from './Select';
 export { SearchableSelect } from './SearchableSelect';
+export { LanguageToggle } from './LanguageToggle';

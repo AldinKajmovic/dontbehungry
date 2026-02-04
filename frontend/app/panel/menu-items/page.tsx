@@ -9,14 +9,16 @@ import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert, Select, SearchableSelect } from '@/components/ui'
 import { adminService, AdminMenuItem, PaginationInfo, MenuItemFilters, SortParams } from '@/services/admin'
-
-const AVAILABILITY_OPTIONS = [
-  { value: '', label: 'All Items' },
-  { value: 'true', label: 'Available' },
-  { value: 'false', label: 'Unavailable' },
-]
+import { useLanguage } from '@/hooks/useLanguage'
 
 export default function MenuItemsPage() {
+  const { t } = useLanguage()
+
+  const AVAILABILITY_OPTIONS = [
+    { value: '', label: t('admin.menuItemsPage.allItems') },
+    { value: 'true', label: t('admin.menuItemsPage.available') },
+    { value: 'false', label: t('admin.menuItemsPage.unavailable') },
+  ]
   const [menuItems, setMenuItems] = useState<AdminMenuItem[]>([])
   const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -146,7 +148,7 @@ export default function MenuItemsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.restaurantId) {
-      setFormError('Please select a restaurant')
+      setFormError(t('admin.menuItemsPage.selectRestaurant'))
       return
     }
     try {
@@ -225,7 +227,7 @@ export default function MenuItemsPage() {
   const columns = [
     {
       key: 'name',
-      header: 'Item',
+      header: t('admin.menuItemsPage.item'),
       sortable: true,
       render: (item: AdminMenuItem) => (
         <div className="flex items-center gap-3">
@@ -247,7 +249,7 @@ export default function MenuItemsPage() {
     },
     {
       key: 'price',
-      header: 'Price',
+      header: t('admin.menuItemsPage.price'),
       sortable: true,
       render: (item: AdminMenuItem) => (
         <span className="font-medium">${parseFloat(item.price).toFixed(2)}</span>
@@ -255,26 +257,26 @@ export default function MenuItemsPage() {
     },
     {
       key: 'category',
-      header: 'Category',
+      header: t('admin.menuItemsPage.category'),
       render: (item: AdminMenuItem) => (
         <span className="text-gray-500">{item.category?.name || '-'}</span>
       ),
     },
     {
       key: 'isAvailable',
-      header: 'Status',
+      header: t('admin.columns.status'),
       sortable: true,
       render: (item: AdminMenuItem) => (
         <span className={`px-2 py-1 text-xs font-medium rounded-full ${
           item.isAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
         }`}>
-          {item.isAvailable ? 'Available' : 'Unavailable'}
+          {item.isAvailable ? t('admin.menuItemsPage.available') : t('admin.menuItemsPage.unavailable')}
         </span>
       ),
     },
     {
       key: 'preparationTime',
-      header: 'Prep Time',
+      header: t('admin.menuItemsPage.prepTime'),
       sortable: true,
       render: (item: AdminMenuItem) => (
         <span className="text-gray-500">{item.preparationTime ? `${item.preparationTime} min` : '-'}</span>
@@ -287,8 +289,8 @@ export default function MenuItemsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Menu Items</h1>
-          <p className="text-gray-500 mt-1">Manage restaurant menu items</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('admin.menuItemsPage.title')}</h1>
+          <p className="text-gray-500 mt-1">{t('admin.menuItemsPage.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -301,7 +303,7 @@ export default function MenuItemsPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add Item
+              {t('admin.menuItemsPage.addItem')}
             </span>
           </Button>
         </div>
@@ -315,12 +317,12 @@ export default function MenuItemsPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name..."
+              placeholder={t('admin.menuItemsPage.searchPlaceholder')}
               className="input-field"
             />
           </div>
           <Button type="submit" variant="secondary" className="!w-auto !px-6">
-            Search
+            {t('common.search')}
           </Button>
         </div>
       </form>
@@ -330,17 +332,17 @@ export default function MenuItemsPage() {
         <div className="flex flex-wrap items-end gap-4">
           <div className="min-w-[200px]">
             <SearchableSelect
-              label="Category"
+              label={t('admin.menuItemsPage.category')}
               id="filter-category"
               value={filters.categoryId || ''}
               onChange={(value) => handleFilterChange('categoryId', value)}
               loadOptions={loadCategoryOptions}
-              placeholder="All Categories"
-              emptyMessage="No categories found"
+              placeholder={t('admin.menuItemsPage.allCategories')}
+              emptyMessage={t('admin.menuItemsPage.noCategoriesFound')}
             />
           </div>
           <div className="min-w-[150px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Availability</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.menuItemsPage.availability')}</label>
             <select
               value={filters.isAvailable || ''}
               onChange={(e) => handleFilterChange('isAvailable', e.target.value)}
@@ -352,7 +354,7 @@ export default function MenuItemsPage() {
             </select>
           </div>
           <RangeFilter
-            label="Price"
+            label={t('admin.menuItemsPage.price')}
             minValue={filters.minPrice || ''}
             maxValue={filters.maxPrice || ''}
             onMinChange={(value) => handleFilterChange('minPrice', value)}
@@ -363,7 +365,7 @@ export default function MenuItemsPage() {
             prefix="$"
           />
           <RangeFilter
-            label="Prep Time (min)"
+            label={t('admin.menuItemsPage.preparationTime')}
             minValue={filters.minPrepTime || ''}
             maxValue={filters.maxPrepTime || ''}
             onMinChange={(value) => handleFilterChange('minPrepTime', value)}
@@ -377,7 +379,7 @@ export default function MenuItemsPage() {
               onClick={handleClearFilters}
               className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              Clear Filters
+              {t('admin.clearFilters')}
             </button>
           )}
         </div>
@@ -392,7 +394,7 @@ export default function MenuItemsPage() {
         data={menuItems}
         keyField="id"
         isLoading={isLoading}
-        emptyMessage="No menu items found"
+        emptyMessage={t('admin.menuItemsPage.noMenuItemsFound')}
         sortConfig={sort.sortBy ? { key: sort.sortBy, direction: sort.sortOrder || 'asc' } : undefined}
         onSort={handleSort}
         actions={(item) => (
@@ -400,7 +402,7 @@ export default function MenuItemsPage() {
             <button
               onClick={() => openEditModal(item)}
               className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-              title="Edit"
+              title={t('common.edit')}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -409,7 +411,7 @@ export default function MenuItemsPage() {
             <button
               onClick={() => openDeleteModal(item)}
               className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Delete"
+              title={t('common.delete')}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -435,14 +437,14 @@ export default function MenuItemsPage() {
       <Modal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        title="Add New Menu Item"
+        title={t('admin.menuItemsPage.addNewMenuItem')}
         size="lg"
       >
         <form onSubmit={handleCreate} className="space-y-4">
           {formError && <Alert type="error">{formError}</Alert>}
 
           <Input
-            label="Item Name"
+            label={t('admin.menuItemsPage.itemName')}
             id="name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -450,16 +452,16 @@ export default function MenuItemsPage() {
           />
 
           <Input
-            label="Description"
+            label={t('admin.menuItemsPage.description')}
             id="description"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            hint="(optional)"
+            hint={`(${t('common.optional')})`}
           />
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Price"
+              label={t('admin.menuItemsPage.price')}
               type="number"
               step="0.01"
               min="0"
@@ -470,47 +472,47 @@ export default function MenuItemsPage() {
               required
             />
             <Input
-              label="Preparation Time (min)"
+              label={t('admin.menuItemsPage.preparationTime')}
               type="number"
               min="0"
               id="preparationTime"
               value={formData.preparationTime}
               onChange={(e) => setFormData({ ...formData, preparationTime: e.target.value })}
-              hint="(optional)"
+              hint={`(${t('common.optional')})`}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <SearchableSelect
-              label="Restaurant"
+              label={t('admin.menuItemsPage.restaurant')}
               id="restaurantId"
               value={formData.restaurantId}
               onChange={(value) => setFormData({ ...formData, restaurantId: value })}
               loadOptions={loadRestaurantOptions}
-              placeholder="Search restaurants..."
-              emptyMessage="No restaurants found"
+              placeholder={t('admin.menuItemsPage.searchRestaurants')}
+              emptyMessage={t('admin.menuItemsPage.noRestaurantsFound')}
               required
             />
             <SearchableSelect
-              label="Category"
+              label={t('admin.menuItemsPage.category')}
               id="categoryId"
               value={formData.categoryId}
               onChange={(value) => setFormData({ ...formData, categoryId: value })}
               loadOptions={loadCategoryOptions}
-              placeholder="Search categories..."
-              emptyMessage="No categories found"
-              hint="(optional)"
+              placeholder={t('admin.menuItemsPage.searchCategories')}
+              emptyMessage={t('admin.menuItemsPage.noCategoriesFound')}
+              hint={`(${t('common.optional')})`}
             />
           </div>
 
           <Input
-            label="Image URL"
+            label={t('admin.menuItemsPage.imageUrl')}
             type="url"
             id="imageUrl"
             value={formData.imageUrl}
             onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
             placeholder="https://..."
-            hint="(optional)"
+            hint={`(${t('common.optional')})`}
           />
 
           <label className="flex items-center gap-3 cursor-pointer">
@@ -520,15 +522,15 @@ export default function MenuItemsPage() {
               onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
               className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
             />
-            <span className="text-sm font-medium text-gray-700">Available</span>
+            <span className="text-sm font-medium text-gray-700">{t('admin.menuItemsPage.available')}</span>
           </label>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowCreateModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Create Item
+              {t('admin.menuItemsPage.createItem')}
             </Button>
           </div>
         </form>
@@ -538,14 +540,14 @@ export default function MenuItemsPage() {
       <Modal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Edit Menu Item"
+        title={t('admin.menuItemsPage.editMenuItem')}
         size="lg"
       >
         <form onSubmit={handleUpdate} className="space-y-4">
           {formError && <Alert type="error">{formError}</Alert>}
 
           <Input
-            label="Item Name"
+            label={t('admin.menuItemsPage.itemName')}
             id="edit-name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -553,16 +555,16 @@ export default function MenuItemsPage() {
           />
 
           <Input
-            label="Description"
+            label={t('admin.menuItemsPage.description')}
             id="edit-description"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            hint="(optional)"
+            hint={`(${t('common.optional')})`}
           />
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Price"
+              label={t('admin.menuItemsPage.price')}
               type="number"
               step="0.01"
               min="0"
@@ -573,49 +575,49 @@ export default function MenuItemsPage() {
               required
             />
             <Input
-              label="Preparation Time (min)"
+              label={t('admin.menuItemsPage.preparationTime')}
               type="number"
               min="0"
               id="edit-preparationTime"
               value={formData.preparationTime}
               onChange={(e) => setFormData({ ...formData, preparationTime: e.target.value })}
-              hint="(optional)"
+              hint={`(${t('common.optional')})`}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <SearchableSelect
-              label="Restaurant"
+              label={t('admin.menuItemsPage.restaurant')}
               id="edit-restaurantId"
               value={formData.restaurantId}
               onChange={(value) => setFormData({ ...formData, restaurantId: value })}
               loadOptions={loadRestaurantOptions}
-              placeholder="Search restaurants..."
-              emptyMessage="No restaurants found"
+              placeholder={t('admin.menuItemsPage.searchRestaurants')}
+              emptyMessage={t('admin.menuItemsPage.noRestaurantsFound')}
               initialLabel={selectedItem?.restaurant.name}
               required
             />
             <SearchableSelect
-              label="Category"
+              label={t('admin.menuItemsPage.category')}
               id="edit-categoryId"
               value={formData.categoryId}
               onChange={(value) => setFormData({ ...formData, categoryId: value })}
               loadOptions={loadCategoryOptions}
-              placeholder="Search categories..."
-              emptyMessage="No categories found"
+              placeholder={t('admin.menuItemsPage.searchCategories')}
+              emptyMessage={t('admin.menuItemsPage.noCategoriesFound')}
               initialLabel={selectedItem?.category?.name}
-              hint="(optional)"
+              hint={`(${t('common.optional')})`}
             />
           </div>
 
           <Input
-            label="Image URL"
+            label={t('admin.menuItemsPage.imageUrl')}
             type="url"
             id="edit-imageUrl"
             value={formData.imageUrl}
             onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
             placeholder="https://..."
-            hint="(optional)"
+            hint={`(${t('common.optional')})`}
           />
 
           <label className="flex items-center gap-3 cursor-pointer">
@@ -625,15 +627,15 @@ export default function MenuItemsPage() {
               onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
               className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
             />
-            <span className="text-sm font-medium text-gray-700">Available</span>
+            <span className="text-sm font-medium text-gray-700">{t('admin.menuItemsPage.available')}</span>
           </label>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowEditModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Save Changes
+              {t('admin.buttons.saveChanges')}
             </Button>
           </div>
         </form>
@@ -644,8 +646,8 @@ export default function MenuItemsPage() {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
-        title="Delete Menu Item"
-        message={`Are you sure you want to delete "${selectedItem?.name}"? This action cannot be undone.`}
+        title={t('admin.menuItemsPage.deleteMenuItem')}
+        message={t('admin.menuItemsPage.deleteMenuItemConfirm', { name: selectedItem?.name || '' })}
         isLoading={formLoading}
       />
 

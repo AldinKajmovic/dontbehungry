@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react'
 import { Modal, Button, Alert, Input } from '@/components/ui'
 import { reportsService, ReportType } from '@/services/admin'
+import { useLanguage } from '@/hooks/useLanguage'
 
 interface EmailReportModalProps {
   isOpen: boolean
@@ -11,22 +12,13 @@ interface EmailReportModalProps {
   filters?: Record<string, string | undefined>
 }
 
-const REPORT_TITLES: Record<ReportType, string> = {
-  orders: 'Orders',
-  restaurants: 'Restaurants',
-  users: 'Users',
-  reviews: 'Reviews',
-  categories: 'Categories',
-  menuItems: 'Menu Items',
-  places: 'Places',
-}
-
 export function EmailReportModal({
   isOpen,
   onClose,
   reportType,
   filters,
 }: EmailReportModalProps) {
+  const { t } = useLanguage()
   const [email, setEmail] = useState('')
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
@@ -34,7 +26,8 @@ export function EmailReportModal({
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
-  const defaultSubject = `Admin Report - ${REPORT_TITLES[reportType]} - ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`
+  const reportTypeName = t(`admin.reports.types.${reportType}`)
+  const defaultSubject = `Admin Report - ${reportTypeName} - ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -42,13 +35,13 @@ export function EmailReportModal({
     setSuccess(false)
 
     if (!email) {
-      setError('Email address is required')
+      setError(t('admin.reports.emailRequired'))
       return
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address')
+      setError(t('admin.reports.invalidEmail'))
       return
     }
 
@@ -71,7 +64,7 @@ export function EmailReportModal({
         onClose()
       }, 2000)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send report')
+      setError(err instanceof Error ? err.message : t('admin.reports.sendFailed'))
     } finally {
       setIsLoading(false)
     }
@@ -92,7 +85,7 @@ export function EmailReportModal({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title={`Email ${REPORT_TITLES[reportType]} Report`}
+      title={t('admin.reports.emailTitle', { type: reportTypeName })}
       icon={
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -102,10 +95,10 @@ export function EmailReportModal({
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <Alert type="error">{error}</Alert>}
-        {success && <Alert type="success">Report sent successfully!</Alert>}
+        {success && <Alert type="success">{t('admin.reports.sentSuccess')}</Alert>}
 
         <Input
-          label="Recipient Email"
+          label={t('admin.reports.recipientEmail')}
           id="report-email"
           type="email"
           value={email}
@@ -117,7 +110,7 @@ export function EmailReportModal({
 
         <div>
           <label htmlFor="report-subject" className="block text-sm font-medium text-gray-700 mb-2">
-            Subject <span className="text-gray-400 font-normal">(optional)</span>
+            {t('admin.reports.subject')} <span className="text-gray-400 font-normal">({t('common.optional')})</span>
           </label>
           <input
             id="report-subject"
@@ -132,13 +125,13 @@ export function EmailReportModal({
 
         <div>
           <label htmlFor="report-message" className="block text-sm font-medium text-gray-700 mb-2">
-            Message <span className="text-gray-400 font-normal">(optional)</span>
+            {t('admin.reports.message')} <span className="text-gray-400 font-normal">({t('common.optional')})</span>
           </label>
           <textarea
             id="report-message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Add a custom message to the email..."
+            placeholder={t('admin.reports.addCustomMessage')}
             rows={3}
             className="input-field resize-none"
             disabled={isLoading || success}
@@ -153,7 +146,7 @@ export function EmailReportModal({
             onClick={handleClose}
             disabled={isLoading}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             type="submit"
@@ -161,7 +154,7 @@ export function EmailReportModal({
             isLoading={isLoading}
             disabled={success}
           >
-            Send Report
+            {t('admin.reports.sendReport')}
           </Button>
         </div>
       </form>

@@ -3,16 +3,18 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { useLanguage } from '@/hooks/useLanguage'
+import { LanguageToggle } from '@/components/ui'
 
 interface NavItem {
-  label: string
+  labelKey: string
   href: string
   icon: React.ReactNode
 }
 
 const navItems: NavItem[] = [
   {
-    label: 'Dashboard',
+    labelKey: 'admin.dashboard',
     href: '/panel',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,7 +23,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: 'Users',
+    labelKey: 'admin.users',
     href: '/panel/users',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -30,7 +32,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: 'Restaurants',
+    labelKey: 'admin.restaurants',
     href: '/panel/restaurants',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,7 +41,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: 'Categories',
+    labelKey: 'admin.categories',
     href: '/panel/categories',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,7 +50,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: 'Menu Items',
+    labelKey: 'admin.menuItems',
     href: '/panel/menu-items',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +59,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: 'Orders',
+    labelKey: 'admin.orders',
     href: '/panel/orders',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +68,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: 'Reviews',
+    labelKey: 'admin.reviews',
     href: '/panel/reviews',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,7 +77,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: 'Places',
+    labelKey: 'admin.places',
     href: '/panel/places',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,6 +91,7 @@ const navItems: NavItem[] = [
 export function AdminSidebar() {
   const pathname = usePathname()
   const { logout } = useAuth()
+  const { t } = useLanguage()
 
   return (
     <aside className="w-64 bg-white border-r border-gray-100 min-h-screen">
@@ -102,7 +105,7 @@ export function AdminSidebar() {
           </div>
           <div>
             <span className="font-bold text-gray-900">Admin</span>
-            <span className="text-xs text-gray-500 block">Dashboard</span>
+            <span className="text-xs text-gray-500 block">{t('admin.dashboard')}</span>
           </div>
         </Link>
       </div>
@@ -123,7 +126,7 @@ export function AdminSidebar() {
                   }`}
                 >
                   {item.icon}
-                  {item.label}
+                  {t(item.labelKey)}
                 </Link>
               </li>
             )
@@ -131,8 +134,11 @@ export function AdminSidebar() {
         </ul>
       </nav>
 
-      {/* Back to site & Logout */}
+      {/* Language Toggle & Back to site & Logout */}
       <div className="absolute bottom-0 left-0 w-64 p-4 border-t border-gray-100 bg-white space-y-1">
+        <div className="px-4 py-2 mb-2">
+          <LanguageToggle />
+        </div>
         <Link
           href="/my-profile"
           className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors"
@@ -140,7 +146,7 @@ export function AdminSidebar() {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
           </svg>
-          Back to Site
+          {t('common.back')}
         </Link>
         <button
           onClick={logout}
@@ -149,7 +155,7 @@ export function AdminSidebar() {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          Log out
+          {t('common.logOut')}
         </button>
       </div>
     </aside>

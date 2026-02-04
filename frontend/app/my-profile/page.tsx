@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Input, Button, Alert, EmailVerificationBanner, Section, Modal } from '@/components/ui'
+import { Input, Button, Alert, EmailVerificationBanner, Section, Modal, LanguageToggle } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
+import { useLanguage } from '@/hooks/useLanguage'
 import { NotificationBell } from '@/components/notifications'
 import { profileService, UpdateProfileData, ChangePasswordData, MyRestaurant, MyMenuItem, Category, OrderHistoryItem, RestaurantOrderItem } from '@/services/profile'
 import { addressService, Address } from '@/services/address'
@@ -30,6 +31,7 @@ const LocationIcon = (
 
 export default function MyProfilePage() {
   const { user, isLoading, updateUser, logout } = useAuth()
+  const { t } = useLanguage()
 
   // Delete account modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -916,9 +918,10 @@ export default function MyProfilePage() {
                   </svg>
                 </Link>
               )}
-              <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t('profile.title')}</h1>
             </div>
             <div className="flex items-center gap-3">
+              <LanguageToggle />
               <NotificationBell />
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
                 {user.role.replace('_', ' ')}
@@ -927,7 +930,7 @@ export default function MyProfilePage() {
                 onClick={logout}
                 className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
               >
-                Log out
+                {t('profile.logOut')}
               </button>
             </div>
           </div>
@@ -936,7 +939,7 @@ export default function MyProfilePage() {
 
       <main className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-8">
         {/* Profile Picture Section */}
-        <Section title="Profile Picture">
+        <Section title={t('profile.profilePicture')}>
           <div className="flex items-center gap-6">
             <div className="relative">
               {user.avatarUrl ? (
@@ -985,34 +988,34 @@ export default function MyProfilePage() {
         </Section>
 
         {/* Basic Info Section */}
-        <Section title="Basic Information">
+        <Section title={t('profile.basicInfo')}>
           <form onSubmit={handleProfileSubmit} className="space-y-4">
             {profileSuccess && <Alert type="success">{profileSuccess}</Alert>}
             {profileError && <Alert type="error">{profileError}</Alert>}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
-                label="First Name"
+                label={t('profile.firstName')}
                 type="text"
                 id="firstName"
                 name="firstName"
                 value={profileForm.firstName}
                 onChange={handleProfileChange}
-                placeholder="Your first name"
+                placeholder={t('profile.firstNamePlaceholder')}
               />
               <Input
-                label="Last Name"
+                label={t('profile.lastName')}
                 type="text"
                 id="lastName"
                 name="lastName"
                 value={profileForm.lastName}
                 onChange={handleProfileChange}
-                placeholder="Your last name"
+                placeholder={t('profile.lastNamePlaceholder')}
               />
             </div>
 
             <Input
-              label="Email"
+              label={t('profile.email')}
               type="email"
               id="email"
               name="email"
@@ -1022,19 +1025,19 @@ export default function MyProfilePage() {
             />
 
             <Input
-              label="Phone Number"
+              label={t('profile.phoneNumber')}
               type="tel"
               id="phone"
               name="phone"
               value={profileForm.phone}
               onChange={handleProfileChange}
-              placeholder="+1 234 567 8900"
-              hint="(optional)"
+              placeholder={t('profile.phonePlaceholder')}
+              required
             />
 
             <div className="flex items-center gap-4 pt-2">
               <Button type="submit" isLoading={profileLoading} className="!w-auto !px-6">
-                {profileLoading ? 'Saving...' : 'Save Changes'}
+                {profileLoading ? t('profile.saving') : t('profile.saveChanges')}
               </Button>
               <div className="flex items-center gap-2 text-sm">
                 {user.emailVerified ? (
@@ -1060,8 +1063,8 @@ export default function MyProfilePage() {
         {/* Addresses Section - Hidden for delivery drivers (they use separate customer accounts to order) */}
         {!isDeliveryDriver && (
           <Section
-            title="My Addresses"
-            description="Manage your delivery addresses"
+            title={t('profile.myAddresses')}
+            description={t('profile.manageAddresses')}
           headerAction={
             <Button
               type="button"
@@ -1073,7 +1076,7 @@ export default function MyProfilePage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Add Address
+                {t('profile.addAddress')}
               </span>
             </Button>
           }
@@ -1090,14 +1093,14 @@ export default function MyProfilePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <p className="text-gray-500 mb-4">No addresses yet</p>
+              <p className="text-gray-500 mb-4">{t('profile.noAddresses')}</p>
               <Button
                 type="button"
                 variant="secondary"
                 className="!w-auto !py-2 !px-4"
                 onClick={openAddAddressModal}
               >
-                Add your first address
+                {t('profile.addFirstAddress')}
               </Button>
             </div>
           ) : (
@@ -1139,7 +1142,7 @@ export default function MyProfilePage() {
                       onClick={() => openEditAddressModal(address)}
                       className="text-xs text-gray-500 hover:text-gray-700"
                     >
-                      Edit
+                      {t('common.edit')}
                     </button>
                     {!address.isDefault && (
                       <>
@@ -1149,7 +1152,7 @@ export default function MyProfilePage() {
                           onClick={() => handleSetDefaultAddress(address.id)}
                           className="text-xs text-primary-600 hover:text-primary-700"
                         >
-                          Set as default
+                          {t('address.setAsDefault')}
                         </button>
                       </>
                     )}
@@ -1159,7 +1162,7 @@ export default function MyProfilePage() {
                       onClick={() => handleDeleteAddress(address.id)}
                       className="text-xs text-red-500 hover:text-red-600"
                     >
-                      Delete
+                      {t('common.delete')}
                     </button>
                   </div>
                 </div>
@@ -1172,8 +1175,8 @@ export default function MyProfilePage() {
         {/* Order History Section - Link to dedicated page (not for admins, restaurant owners, or delivery drivers) */}
         {!isAdmin && !isRestaurantOwner && !isDeliveryDriver && (
           <Section
-            title="Order History"
-            description="View and track your past orders"
+            title={t('profile.orderHistory')}
+            description={t('profile.viewTrackOrders')}
           >
             <a
               href="/orders"
@@ -1186,8 +1189,7 @@ export default function MyProfilePage() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">View All Orders</p>
-                  <p className="text-sm text-gray-500">Filter by status, date range, and more</p>
+                  <p className="font-medium text-gray-900">{t('profile.viewAllOrders')}</p>
                 </div>
               </div>
               <svg className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1354,51 +1356,51 @@ export default function MyProfilePage() {
 
         {/* Change Password Section - Hidden for Google-only users */}
         {!isGoogleUser && (
-          <Section title="Change Password">
+          <Section title={t('profile.changePassword')}>
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               {passwordSuccess && <Alert type="success">{passwordSuccess}</Alert>}
               {passwordError && <Alert type="error">{passwordError}</Alert>}
 
               <Input
-                label="Current Password"
+                label={t('profile.currentPassword')}
                 type="password"
                 id="currentPassword"
                 name="currentPassword"
                 value={passwordForm.currentPassword}
                 onChange={handlePasswordChange}
-                placeholder="Enter your current password"
+                placeholder={t('profile.enterCurrentPassword')}
                 showPasswordToggle
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                  label="New Password"
+                  label={t('profile.newPassword')}
                   type="password"
                   id="newPassword"
                   name="newPassword"
                   value={passwordForm.newPassword}
                   onChange={handlePasswordChange}
-                  placeholder="Enter new password"
+                  placeholder={t('profile.enterNewPassword')}
                   showPasswordToggle
                 />
                 <Input
-                  label="Confirm New Password"
+                  label={t('profile.confirmNewPassword')}
                   type="password"
                   id="confirmPassword"
                   name="confirmPassword"
                   value={passwordForm.confirmPassword}
                   onChange={handlePasswordChange}
-                  placeholder="Confirm new password"
+                  placeholder={t('profile.confirmNewPasswordPlaceholder')}
                   showPasswordToggle
                 />
               </div>
 
               <p className="text-xs text-gray-500">
-                Password must be at least 8 characters long.
+                {t('profile.passwordTooShort')}
               </p>
 
               <Button type="submit" isLoading={passwordLoading} className="!w-auto !px-6">
-                {passwordLoading ? 'Changing...' : 'Change Password'}
+                {passwordLoading ? t('profile.changing') : t('profile.changePassword')}
               </Button>
             </form>
           </Section>
@@ -1407,8 +1409,8 @@ export default function MyProfilePage() {
         {/* My Restaurants Section - Only for Restaurant Owners */}
         {isRestaurantOwner && (
           <Section
-            title="My Restaurants"
-            description="Manage your restaurants"
+            title={t('profile.myRestaurants')}
+            description={t('profile.manageRestaurants')}
             headerAction={
               <Button
                 type="button"
@@ -1420,7 +1422,7 @@ export default function MyProfilePage() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  Add Restaurant
+                  {t('profile.addRestaurant')}
                 </span>
               </Button>
             }
@@ -1436,14 +1438,14 @@ export default function MyProfilePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                 </div>
-                <p className="text-gray-500 mb-4">No restaurants yet</p>
+                <p className="text-gray-500 mb-4">{t('profile.noRestaurantsYet')}</p>
                 <Button
                   type="button"
                   variant="secondary"
                   className="!w-auto !py-2 !px-4"
                   onClick={openAddRestaurantModal}
                 >
-                  Add your first restaurant
+                  {t('profile.addFirstRestaurant')}
                 </Button>
               </div>
             ) : (
@@ -1525,22 +1527,22 @@ export default function MyProfilePage() {
         )}
 
         {/* Account Info Section */}
-        <Section title="Account Information">
+        <Section title={t('profile.accountInfo')}>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between py-2 border-b border-gray-100">
               <span className="text-gray-500">Role</span>
               <span className="text-gray-900">{user.role.replace('_', ' ')}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-gray-100">
-              <span className="text-gray-500">Email Status</span>
+              <span className="text-gray-500">{t('profile.emailStatus')}</span>
               <span className={user.emailVerified ? 'text-green-600' : 'text-yellow-600'}>
-                {user.emailVerified ? 'Verified' : 'Not Verified'}
+                {user.emailVerified ? t('profile.verified') : t('profile.notVerified')}
               </span>
             </div>
             <div className="flex justify-between py-2">
-              <span className="text-gray-500">Phone Status</span>
+              <span className="text-gray-500">{t('profile.phoneStatus')}</span>
               <span className={user.phoneVerified ? 'text-green-600' : 'text-gray-400'}>
-                {user.phoneVerified ? 'Verified' : 'Not Verified'}
+                {user.phoneVerified ? t('profile.verified') : t('profile.notVerified')}
               </span>
             </div>
           </div>
@@ -1548,9 +1550,9 @@ export default function MyProfilePage() {
 
         {/* Administration Section - Only for Admins */}
         {isAdmin && (
-          <Section title="Administration">
+          <Section title={t('profile.administration')}>
             <p className="text-sm text-gray-600 mb-4">
-              Access the admin panel to manage users, restaurants, orders, and more.
+              {t('admin.welcomeMessage')}
             </p>
             <Link href="/panel">
               <Button type="button" className="!w-auto !px-6">
@@ -1558,7 +1560,7 @@ export default function MyProfilePage() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                   </svg>
-                  Go to Admin Panel
+                  {t('profile.goToAdminPanel')}
                 </span>
               </Button>
             </Link>
@@ -1566,9 +1568,9 @@ export default function MyProfilePage() {
         )}
 
         {/* Danger Zone */}
-        <Section title="Danger Zone" variant="danger">
+        <Section title={t('profile.dangerZone')} variant="danger">
           <p className="text-sm text-gray-600 mb-4">
-            Once you delete your account, there is no going back. Please be certain.
+            {t('profile.dangerZoneDesc')}
           </p>
           <Button
             type="button"
@@ -1576,7 +1578,7 @@ export default function MyProfilePage() {
             className="!w-auto !px-6 !border-red-300 !text-red-600 hover:!bg-red-50"
             onClick={openDeleteModal}
           >
-            Delete Account
+            {t('profile.deleteAccountBtn')}
           </Button>
         </Section>
       </main>
@@ -1585,32 +1587,32 @@ export default function MyProfilePage() {
       <Modal
         isOpen={showDeleteModal}
         onClose={closeDeleteModal}
-        title={deleteStep === 1 ? 'Delete Account?' : 'Final Confirmation'}
+        title={deleteStep === 1 ? t('profile.deleteAccountTitle') : t('profile.finalConfirmation')}
         icon={deleteStep === 1 ? WarningIcon : TrashIcon}
         iconColor="red"
         actions={
           deleteStep === 1
             ? [
-                { label: 'Cancel', onClick: closeDeleteModal, variant: 'secondary' },
-                { label: 'Yes, delete my account', onClick: () => setDeleteStep(2), variant: 'secondary' },
+                { label: t('common.cancel'), onClick: closeDeleteModal, variant: 'secondary' },
+                { label: t('profile.yesDeleteAccount'), onClick: () => setDeleteStep(2), variant: 'secondary' },
               ]
             : [
-                { label: 'Cancel', onClick: closeDeleteModal, variant: 'secondary', disabled: deleteLoading },
-                { label: deleteLoading ? 'Deleting...' : 'I understand, delete my account', onClick: handleDeleteAccount, variant: 'danger', loading: deleteLoading },
+                { label: t('common.cancel'), onClick: closeDeleteModal, variant: 'secondary', disabled: deleteLoading },
+                { label: deleteLoading ? t('profile.deleting') : t('profile.understandDelete'), onClick: handleDeleteAccount, variant: 'danger', loading: deleteLoading },
               ]
         }
       >
         {deleteStep === 1 ? (
           <p className="text-sm text-gray-600">
-            Are you sure you want to delete your account? This action cannot be undone. All your data, including orders, reviews, and profile information will be permanently removed.
+            {t('profile.deleteAccountWarning')}
           </p>
         ) : (
           <>
             <p className="text-sm text-gray-600 mb-2">
-              This is your last chance to change your mind.
+              {t('profile.deleteAccountFinalWarning')}
             </p>
             <p className="text-sm font-medium text-red-600 mb-2">
-              Click the button below to permanently delete your account.
+              {t('profile.clickToDelete')}
             </p>
             {deleteError && (
               <div className="mt-4">
@@ -1625,7 +1627,7 @@ export default function MyProfilePage() {
       <Modal
         isOpen={showAddressModal}
         onClose={closeAddressModal}
-        title={editingAddress ? 'Edit Address' : 'Add New Address'}
+        title={editingAddress ? t('address.editAddress') : t('address.addNew')}
         icon={LocationIcon}
         iconColor="primary"
         size="lg"
@@ -1636,69 +1638,69 @@ export default function MyProfilePage() {
           )}
 
           <Input
-            label="Street Address"
+            label={t('address.streetAddress')}
             id="address"
             name="address"
             value={addressForm.address}
             onChange={handleAddressChange}
-            placeholder="123 Main Street, Apt 4"
+            placeholder={t('address.streetAddressPlaceholder')}
             autoComplete="street-address"
           />
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="City"
+              label={t('address.city')}
               id="city"
               name="city"
               value={addressForm.city}
               onChange={handleAddressChange}
-              placeholder="New York"
+              placeholder={t('address.cityPlaceholder')}
               autoComplete="address-level2"
             />
             <Input
-              label="State/Province"
+              label={t('address.state')}
               id="state"
               name="state"
               value={addressForm.state}
               onChange={handleAddressChange}
-              placeholder="NY"
-              hint="(optional)"
+              placeholder={t('address.statePlaceholder')}
+              hint={`(${t('common.optional')})`}
               autoComplete="address-level1"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Country"
+              label={t('address.country')}
               id="country"
               name="country"
               value={addressForm.country}
               onChange={handleAddressChange}
-              placeholder="USA"
+              placeholder={t('address.countryPlaceholder')}
               autoComplete="country-name"
             />
             <Input
-              label="Postal Code"
+              label={t('address.postalCode')}
               id="postalCode"
               name="postalCode"
               value={addressForm.postalCode}
               onChange={handleAddressChange}
-              placeholder="10001"
-              hint="(optional)"
+              placeholder={t('address.postalCodePlaceholder')}
+              hint={`(${t('common.optional')})`}
               autoComplete="postal-code"
             />
           </div>
 
           <div>
             <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-              Delivery Notes <span className="text-gray-400 font-normal">(optional)</span>
+              {t('address.deliveryNotes')} <span className="text-gray-400 font-normal">({t('common.optional')})</span>
             </label>
             <textarea
               id="notes"
               name="notes"
               value={addressForm.notes}
               onChange={handleAddressChange}
-              placeholder="e.g., Ring doorbell, leave at door..."
+              placeholder={t('address.deliveryNotesPlaceholder')}
               rows={2}
               className="input-field resize-none"
             />
@@ -1712,14 +1714,14 @@ export default function MyProfilePage() {
               onClick={closeAddressModal}
               disabled={addressLoading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               type="submit"
               className="flex-1"
               isLoading={addressLoading}
             >
-              {addressLoading ? 'Saving...' : editingAddress ? 'Save Changes' : 'Add Address'}
+              {addressLoading ? t('common.loading') : editingAddress ? t('common.save') : t('address.addAddress')}
             </Button>
           </div>
         </form>
@@ -1770,24 +1772,24 @@ export default function MyProfilePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Phone"
+              label={t('restaurant.phone')}
               type="tel"
               id="restaurantPhone"
               name="phone"
               value={restaurantForm.phone}
               onChange={handleRestaurantChange}
               placeholder="+1 234 567 8900"
-              hint="(optional)"
+              required
             />
             <Input
-              label="Email"
+              label={t('restaurant.email')}
               type="email"
               id="restaurantEmail"
               name="email"
               value={restaurantForm.email}
               onChange={handleRestaurantChange}
               placeholder="contact@restaurant.com"
-              hint="(optional)"
+              hint={`(${t('common.optional')})`}
             />
           </div>
 

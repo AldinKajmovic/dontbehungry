@@ -1,17 +1,20 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { CountryCode } from 'libphonenumber-js'
-import { Input, Button, PhoneInput, Alert, AuthLayout } from '@/components/ui'
+import { Input, Button, PhoneInput, Alert, AuthLayout, LanguageToggle } from '@/components/ui'
 import { registerSchema, extractZodErrors, formatPhoneE164, RegisterForm } from '@/services/validation'
 import { useFormValidation } from '@/hooks/useFormValidation'
 import { useAuth } from '@/hooks/useAuth'
+import { useLanguage } from '@/hooks/useLanguage'
 
 export default function RegisterPage() {
   const [selectedCountry, setSelectedCountry] = useState<CountryCode>('US')
   const [serverError, setServerError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const { register } = useAuth()
+  const { t } = useLanguage()
 
   const {
     formData,
@@ -51,7 +54,7 @@ export default function RegisterPage() {
     // Validate address fields if any are filled
     if (formData.address || formData.city || formData.country) {
       if (!formData.address || !formData.city || !formData.country) {
-        setServerError('Please fill in all address fields (address, city, and country)')
+        setServerError(t('address.requiredFields'))
         return
       }
     }
@@ -64,7 +67,7 @@ export default function RegisterPage() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        phone: formatPhoneE164(formData.phone || '', selectedCountry),
+        phone: formatPhoneE164(formData.phone, selectedCountry) || formData.phone,
         password: formData.password,
         address: formData.address || undefined,
         city: formData.city || undefined,
@@ -86,46 +89,68 @@ export default function RegisterPage() {
 
   return (
     <AuthLayout
-      title="Create your account"
-      subtitle="Join Glovo Copy and start ordering"
+      title={t('auth.register.title')}
+      subtitle={t('auth.register.subtitle')}
       icon={icon}
       iconGradient="secondary"
       backgroundGradient="green"
-      footerText="Already have an account?"
-      footerLinkText="Sign in"
+      footerText={t('auth.register.hasAccount')}
+      footerLinkText={t('common.signIn')}
       footerLinkHref="/auth/login"
+      headerRight={<LanguageToggle />}
     >
+      {/* Restaurant Owner Banner */}
+      <Link
+        href="/auth/register-restaurant"
+        className="block mb-6 p-4 bg-gradient-to-r from-secondary-50 to-secondary-100 border border-secondary-200 rounded-xl hover:from-secondary-100 hover:to-secondary-200 transition-all group"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-secondary-500 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <p className="font-medium text-secondary-900">{t('auth.register.restaurantOwner')}</p>
+            <p className="text-sm text-secondary-700">{t('auth.register.registerRestaurant')}</p>
+          </div>
+          <svg className="w-5 h-5 text-secondary-400 group-hover:text-secondary-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </Link>
+
       <form onSubmit={handleSubmit} className="space-y-4">
         {serverError && <Alert type="error">{serverError}</Alert>}
 
         {/* Name fields */}
         <div className="grid grid-cols-2 gap-3">
           <Input
-            label="First name"
+            label={t('auth.register.firstNameLabel')}
             id="firstName"
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
             onBlur={handleBlur}
             error={getFieldError('firstName')}
-            placeholder="John"
+            placeholder={t('auth.register.firstNamePlaceholder')}
             autoComplete="given-name"
           />
           <Input
-            label="Last name"
+            label={t('auth.register.lastNameLabel')}
             id="lastName"
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
             onBlur={handleBlur}
             error={getFieldError('lastName')}
-            placeholder="Doe"
+            placeholder={t('auth.register.lastNamePlaceholder')}
             autoComplete="family-name"
           />
         </div>
 
         <Input
-          label="Email address"
+          label={t('auth.register.emailLabel')}
           type="email"
           id="email"
           name="email"
@@ -133,13 +158,12 @@ export default function RegisterPage() {
           onChange={handleChange}
           onBlur={handleBlur}
           error={getFieldError('email')}
-          placeholder="you@example.com"
+          placeholder={t('auth.register.emailPlaceholder')}
           autoComplete="email"
         />
 
         <PhoneInput
-          label="Phone number"
-          hint="(optional)"
+          label={t('auth.register.phoneLabel')}
           value={formData.phone || ''}
           onChange={(value) => setFieldValue('phone', value)}
           onBlur={() => {
@@ -152,7 +176,7 @@ export default function RegisterPage() {
         />
 
         <Input
-          label="Password"
+          label={t('auth.register.passwordLabel')}
           type="password"
           id="password"
           name="password"
@@ -160,13 +184,13 @@ export default function RegisterPage() {
           onChange={handleChange}
           onBlur={handleBlur}
           error={getFieldError('password')}
-          placeholder="Create a password"
+          placeholder={t('auth.register.passwordPlaceholder')}
           autoComplete="new-password"
           showPasswordToggle
         />
 
         <Input
-          label="Confirm password"
+          label={t('auth.register.confirmPasswordLabel')}
           type="password"
           id="confirmPassword"
           name="confirmPassword"
@@ -174,47 +198,47 @@ export default function RegisterPage() {
           onChange={handleChange}
           onBlur={handleBlur}
           error={getFieldError('confirmPassword')}
-          placeholder="Confirm your password"
+          placeholder={t('auth.register.confirmPasswordPlaceholder')}
           autoComplete="new-password"
           showPasswordToggle
         />
 
         {/* Delivery Address */}
         <div className="pt-4 border-t border-gray-200">
-          <p className="text-sm font-medium text-gray-700 mb-3">Delivery Address</p>
+          <p className="text-sm font-medium text-gray-700 mb-3">{t('auth.register.deliveryAddress')}</p>
           <div className="space-y-3">
             <Input
-              label="Street address"
+              label={t('auth.register.streetAddressLabel')}
               id="address"
               name="address"
               value={formData.address || ''}
               onChange={handleChange}
               onBlur={handleBlur}
               error={getFieldError('address')}
-              placeholder="123 Main Street, Apt 4"
+              placeholder={t('auth.register.streetAddressPlaceholder')}
               autoComplete="street-address"
             />
             <div className="grid grid-cols-2 gap-3">
               <Input
-                label="City"
+                label={t('auth.register.cityLabel')}
                 id="city"
                 name="city"
                 value={formData.city || ''}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={getFieldError('city')}
-                placeholder="New York"
+                placeholder={t('auth.register.cityPlaceholder')}
                 autoComplete="address-level2"
               />
               <Input
-                label="Country"
+                label={t('auth.register.countryLabel')}
                 id="country"
                 name="country"
                 value={formData.country || ''}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={getFieldError('country')}
-                placeholder="USA"
+                placeholder={t('auth.register.countryPlaceholder')}
                 autoComplete="country-name"
               />
             </div>
@@ -222,7 +246,7 @@ export default function RegisterPage() {
         </div>
 
         <Button type="submit" isLoading={isLoading} className="mt-2">
-          {isLoading ? 'Creating account...' : 'Create account'}
+          {isLoading ? t('auth.register.creatingAccount') : t('auth.register.createAccount')}
         </Button>
       </form>
 
@@ -232,13 +256,13 @@ export default function RegisterPage() {
           <div className="w-full border-t border-gray-200" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-white text-gray-500">or sign up with</span>
+          <span className="px-4 bg-white text-gray-500">{t('auth.register.signUpWith')}</span>
         </div>
       </div>
 
       {/* Social login buttons */}
-      <div className="grid grid-cols-2 gap-3">
-        <Button type="button" variant="secondary" className="flex items-center justify-center gap-2">
+      <div className="flex justify-center">
+        <Button type="button" variant="secondary" className="flex items-center justify-center gap-2 !w-auto !px-8">
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
             <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -247,13 +271,8 @@ export default function RegisterPage() {
           </svg>
           Google
         </Button>
-        <Button type="button" variant="secondary" className="flex items-center justify-center gap-2">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-          </svg>
-          Phone
-        </Button>
       </div>
+
     </AuthLayout>
   )
 }

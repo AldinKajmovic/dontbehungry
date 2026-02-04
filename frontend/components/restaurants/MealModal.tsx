@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { PublicRestaurant, MenuCategory, MenuItem, publicService } from '@/services/public'
 import { useCart } from '@/hooks/useCart'
 import { useAuth } from '@/hooks/useAuth'
+import { useLanguage } from '@/hooks/useLanguage'
+import { logger } from '@/utils/logger'
 
 interface MealModalProps {
   restaurant: PublicRestaurant | null
@@ -19,6 +21,7 @@ interface ItemQuantities {
 export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }: MealModalProps) {
   const { isAuthenticated } = useAuth()
   const { addItem, isDifferentRestaurant, clearCart, openCart } = useCart()
+  const { t } = useLanguage()
 
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -67,7 +70,7 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
         setSelectedCategory(items[0].categoryId)
       }
     } catch (error) {
-      console.error('Failed to load menu items:', error)
+      logger.error('Failed to load menu items', error)
     } finally {
       setIsLoading(false)
     }
@@ -212,7 +215,7 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                View Cart
+                {t('mealModal.viewCart')}
               </button>
             )}
 
@@ -291,7 +294,7 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
                     d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                   />
                 </svg>
-                <p>No menu items available for this restaurant.</p>
+                <p>{t('mealModal.noMenuItems')}</p>
               </div>
             ) : (
               <div className="grid gap-3 md:grid-cols-2">
@@ -337,7 +340,7 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
                           </span>
                           {item.preparationTime && (
                             <span className="text-xs text-gray-400">
-                              ~{item.preparationTime} min
+                              ~{item.preparationTime} {t('mealModal.min')}
                             </span>
                           )}
                         </div>
@@ -406,23 +409,23 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
           />
           <div className="relative bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Start a new order?
+              {t('mealModal.startNewOrder')}
             </h3>
             <p className="text-gray-600 mb-4">
-              Your cart contains items from another restaurant. Would you like to clear your cart and start a new order from <strong>{restaurant.name}</strong>?
+              {t('mealModal.differentRestaurantWarning')} <strong>{restaurant.name}</strong>?
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={handleCancelNewRestaurant}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Keep current cart
+                {t('mealModal.keepCurrentCart')}
               </button>
               <button
                 onClick={handleConfirmNewRestaurant}
                 className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors"
               >
-                Start new order
+                {t('mealModal.startNewOrderButton')}
               </button>
             </div>
           </div>

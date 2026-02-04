@@ -9,8 +9,10 @@ import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert, SearchableSelect } from '@/components/ui'
 import { adminService, AdminRestaurant, PaginationInfo, RestaurantFilters, SortParams } from '@/services/admin'
+import { useLanguage } from '@/hooks/useLanguage'
 
 export default function RestaurantsPage() {
+  const { t } = useLanguage()
   const [restaurants, setRestaurants] = useState<AdminRestaurant[]>([])
   const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -232,7 +234,7 @@ export default function RestaurantsPage() {
   const columns = [
     {
       key: 'name',
-      header: 'Restaurant',
+      header: t('admin.columns.restaurant'),
       sortable: true,
       render: (restaurant: AdminRestaurant) => (
         <div>
@@ -243,7 +245,7 @@ export default function RestaurantsPage() {
     },
     {
       key: 'owner',
-      header: 'Owner',
+      header: t('admin.columns.owner'),
       render: (restaurant: AdminRestaurant) => (
         <div>
           <p className="text-sm">{restaurant.owner.firstName} {restaurant.owner.lastName}</p>
@@ -253,7 +255,7 @@ export default function RestaurantsPage() {
     },
     {
       key: 'rating',
-      header: 'Rating',
+      header: t('admin.columns.rating'),
       sortable: true,
       render: (restaurant: AdminRestaurant) => (
         <div className="flex items-center gap-1">
@@ -266,7 +268,7 @@ export default function RestaurantsPage() {
     },
     {
       key: 'minOrderAmount',
-      header: 'Min Order',
+      header: t('admin.columns.minOrder'),
       sortable: true,
       render: (restaurant: AdminRestaurant) => (
         <span className="text-sm">${restaurant.minOrderAmount || '0'}</span>
@@ -274,7 +276,7 @@ export default function RestaurantsPage() {
     },
     {
       key: 'deliveryFee',
-      header: 'Delivery Fee',
+      header: t('admin.columns.deliveryFee'),
       sortable: true,
       render: (restaurant: AdminRestaurant) => (
         <span className="text-sm">${restaurant.deliveryFee || '0'}</span>
@@ -287,8 +289,8 @@ export default function RestaurantsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Restaurants</h1>
-          <p className="text-gray-500 mt-1">Manage restaurant listings</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('admin.restaurants')}</h1>
+          <p className="text-gray-500 mt-1">{t('admin.manageRestaurants')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -301,7 +303,7 @@ export default function RestaurantsPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add Restaurant
+              {t('admin.actions.addRestaurant')}
             </span>
           </Button>
         </div>
@@ -315,12 +317,12 @@ export default function RestaurantsPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name or email..."
+              placeholder={t('admin.searchByNameOrEmail')}
               className="input-field"
             />
           </div>
           <Button type="submit" variant="secondary" className="!w-auto !px-6">
-            Search
+            {t('common.search')}
           </Button>
         </div>
       </form>
@@ -330,17 +332,17 @@ export default function RestaurantsPage() {
         <div className="flex flex-wrap items-end gap-4">
           <div className="min-w-[200px]">
             <SearchableSelect
-              label="Owner"
+              label={t('admin.filters.owner')}
               id="filter-owner"
               value={filters.ownerId || ''}
               onChange={(value) => handleFilterChange('ownerId', value)}
               loadOptions={loadOwnerOptions}
-              placeholder="All Owners"
-              emptyMessage="No users found"
+              placeholder={t('admin.filters.allOwners')}
+              emptyMessage={t('admin.modals.noUsersFound')}
             />
           </div>
           <RangeFilter
-            label="Rating"
+            label={t('admin.filters.rating')}
             minValue={filters.minRating || ''}
             maxValue={filters.maxRating || ''}
             onMinChange={(value) => handleFilterChange('minRating', value)}
@@ -350,7 +352,7 @@ export default function RestaurantsPage() {
             step={0.1}
           />
           <RangeFilter
-            label="Delivery Fee"
+            label={t('admin.columns.deliveryFee')}
             minValue={filters.minDeliveryFee || ''}
             maxValue={filters.maxDeliveryFee || ''}
             onMinChange={(value) => handleFilterChange('minDeliveryFee', value)}
@@ -361,7 +363,7 @@ export default function RestaurantsPage() {
             prefix="$"
           />
           <RangeFilter
-            label="Min Order Amount"
+            label={t('admin.filters.minOrderAmount')}
             minValue={filters.minOrderAmount || ''}
             maxValue={filters.maxOrderAmount || ''}
             onMinChange={(value) => handleFilterChange('minOrderAmount', value)}
@@ -376,7 +378,7 @@ export default function RestaurantsPage() {
               onClick={handleClearFilters}
               className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              Clear Filters
+              {t('admin.clearFilters')}
             </button>
           )}
         </div>
@@ -391,7 +393,7 @@ export default function RestaurantsPage() {
         data={restaurants}
         keyField="id"
         isLoading={isLoading}
-        emptyMessage="No restaurants found"
+        emptyMessage={t('admin.noRestaurantsFound')}
         sortConfig={sort.sortBy ? { key: sort.sortBy, direction: sort.sortOrder || 'asc' } : undefined}
         onSort={handleSort}
         actions={(restaurant) => (
@@ -434,14 +436,14 @@ export default function RestaurantsPage() {
       <Modal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        title="Add New Restaurant"
+        title={t('admin.modals.addNewRestaurant')}
         size="lg"
       >
         <form onSubmit={handleCreate} className="space-y-4">
           {formError && <Alert type="error">{formError}</Alert>}
 
           <Input
-            label="Restaurant Name"
+            label={t('restaurant.name')}
             id="name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -449,81 +451,81 @@ export default function RestaurantsPage() {
           />
 
           <Input
-            label="Description"
+            label={t('restaurant.description')}
             id="description"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            hint="(optional)"
+            hint={`(${t('common.optional')})`}
           />
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Phone"
+              label={t('restaurant.phone')}
               type="tel"
               id="phone"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              hint="(optional)"
+              required
             />
             <Input
-              label="Email"
+              label={t('restaurant.email')}
               type="email"
               id="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              hint="(optional)"
+              hint={`(${t('common.optional')})`}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <SearchableSelect
-              label="Owner"
+              label={t('admin.filters.owner')}
               id="ownerId"
               value={formData.ownerId}
               onChange={(value) => setFormData({ ...formData, ownerId: value })}
               loadOptions={loadOwnerOptions}
-              placeholder="Search users..."
-              emptyMessage="No users found"
+              placeholder={t('admin.modals.searchUsers')}
+              emptyMessage={t('admin.modals.noUsersFound')}
               required
             />
             <SearchableSelect
-              label="Place"
+              label={t('admin.modals.place')}
               id="placeId"
               value={formData.placeId}
               onChange={(value) => setFormData({ ...formData, placeId: value })}
               loadOptions={loadPlaceOptions}
-              placeholder="Search places..."
-              emptyMessage="No places found"
+              placeholder={t('admin.modals.searchPlaces')}
+              emptyMessage={t('admin.modals.noPlacesFound')}
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4 items-start">
             <Input
-              label="Min Order"
+              label={t('admin.columns.minOrder')}
               type="number"
               step="0.01"
               id="minOrderAmount"
               value={formData.minOrderAmount}
               onChange={(e) => setFormData({ ...formData, minOrderAmount: e.target.value })}
               prefix="$"
-              hint="(optional)"
+              hint={`(${t('common.optional')})`}
             />
             <Input
-              label="Delivery Fee"
+              label={t('admin.columns.deliveryFee')}
               type="number"
               step="0.01"
               id="deliveryFee"
               value={formData.deliveryFee}
               onChange={(e) => setFormData({ ...formData, deliveryFee: e.target.value })}
               prefix="$"
-              hint="(optional)"
+              hint={`(${t('common.optional')})`}
             />
           </div>
 
           {/* Gallery Section */}
           <div className="mt-4">
-            <p className="text-sm text-gray-600 font-medium mb-2">Gallery (Interior, Exterior, etc.)</p>
+            <p className="text-sm text-gray-600 font-medium mb-2">{t('admin.modals.gallery')}</p>
             <div className="grid grid-cols-3 gap-3">
               {formData.images.map((imgUrl, index) => (
                 <div key={index} className="relative group">
@@ -564,15 +566,15 @@ export default function RestaurantsPage() {
                 </button>
               )}
             </div>
-            <p className="text-xs text-gray-400 mt-2">Click to add images (up to 6)</p>
+            <p className="text-xs text-gray-400 mt-2">{t('admin.modals.clickToAddImages')}</p>
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowCreateModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Create Restaurant
+              {t('admin.buttons.createRestaurant')}
             </Button>
           </div>
         </form>
@@ -582,14 +584,14 @@ export default function RestaurantsPage() {
       <Modal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Edit Restaurant"
+        title={t('admin.modals.editRestaurant')}
         size="lg"
       >
         <form onSubmit={handleUpdate} className="space-y-4">
           {formError && <Alert type="error">{formError}</Alert>}
 
           <Input
-            label="Restaurant Name"
+            label={t('restaurant.name')}
             id="edit-name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -597,52 +599,52 @@ export default function RestaurantsPage() {
           />
 
           <Input
-            label="Description"
+            label={t('restaurant.description')}
             id="edit-description"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            hint="(optional)"
+            hint={`(${t('common.optional')})`}
           />
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Phone"
+              label={t('restaurant.phone')}
               type="tel"
               id="edit-phone"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              hint="(optional)"
+              required
             />
             <Input
-              label="Email"
+              label={t('restaurant.email')}
               type="email"
               id="edit-email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              hint="(optional)"
+              hint={`(${t('common.optional')})`}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <SearchableSelect
-              label="Owner"
+              label={t('admin.filters.owner')}
               id="edit-ownerId"
               value={formData.ownerId}
               onChange={(value) => setFormData({ ...formData, ownerId: value })}
               loadOptions={loadOwnerOptions}
-              placeholder="Search users..."
-              emptyMessage="No users found"
+              placeholder={t('admin.modals.searchUsers')}
+              emptyMessage={t('admin.modals.noUsersFound')}
               initialLabel={selectedRestaurant ? `${selectedRestaurant.owner.firstName} ${selectedRestaurant.owner.lastName}` : undefined}
               required
             />
             <SearchableSelect
-              label="Place"
+              label={t('admin.modals.place')}
               id="edit-placeId"
               value={formData.placeId}
               onChange={(value) => setFormData({ ...formData, placeId: value })}
               loadOptions={loadPlaceOptions}
-              placeholder="Search places..."
-              emptyMessage="No places found"
+              placeholder={t('admin.modals.searchPlaces')}
+              emptyMessage={t('admin.modals.noPlacesFound')}
               initialLabel={selectedRestaurant ? `${selectedRestaurant.place.address}, ${selectedRestaurant.place.city}` : undefined}
               required
             />
@@ -650,30 +652,30 @@ export default function RestaurantsPage() {
 
           <div className="grid grid-cols-2 gap-4 items-start">
             <Input
-              label="Min Order"
+              label={t('admin.columns.minOrder')}
               type="number"
               step="0.01"
               id="edit-minOrderAmount"
               value={formData.minOrderAmount}
               onChange={(e) => setFormData({ ...formData, minOrderAmount: e.target.value })}
               prefix="$"
-              hint="(optional)"
+              hint={`(${t('common.optional')})`}
             />
             <Input
-              label="Delivery Fee"
+              label={t('admin.columns.deliveryFee')}
               type="number"
               step="0.01"
               id="edit-deliveryFee"
               value={formData.deliveryFee}
               onChange={(e) => setFormData({ ...formData, deliveryFee: e.target.value })}
               prefix="$"
-              hint="(optional)"
+              hint={`(${t('common.optional')})`}
             />
           </div>
 
           {/* Gallery Section */}
           <div className="mt-4">
-            <p className="text-sm text-gray-600 font-medium mb-2">Gallery (Interior, Exterior, etc.)</p>
+            <p className="text-sm text-gray-600 font-medium mb-2">{t('admin.modals.gallery')}</p>
             <div className="grid grid-cols-3 gap-3">
               {formData.images.map((imgUrl, index) => (
                 <div key={index} className="relative group">
@@ -714,15 +716,15 @@ export default function RestaurantsPage() {
                 </button>
               )}
             </div>
-            <p className="text-xs text-gray-400 mt-2">Click to add images (up to 6)</p>
+            <p className="text-xs text-gray-400 mt-2">{t('admin.modals.clickToAddImages')}</p>
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowEditModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Save Changes
+              {t('admin.buttons.saveChanges')}
             </Button>
           </div>
         </form>
@@ -733,8 +735,8 @@ export default function RestaurantsPage() {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
-        title="Delete Restaurant"
-        message={`Are you sure you want to delete "${selectedRestaurant?.name}"? This will also delete all associated menu items, orders, and reviews.`}
+        title={t('admin.modals.deleteRestaurant')}
+        message={t('admin.confirmDelete.restaurant').replace('{name}', selectedRestaurant?.name || '')}
         isLoading={formLoading}
       />
 

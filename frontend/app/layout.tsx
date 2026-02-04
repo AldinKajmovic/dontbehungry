@@ -6,6 +6,7 @@ import { NextAuthProvider } from '@/providers/NextAuthProvider'
 import { CartProvider } from '@/providers/CartProvider'
 import { SocketProvider } from '@/providers/SocketProvider'
 import { NotificationProvider } from '@/providers/NotificationProvider'
+import { LanguageProvider } from '@/providers/LanguageProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,13 +24,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <NextAuthProvider>
-          <AuthProvider>
-            <SocketProvider>
-              <NotificationProvider>
-                <CartProvider>{children}</CartProvider>
-              </NotificationProvider>
-            </SocketProvider>
-          </AuthProvider>
+          <LanguageProvider>
+            <AuthProvider>
+              <SocketProvider>
+                <NotificationProvider>
+                  <CartProvider>{children}</CartProvider>
+                </NotificationProvider>
+              </SocketProvider>
+            </AuthProvider>
+          </LanguageProvider>
         </NextAuthProvider>
       </body>
     </html>

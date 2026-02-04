@@ -5,14 +5,16 @@ import { useRouter } from 'next/navigation'
 import { useCart } from '@/hooks/useCart'
 import { PaymentMethod } from '@/providers/CartProvider'
 import { useAuth } from '@/hooks/useAuth'
+import { useLanguage } from '@/hooks/useLanguage'
 import { addressService, Address, AddAddressData } from '@/services/address'
 import { profileService } from '@/services/profile'
 import { Modal, Input, Button, Alert } from '@/components/ui'
+import { logger } from '@/utils/logger'
 
-const PAYMENT_METHODS: { value: PaymentMethod; label: string; description: string }[] = [
-  { value: 'CASH', label: 'Cash', description: 'Pay with cash when your order arrives' },
-  { value: 'CREDIT_CARD', label: 'Credit Card', description: 'Pay with credit card on delivery' },
-  { value: 'DIGITAL_WALLET', label: 'Digital Wallet', description: 'Pay with digital wallet (Apple Pay, Google Pay, etc.)' },
+const PAYMENT_METHODS: { value: PaymentMethod; labelKey: string; descriptionKey: string }[] = [
+  { value: 'CASH', labelKey: 'payment.cash', descriptionKey: 'payment.cashDescription' },
+  { value: 'CREDIT_CARD', labelKey: 'payment.creditCard', descriptionKey: 'payment.creditCardDescription' },
+  { value: 'DIGITAL_WALLET', labelKey: 'payment.digitalWallet', descriptionKey: 'payment.digitalWalletDescription' },
 ]
 
 const LocationIcon = (
@@ -25,6 +27,7 @@ const LocationIcon = (
 export function CartDrawer() {
   const router = useRouter()
   const { isAuthenticated } = useAuth()
+  const { t } = useLanguage()
   const {
     items,
     restaurant,
@@ -94,7 +97,7 @@ export function CartDrawer() {
         setSelectedAddressId(loadedAddresses[0].id)
       }
     } catch (error) {
-      console.error('Failed to load addresses:', error)
+      logger.error('Failed to load addresses', error)
     } finally {
       setIsLoadingAddresses(false)
     }
@@ -162,7 +165,7 @@ export function CartDrawer() {
 
   const handlePlaceOrder = async () => {
     if (!restaurant || items.length === 0 || !selectedAddressId) {
-      setOrderError('Please select a delivery address')
+      setOrderError(t('cart.selectDeliveryAddress'))
       return
     }
 
@@ -191,7 +194,7 @@ export function CartDrawer() {
         router.push('/orders')
       }, 2000)
     } catch (error) {
-      console.error('Failed to place order:', error)
+      logger.error('Failed to place order', error)
       setOrderError(error instanceof Error ? error.message : 'Failed to place order. Please try again.')
     } finally {
       setIsPlacingOrder(false)
@@ -215,7 +218,7 @@ export function CartDrawer() {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Your Cart</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('cart.title')}</h2>
             {restaurant && (
               <p className="text-sm text-gray-500">{restaurant.name}</p>
             )}
@@ -239,21 +242,21 @@ export function CartDrawer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Order Placed!</h3>
-              <p className="text-gray-600">Your order has been placed successfully. Redirecting to orders...</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('cart.orderPlaced')}</h3>
+              <p className="text-gray-600">{t('cart.orderPlacedDescription')}</p>
             </div>
           ) : items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full p-6 text-center">
               <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Your cart is empty</h3>
-              <p className="text-gray-600 mb-4">Add some delicious items from a restaurant!</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('cart.empty')}</h3>
+              <p className="text-gray-600 mb-4">{t('cart.emptyDescription')}</p>
               <button
                 onClick={closeCart}
                 className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors"
               >
-                Browse restaurants
+                {t('cart.browseRestaurants')}
               </button>
             </div>
           ) : (
@@ -324,7 +327,7 @@ export function CartDrawer() {
               {/* Delivery Address */}
               <div className="border-t pt-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium text-gray-900">Delivery Address</h3>
+                  <h3 className="font-medium text-gray-900">{t('cart.deliveryAddress')}</h3>
                   <button
                     onClick={openAddAddressModal}
                     className="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center gap-1"
@@ -332,7 +335,7 @@ export function CartDrawer() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    Add new
+                    {t('cart.addNew')}
                   </button>
                 </div>
                 {isLoadingAddresses ? (
@@ -341,12 +344,12 @@ export function CartDrawer() {
                   </div>
                 ) : addresses.length === 0 ? (
                   <div className="text-center py-4">
-                    <p className="text-gray-500 text-sm mb-2">No saved addresses</p>
+                    <p className="text-gray-500 text-sm mb-2">{t('cart.noSavedAddresses')}</p>
                     <button
                       onClick={openAddAddressModal}
                       className="text-primary-600 hover:text-primary-700 text-sm font-medium"
                     >
-                      Add an address
+                      {t('cart.addAnAddress')}
                     </button>
                   </div>
                 ) : (
@@ -389,9 +392,9 @@ export function CartDrawer() {
 
               {/* Payment Method */}
               <div className="border-t pt-4">
-                <h3 className="font-medium text-gray-900 mb-3">Payment Method</h3>
+                <h3 className="font-medium text-gray-900 mb-3">{t('cart.paymentMethod')}</h3>
                 <p className="text-sm text-gray-500 mb-3">
-                  Payment will be collected upon delivery
+                  {t('cart.paymentOnDelivery')}
                 </p>
                 <div className="space-y-2">
                   {PAYMENT_METHODS.map((method) => (
@@ -413,8 +416,8 @@ export function CartDrawer() {
                         className="mt-1 text-primary-600 focus:ring-primary-500"
                       />
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">{method.label}</p>
-                        <p className="text-xs text-gray-500">{method.description}</p>
+                        <p className="text-sm font-medium text-gray-900">{t(method.labelKey)}</p>
+                        <p className="text-xs text-gray-500">{t(method.descriptionKey)}</p>
                       </div>
                     </label>
                   ))}
@@ -423,11 +426,11 @@ export function CartDrawer() {
 
               {/* Order Notes */}
               <div className="border-t pt-4">
-                <h3 className="font-medium text-gray-900 mb-3">Order Notes (Optional)</h3>
+                <h3 className="font-medium text-gray-900 mb-3">{t('cart.orderNotesOptional')}</h3>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Any special instructions for your order..."
+                  placeholder={t('cart.orderNotesPlaceholder')}
                   className="w-full p-3 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
                   rows={2}
                 />
@@ -449,25 +452,25 @@ export function CartDrawer() {
             {/* Summary */}
             <div className="space-y-1 text-sm">
               <div className="flex justify-between text-gray-600">
-                <span>Subtotal ({itemCount} items)</span>
+                <span>{t('cart.subtotal')} ({itemCount} {t('common.items')})</span>
                 <span>${formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
-                <span>Tax (20%)</span>
+                <span>{t('cart.tax')} (20%)</span>
                 <span>${formatPrice(tax)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
-                <span>Delivery Fee</span>
+                <span>{t('cart.deliveryFee')}</span>
                 <span>${formatPrice(deliveryFee)}</span>
               </div>
               {minOrderFee > 0 && (
                 <div className="flex justify-between text-amber-600">
-                  <span>Small Order Fee</span>
+                  <span>{t('cart.smallOrderFee')}</span>
                   <span>${formatPrice(minOrderFee)}</span>
                 </div>
               )}
               <div className="flex justify-between font-semibold text-gray-900 text-base pt-2 border-t">
-                <span>Total</span>
+                <span>{t('cart.total')}</span>
                 <span>${formatPrice(total)}</span>
               </div>
             </div>
@@ -490,11 +493,11 @@ export function CartDrawer() {
               {isPlacingOrder ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Placing Order...
+                  {t('cart.placingOrder')}
                 </>
               ) : (
                 <>
-                  Place Order - ${formatPrice(total)}
+                  {t('cart.placeOrder')} - ${formatPrice(total)}
                 </>
               )}
             </button>
@@ -504,7 +507,7 @@ export function CartDrawer() {
               onClick={clearCart}
               className="w-full py-2 text-gray-600 hover:text-red-600 text-sm transition-colors"
             >
-              Clear cart
+              {t('cart.clearCart')}
             </button>
           </div>
         )}
@@ -514,7 +517,7 @@ export function CartDrawer() {
       <Modal
         isOpen={showAddressModal}
         onClose={closeAddressModal}
-        title="Add New Address"
+        title={t('address.addNew')}
         icon={LocationIcon}
         iconColor="primary"
         size="lg"
@@ -525,7 +528,7 @@ export function CartDrawer() {
           )}
 
           <Input
-            label="Street Address"
+            label={t('address.streetAddress')}
             id="cart-address"
             name="address"
             value={addressForm.address}
@@ -536,7 +539,7 @@ export function CartDrawer() {
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="City"
+              label={t('address.city')}
               id="cart-city"
               name="city"
               value={addressForm.city}
@@ -545,20 +548,20 @@ export function CartDrawer() {
               autoComplete="address-level2"
             />
             <Input
-              label="State/Province"
+              label={t('address.state')}
               id="cart-state"
               name="state"
               value={addressForm.state}
               onChange={handleAddressChange}
               placeholder="NY"
-              hint="(optional)"
+              hint={`(${t('common.optional')})`}
               autoComplete="address-level1"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Country"
+              label={t('address.country')}
               id="cart-country"
               name="country"
               value={addressForm.country}
@@ -567,27 +570,27 @@ export function CartDrawer() {
               autoComplete="country-name"
             />
             <Input
-              label="Postal Code"
+              label={t('address.postalCode')}
               id="cart-postalCode"
               name="postalCode"
               value={addressForm.postalCode}
               onChange={handleAddressChange}
               placeholder="10001"
-              hint="(optional)"
+              hint={`(${t('common.optional')})`}
               autoComplete="postal-code"
             />
           </div>
 
           <div>
             <label htmlFor="cart-notes" className="block text-sm font-medium text-gray-700 mb-2">
-              Delivery Notes <span className="text-gray-400 font-normal">(optional)</span>
+              {t('address.deliveryNotes')} <span className="text-gray-400 font-normal">({t('common.optional')})</span>
             </label>
             <textarea
               id="cart-notes"
               name="notes"
               value={addressForm.notes}
               onChange={handleAddressChange}
-              placeholder="e.g., Ring doorbell, leave at door..."
+              placeholder={t('address.deliveryNotesPlaceholder')}
               rows={2}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 resize-none"
             />
@@ -601,14 +604,14 @@ export function CartDrawer() {
               onClick={closeAddressModal}
               disabled={addressLoading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               type="submit"
               className="flex-1"
               isLoading={addressLoading}
             >
-              {addressLoading ? 'Saving...' : 'Add Address'}
+              {addressLoading ? t('common.loading') : t('address.addAddress')}
             </Button>
           </div>
         </form>

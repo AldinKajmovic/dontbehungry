@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { CountryCode } from 'libphonenumber-js'
-import { Input, Button, PhoneInput, Alert, PasswordStrength, AuthLayout } from '@/components/ui'
+import { Input, Button, PhoneInput, Alert, PasswordStrength, AuthLayout, LanguageToggle } from '@/components/ui'
 import { registerRestaurantSchema, extractZodErrors, formatPhoneE164, RegisterRestaurantForm } from '@/services/validation'
 import { useFormValidation } from '@/hooks/useFormValidation'
 import { useAuth } from '@/hooks/useAuth'
+import { useLanguage } from '@/hooks/useLanguage'
 
 export default function RegisterRestaurantPage() {
   const [step, setStep] = useState(1)
@@ -15,6 +16,7 @@ export default function RegisterRestaurantPage() {
   const [serverError, setServerError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const { registerRestaurant } = useAuth()
+  const { t } = useLanguage()
 
   const {
     formData,
@@ -79,7 +81,7 @@ export default function RegisterRestaurantPage() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        phone: formatPhoneE164(formData.phone || '', selectedCountry),
+        phone: formatPhoneE164(formData.phone, selectedCountry) || formData.phone,
         password: formData.password,
         restaurantName: formData.restaurantName,
         restaurantDescription: formData.restaurantDescription || undefined,
@@ -108,14 +110,15 @@ export default function RegisterRestaurantPage() {
 
   return (
     <AuthLayout
-      title="Register your restaurant"
-      subtitle="Join Glovo Copy and reach more customers"
+      title={t('auth.registerRestaurant.title')}
+      subtitle={t('auth.registerRestaurant.subtitle')}
       icon={icon}
       iconGradient="secondary"
       backgroundGradient="green"
-      footerText="Already have an account?"
-      footerLinkText="Sign in"
+      footerText={t('auth.registerRestaurant.hasAccount')}
+      footerLinkText={t('common.signIn')}
       footerLinkHref="/auth/login"
+      headerRight={<LanguageToggle />}
     >
       {/* Progress indicator */}
       <div className="flex items-center justify-center gap-2 mb-6">
@@ -133,35 +136,35 @@ export default function RegisterRestaurantPage() {
 
         {step === 1 && (
           <>
-            <p className="text-sm text-gray-600 font-medium mb-4">Owner Information</p>
+            <p className="text-sm text-gray-600 font-medium mb-4">{t('auth.registerRestaurant.ownerInfo')}</p>
 
             <div className="grid grid-cols-2 gap-3">
               <Input
-                label="First name"
+                label={t('auth.registerRestaurant.firstName')}
                 id="firstName"
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={getFieldError('firstName')}
-                placeholder="John"
+                placeholder={t('auth.register.firstNamePlaceholder')}
                 autoComplete="given-name"
               />
               <Input
-                label="Last name"
+                label={t('auth.registerRestaurant.lastName')}
                 id="lastName"
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={getFieldError('lastName')}
-                placeholder="Doe"
+                placeholder={t('auth.register.lastNamePlaceholder')}
                 autoComplete="family-name"
               />
             </div>
 
             <Input
-              label="Email address"
+              label={t('auth.registerRestaurant.email')}
               type="email"
               id="email"
               name="email"
@@ -169,13 +172,12 @@ export default function RegisterRestaurantPage() {
               onChange={handleChange}
               onBlur={handleBlur}
               error={getFieldError('email')}
-              placeholder="you@example.com"
+              placeholder={t('auth.register.emailPlaceholder')}
               autoComplete="email"
             />
 
             <PhoneInput
-              label="Phone number"
-              hint="(optional)"
+              label={t('auth.registerRestaurant.phone')}
               value={formData.phone || ''}
               onChange={(value) => setFieldValue('phone', value)}
               onBlur={() => {
@@ -188,7 +190,7 @@ export default function RegisterRestaurantPage() {
             />
 
             <Input
-              label="Password"
+              label={t('auth.registerRestaurant.password')}
               type="password"
               id="password"
               name="password"
@@ -196,7 +198,7 @@ export default function RegisterRestaurantPage() {
               onChange={handleChange}
               onBlur={handleBlur}
               error={getFieldError('password')}
-              placeholder="Create a password"
+              placeholder={t('auth.registerRestaurant.passwordPlaceholder')}
               autoComplete="new-password"
               showPasswordToggle
             />
@@ -205,7 +207,7 @@ export default function RegisterRestaurantPage() {
             )}
 
             <Input
-              label="Confirm password"
+              label={t('auth.registerRestaurant.confirmPassword')}
               type="password"
               id="confirmPassword"
               name="confirmPassword"
@@ -213,35 +215,35 @@ export default function RegisterRestaurantPage() {
               onChange={handleChange}
               onBlur={handleBlur}
               error={getFieldError('confirmPassword')}
-              placeholder="Confirm your password"
+              placeholder={t('auth.registerRestaurant.confirmPasswordPlaceholder')}
               autoComplete="new-password"
               showPasswordToggle
             />
 
             <Button type="button" onClick={handleNext} className="mt-2">
-              Continue
+              {t('auth.registerRestaurant.continue')}
             </Button>
           </>
         )}
 
         {step === 2 && (
           <>
-            <p className="text-sm text-gray-600 font-medium mb-4">Restaurant Information</p>
+            <p className="text-sm text-gray-600 font-medium mb-4">{t('auth.registerRestaurant.restaurantInfo')}</p>
 
             <Input
-              label="Restaurant name"
+              label={t('auth.registerRestaurant.restaurantName')}
               id="restaurantName"
               name="restaurantName"
               value={formData.restaurantName}
               onChange={handleChange}
               onBlur={handleBlur}
               error={getFieldError('restaurantName')}
-              placeholder="My Awesome Restaurant"
+              placeholder={t('auth.registerRestaurant.restaurantNamePlaceholder')}
             />
 
             <div>
               <label htmlFor="restaurantDescription" className="block text-sm font-medium text-gray-700 mb-2">
-                Description <span className="text-gray-400">(optional)</span>
+                {t('auth.registerRestaurant.description')} <span className="text-gray-400">({t('common.optional')})</span>
               </label>
               <textarea
                 id="restaurantDescription"
@@ -250,14 +252,14 @@ export default function RegisterRestaurantPage() {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className="input-field min-h-[80px] resize-none"
-                placeholder="Tell customers about your restaurant..."
+                placeholder={t('auth.registerRestaurant.descriptionPlaceholder')}
                 maxLength={500}
               />
             </div>
 
             <PhoneInput
-              label="Restaurant phone"
-              hint="(optional)"
+              label={t('auth.registerRestaurant.restaurantPhone')}
+              hint={`(${t('common.optional')})`}
               value={formData.restaurantPhone || ''}
               onChange={(value) => setFieldValue('restaurantPhone', value)}
               onBlur={() => {
@@ -270,8 +272,8 @@ export default function RegisterRestaurantPage() {
             />
 
             <Input
-              label="Restaurant email"
-              hint="(optional)"
+              label={t('auth.registerRestaurant.restaurantEmail')}
+              hint={`(${t('common.optional')})`}
               type="email"
               id="restaurantEmail"
               name="restaurantEmail"
@@ -282,12 +284,12 @@ export default function RegisterRestaurantPage() {
               placeholder="contact@restaurant.com"
             />
 
-            <p className="text-sm text-gray-600 font-medium mt-6 mb-4">Delivery Settings</p>
+            <p className="text-sm text-gray-600 font-medium mt-6 mb-4">{t('auth.registerRestaurant.deliverySettings')}</p>
 
             <div className="grid grid-cols-2 gap-3">
               <Input
-                label="Min order amount"
-                hint="(optional)"
+                label={t('auth.registerRestaurant.minOrderAmount')}
+                hint={`(${t('common.optional')})`}
                 type="number"
                 step="0.01"
                 min="0"
@@ -300,8 +302,8 @@ export default function RegisterRestaurantPage() {
                 placeholder="0.00"
               />
               <Input
-                label="Delivery fee"
-                hint="(optional)"
+                label={t('auth.registerRestaurant.deliveryFee')}
+                hint={`(${t('common.optional')})`}
                 type="number"
                 step="0.01"
                 min="0"
@@ -315,64 +317,64 @@ export default function RegisterRestaurantPage() {
               />
             </div>
 
-            <p className="text-sm text-gray-600 font-medium mt-6 mb-4">Restaurant Address</p>
+            <p className="text-sm text-gray-600 font-medium mt-6 mb-4">{t('auth.registerRestaurant.restaurantAddress')}</p>
 
             <Input
-              label="Street address"
+              label={t('auth.registerRestaurant.streetAddress')}
               id="address"
               name="address"
               value={formData.address}
               onChange={handleChange}
               onBlur={handleBlur}
               error={getFieldError('address')}
-              placeholder="123 Main Street"
+              placeholder={t('address.streetAddressPlaceholder')}
               autoComplete="street-address"
             />
 
             <div className="grid grid-cols-2 gap-3">
               <Input
-                label="City"
+                label={t('auth.registerRestaurant.city')}
                 id="city"
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={getFieldError('city')}
-                placeholder="New York"
+                placeholder={t('address.cityPlaceholder')}
                 autoComplete="address-level2"
               />
               <Input
-                label="Country"
+                label={t('auth.registerRestaurant.country')}
                 id="country"
                 name="country"
                 value={formData.country}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={getFieldError('country')}
-                placeholder="USA"
+                placeholder={t('address.countryPlaceholder')}
                 autoComplete="country-name"
               />
             </div>
 
             <Input
-              label="Postal code"
-              hint="(optional)"
+              label={t('auth.registerRestaurant.postalCode')}
+              hint={`(${t('common.optional')})`}
               id="postalCode"
               name="postalCode"
               value={formData.postalCode}
               onChange={handleChange}
               onBlur={handleBlur}
               error={getFieldError('postalCode')}
-              placeholder="10001"
+              placeholder={t('address.postalCodePlaceholder')}
               autoComplete="postal-code"
             />
 
             <div className="flex gap-3 mt-2">
               <Button type="button" variant="secondary" onClick={() => setStep(1)} className="flex-1">
-                Back
+                {t('auth.registerRestaurant.back')}
               </Button>
               <Button type="submit" isLoading={isLoading} className="flex-1">
-                {isLoading ? 'Creating...' : 'Create Restaurant'}
+                {isLoading ? t('auth.registerRestaurant.creating') : t('auth.registerRestaurant.createRestaurant')}
               </Button>
             </div>
           </>
@@ -381,9 +383,9 @@ export default function RegisterRestaurantPage() {
 
       <div className="mt-6 pt-6 border-t border-gray-200">
         <p className="text-center text-sm text-gray-500">
-          Want to order food instead?{' '}
+          {t('auth.registerRestaurant.wantToOrder')}{' '}
           <Link href="/auth/register" className="link">
-            Register as a customer
+            {t('auth.registerRestaurant.registerAsCustomer')}
           </Link>
         </p>
       </div>

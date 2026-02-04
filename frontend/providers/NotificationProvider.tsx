@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useSocket } from './SocketProvider'
 import { useAuth } from '@/hooks/useAuth'
 import { notificationService, Notification } from '@/services/notification'
+import { logger } from '@/utils/logger'
 
 interface NotificationContextType {
   notifications: Notification[]
@@ -56,7 +57,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
       setHasMore(response.pagination.page < response.pagination.totalPages)
       setPage(pageNum)
     } catch (error) {
-      console.error('Failed to fetch notifications:', error)
+      logger.error('Failed to fetch notifications', error)
     } finally {
       setIsLoading(false)
     }
@@ -69,7 +70,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
       const response = await notificationService.getUnreadCount()
       setUnreadCount(response.count)
     } catch (error) {
-      console.error('Failed to fetch unread count:', error)
+      logger.error('Failed to fetch unread count', error)
     }
   }, [shouldLoadNotifications])
 
@@ -111,7 +112,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
 
       setUnreadCount((prev) => Math.max(0, prev - 1))
     } catch (error) {
-      console.error('Failed to mark notification as read:', error)
+      logger.error('Failed to mark notification as read', error)
       throw error
     }
   }, [])
@@ -123,7 +124,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })))
       setUnreadCount(0)
     } catch (error) {
-      console.error('Failed to mark all notifications as read:', error)
+      logger.error('Failed to mark all notifications as read', error)
       throw error
     }
   }, [])
@@ -140,7 +141,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
         setUnreadCount((prev) => Math.max(0, prev - 1))
       }
     } catch (error) {
-      console.error('Failed to delete notification:', error)
+      logger.error('Failed to delete notification', error)
       throw error
     }
   }, [notifications])

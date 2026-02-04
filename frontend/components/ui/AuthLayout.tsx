@@ -13,6 +13,7 @@ interface AuthLayoutProps {
   footerText?: string;
   footerLinkText?: string;
   footerLinkHref?: string;
+  headerRight?: ReactNode;
 }
 
 export function AuthLayout({
@@ -25,6 +26,7 @@ export function AuthLayout({
   footerText,
   footerLinkText,
   footerLinkHref,
+  headerRight,
 }: AuthLayoutProps) {
   const bgGradient = backgroundGradient === 'orange'
     ? 'from-gray-50 via-white to-orange-50'
@@ -36,6 +38,13 @@ export function AuthLayout({
 
   return (
     <div className={`min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br ${bgGradient}`}>
+      {/* Language toggle in top-right corner */}
+      {headerRight && (
+        <div className="absolute top-4 right-4 z-10">
+          {headerRight}
+        </div>
+      )}
+
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100 rounded-full blur-3xl opacity-50 animate-pulse-subtle" />

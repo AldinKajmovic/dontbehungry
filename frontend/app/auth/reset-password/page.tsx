@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Alert } from '@/components/ui/Alert'
 import { PasswordStrength } from '@/components/ui/PasswordStrength'
+import { LanguageToggle } from '@/components/ui/LanguageToggle'
 import { authService } from '@/services/auth'
 
 function ResetPasswordContent() {
@@ -65,6 +66,7 @@ function ResetPasswordContent() {
         subtitle="This password reset link is invalid"
         icon={icon}
         backgroundGradient="orange"
+        headerRight={<LanguageToggle />}
       >
         <div className="flex flex-col items-center py-6">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
@@ -92,6 +94,7 @@ function ResetPasswordContent() {
         subtitle="Your password has been successfully changed"
         icon={icon}
         backgroundGradient="green"
+        headerRight={<LanguageToggle />}
       >
         <div className="flex flex-col items-center py-6">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
@@ -116,6 +119,7 @@ function ResetPasswordContent() {
       subtitle="Enter your new password"
       icon={icon}
       backgroundGradient="orange"
+      headerRight={<LanguageToggle />}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <Alert type="error">{error}</Alert>}

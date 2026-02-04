@@ -87,7 +87,7 @@ export interface CreateUserInput {
   firstName: string
   lastName: string
   password: string
-  phone?: string
+  phone: string
   role?: string
 }
 

@@ -8,8 +8,10 @@ import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert } from '@/components/ui'
 import { adminService, AdminCategory, PaginationInfo, SortParams } from '@/services/admin'
+import { useLanguage } from '@/hooks/useLanguage'
 
 export default function CategoriesPage() {
+  const { t } = useLanguage()
   const [categories, setCategories] = useState<AdminCategory[]>([])
   const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -153,7 +155,7 @@ export default function CategoriesPage() {
   const columns = [
     {
       key: 'name',
-      header: 'Category',
+      header: t('admin.categoriesPage.categoryName'),
       sortable: true,
       render: (category: AdminCategory) => (
         <div className="flex items-center gap-3">
@@ -172,7 +174,7 @@ export default function CategoriesPage() {
     },
     {
       key: 'description',
-      header: 'Description',
+      header: t('admin.categoriesPage.description'),
       sortable: true,
       render: (category: AdminCategory) => (
         <span className="text-gray-500 truncate max-w-xs block">
@@ -182,7 +184,7 @@ export default function CategoriesPage() {
     },
     {
       key: 'iconUrl',
-      header: 'Icon URL',
+      header: t('admin.categoriesPage.iconUrl'),
       render: (category: AdminCategory) => (
         <span className="text-gray-500 truncate max-w-xs block text-sm">
           {category.iconUrl || '-'}
@@ -196,8 +198,8 @@ export default function CategoriesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
-          <p className="text-gray-500 mt-1">Manage food categories</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('admin.categoriesPage.title')}</h1>
+          <p className="text-gray-500 mt-1">{t('admin.categoriesPage.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -210,7 +212,7 @@ export default function CategoriesPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add Category
+              {t('admin.categoriesPage.addCategory')}
             </span>
           </Button>
         </div>
@@ -224,12 +226,12 @@ export default function CategoriesPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name..."
+              placeholder={t('admin.categoriesPage.searchPlaceholder')}
               className="input-field"
             />
           </div>
           <Button type="submit" variant="secondary" className="!w-auto !px-6">
-            Search
+            {t('common.search')}
           </Button>
         </div>
       </form>
@@ -243,7 +245,7 @@ export default function CategoriesPage() {
         data={categories}
         keyField="id"
         isLoading={isLoading}
-        emptyMessage="No categories found"
+        emptyMessage={t('admin.categoriesPage.noCategoriesFound')}
         sortConfig={sort.sortBy ? { key: sort.sortBy, direction: sort.sortOrder || 'asc' } : undefined}
         onSort={handleSort}
         actions={(category) => (
@@ -251,7 +253,7 @@ export default function CategoriesPage() {
             <button
               onClick={() => openEditModal(category)}
               className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-              title="Edit"
+              title={t('common.edit')}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -260,7 +262,7 @@ export default function CategoriesPage() {
             <button
               onClick={() => openDeleteModal(category)}
               className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Delete"
+              title={t('common.delete')}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -286,14 +288,14 @@ export default function CategoriesPage() {
       <Modal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        title="Add New Category"
+        title={t('admin.categoriesPage.addNewCategory')}
         size="md"
       >
         <form onSubmit={handleCreate} className="space-y-4">
           {formError && <Alert type="error">{formError}</Alert>}
 
           <Input
-            label="Category Name"
+            label={t('admin.categoriesPage.categoryName')}
             id="name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -301,29 +303,29 @@ export default function CategoriesPage() {
           />
 
           <Input
-            label="Description"
+            label={t('admin.categoriesPage.description')}
             id="description"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            hint="(optional)"
+            hint={`(${t('common.optional')})`}
           />
 
           <Input
-            label="Icon URL"
+            label={t('admin.categoriesPage.iconUrl')}
             type="url"
             id="iconUrl"
             value={formData.iconUrl}
             onChange={(e) => setFormData({ ...formData, iconUrl: e.target.value })}
             placeholder="https://..."
-            hint="(optional)"
+            hint={`(${t('common.optional')})`}
           />
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowCreateModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Create Category
+              {t('admin.categoriesPage.createCategory')}
             </Button>
           </div>
         </form>
@@ -333,14 +335,14 @@ export default function CategoriesPage() {
       <Modal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Edit Category"
+        title={t('admin.categoriesPage.editCategory')}
         size="md"
       >
         <form onSubmit={handleUpdate} className="space-y-4">
           {formError && <Alert type="error">{formError}</Alert>}
 
           <Input
-            label="Category Name"
+            label={t('admin.categoriesPage.categoryName')}
             id="edit-name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -348,29 +350,29 @@ export default function CategoriesPage() {
           />
 
           <Input
-            label="Description"
+            label={t('admin.categoriesPage.description')}
             id="edit-description"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            hint="(optional)"
+            hint={`(${t('common.optional')})`}
           />
 
           <Input
-            label="Icon URL"
+            label={t('admin.categoriesPage.iconUrl')}
             type="url"
             id="edit-iconUrl"
             value={formData.iconUrl}
             onChange={(e) => setFormData({ ...formData, iconUrl: e.target.value })}
             placeholder="https://..."
-            hint="(optional)"
+            hint={`(${t('common.optional')})`}
           />
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowEditModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Save Changes
+              {t('admin.buttons.saveChanges')}
             </Button>
           </div>
         </form>
@@ -381,8 +383,8 @@ export default function CategoriesPage() {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
-        title="Delete Category"
-        message={`Are you sure you want to delete "${selectedCategory?.name}"? Menu items in this category will have their category set to null.`}
+        title={t('admin.categoriesPage.deleteCategory')}
+        message={t('admin.categoriesPage.deleteCategoryConfirm', { name: selectedCategory?.name || '' })}
         isLoading={formLoading}
       />
 

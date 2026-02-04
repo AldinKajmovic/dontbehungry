@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express'
 import { UserRole } from '@prisma/client'
 import { AuthenticatedRequest } from '../types'
 import { ForbiddenError, UnauthorizedError } from '../utils/errors'
+import { logger } from '../utils/logger'
 
 type ResourceOwnerCheck = (req: AuthenticatedRequest) => Promise<boolean> | boolean
 
@@ -13,7 +14,7 @@ export function authorize(...allowedRoles: UserRole[]) {
     )
 
     if (!req.user || !req.user.role) {
-      console.warn('Authorization failed: missing user or role', {
+      logger.warn('Authorization failed: missing user or role', {
         hasUser: !!req.user,
         hasRole: !!req.user?.role,
         path: req.path,
@@ -23,11 +24,10 @@ export function authorize(...allowedRoles: UserRole[]) {
     }
 
     if (!allowedRoles.includes(req.user.role)) {
-      console.warn('Authorization failed: insufficient permissions', {
+      logger.warn('Authorization failed: insufficient permissions', {
         userId: req.user.userId,
         path: req.path,
         method: req.method
-
       })
       throw genericError
     }

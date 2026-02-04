@@ -25,7 +25,7 @@ export const registerSchema = z
     firstName: nameSchema,
     lastName: nameSchema,
     email: emailSchema,
-    phone: z.string().optional(),
+    phone: z.string().min(1, { message: 'Phone number is required' }),
     password: passwordSchema,
     confirmPassword: z.string(),
     address: z.string().optional(),
@@ -42,7 +42,7 @@ export const registerRestaurantSchema = z
     firstName: nameSchema,
     lastName: nameSchema,
     email: emailSchema,
-    phone: z.string().optional(),
+    phone: z.string().min(1, { message: 'Phone number is required' }),
     password: passwordSchema,
     confirmPassword: z.string(),
     restaurantName: z

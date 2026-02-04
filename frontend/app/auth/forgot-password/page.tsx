@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AuthLayout, Input, Button, Alert, StatusMessage } from '@/components/ui'
+import { AuthLayout, Input, Button, Alert, StatusMessage, LanguageToggle } from '@/components/ui'
 import { authService } from '@/services/auth'
 
 const EmailIcon = (
@@ -45,6 +45,7 @@ export default function ForgotPasswordPage() {
         subtitle="We've sent you a password reset link"
         icon={icon}
         backgroundGradient="orange"
+        headerRight={<LanguageToggle />}
       >
         <StatusMessage
           status="success"
@@ -72,6 +73,7 @@ export default function ForgotPasswordPage() {
       footerText="Remember your password?"
       footerLinkText="Sign in"
       footerLinkHref="/auth/login"
+      headerRight={<LanguageToggle />}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <Alert type="error">{error}</Alert>}

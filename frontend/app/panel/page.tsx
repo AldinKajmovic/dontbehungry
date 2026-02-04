@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { StatsCard } from '@/components/admin/StatsCard'
 import { CombinedReportModal } from '@/components/admin/CombinedReportModal'
 import { adminService, AdminStats } from '@/services/admin'
+import { useLanguage } from '@/hooks/useLanguage'
 
 // Icons
 const UsersIcon = (
@@ -31,6 +32,7 @@ const RevenueIcon = (
 )
 
 export default function AdminDashboard() {
+  const { t } = useLanguage()
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -65,8 +67,8 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500 mt-1">Welcome to the admin panel</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('admin.dashboard')}</h1>
+          <p className="text-gray-500 mt-1">{t('admin.welcomeMessage')}</p>
         </div>
         <button
           onClick={() => setShowReportModal(true)}
@@ -75,7 +77,7 @@ export default function AdminDashboard() {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          Generate Report
+          {t('admin.generateReport')}
         </button>
       </div>
 
@@ -104,22 +106,22 @@ export default function AdminDashboard() {
       ) : stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
-            title="Total Users"
+            title={t('admin.stats.totalUsers')}
             value={stats.totalUsers.toLocaleString()}
             icon={UsersIcon}
           />
           <StatsCard
-            title="Restaurants"
+            title={t('admin.stats.restaurants')}
             value={stats.totalRestaurants.toLocaleString()}
             icon={RestaurantsIcon}
           />
           <StatsCard
-            title="Total Orders"
+            title={t('admin.stats.totalOrders')}
             value={stats.totalOrders.toLocaleString()}
             icon={OrdersIcon}
           />
           <StatsCard
-            title="Total Revenue"
+            title={t('admin.stats.totalRevenue')}
             value={formatCurrency(stats.totalRevenue)}
             icon={RevenueIcon}
           />
@@ -128,7 +130,7 @@ export default function AdminDashboard() {
 
       {/* Quick Actions */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.quickActions')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <a
             href="/panel/users"
@@ -141,8 +143,8 @@ export default function AdminDashboard() {
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-gray-900">Add New User</p>
-                <p className="text-sm text-gray-500">Create a new user account</p>
+                <p className="font-medium text-gray-900">{t('admin.actions.addNewUser')}</p>
+                <p className="text-sm text-gray-500">{t('admin.actions.createUserAccount')}</p>
               </div>
             </div>
           </a>
@@ -158,8 +160,8 @@ export default function AdminDashboard() {
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-gray-900">Add Restaurant</p>
-                <p className="text-sm text-gray-500">Register a new restaurant</p>
+                <p className="font-medium text-gray-900">{t('admin.actions.addRestaurant')}</p>
+                <p className="text-sm text-gray-500">{t('admin.actions.registerRestaurant')}</p>
               </div>
             </div>
           </a>
@@ -175,8 +177,8 @@ export default function AdminDashboard() {
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-gray-900">View Orders</p>
-                <p className="text-sm text-gray-500">Manage customer orders</p>
+                <p className="font-medium text-gray-900">{t('admin.actions.viewOrders')}</p>
+                <p className="text-sm text-gray-500">{t('admin.actions.manageOrders')}</p>
               </div>
             </div>
           </a>

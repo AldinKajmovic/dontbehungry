@@ -16,7 +16,7 @@ export interface Register {
   password: string;
   firstName: string;
   lastName: string;
-  phone?: string;
+  phone: string;
   address?: string;
   city?: string;
   country?: string;

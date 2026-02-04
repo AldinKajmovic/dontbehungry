@@ -3,15 +3,17 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { signIn } from 'next-auth/react'
-import { Input, Button, Alert, AuthLayout, Divider } from '@/components/ui'
+import { Input, Button, Alert, AuthLayout, Divider, LanguageToggle } from '@/components/ui'
 import { loginSchema, extractZodErrors, LoginForm } from '@/services/validation'
 import { useFormValidation } from '@/hooks/useFormValidation'
 import { useAuth } from '@/hooks/useAuth'
+import { useLanguage } from '@/hooks/useLanguage'
 
 export default function LoginPage() {
   const [serverError, setServerError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const { login } = useAuth()
+  const { t } = useLanguage()
 
   const {
     formData,
@@ -55,20 +57,21 @@ export default function LoginPage() {
 
   return (
     <AuthLayout
-      title="Welcome back"
-      subtitle="Sign in to continue to Glovo Copy"
+      title={t('auth.login.title')}
+      subtitle={t('auth.login.subtitle')}
       icon={icon}
       iconGradient="primary"
       backgroundGradient="orange"
-      footerText="Don't have an account?"
-      footerLinkText="Sign up"
+      footerText={t('auth.login.noAccount')}
+      footerLinkText={t('common.signUp')}
       footerLinkHref="/auth/register"
+      headerRight={<LanguageToggle />}
     >
       <form onSubmit={handleSubmit} className="space-y-5">
         {serverError && <Alert type="error">{serverError}</Alert>}
 
         <Input
-          label="Email address"
+          label={t('auth.login.emailLabel')}
           type="email"
           id="email"
           name="email"
@@ -76,12 +79,12 @@ export default function LoginPage() {
           onChange={handleChange}
           onBlur={handleBlur}
           error={getFieldError('email')}
-          placeholder="you@example.com"
+          placeholder={t('auth.login.emailPlaceholder')}
           autoComplete="email"
         />
 
         <Input
-          label="Password"
+          label={t('auth.login.passwordLabel')}
           type="password"
           id="password"
           name="password"
@@ -89,30 +92,30 @@ export default function LoginPage() {
           onChange={handleChange}
           onBlur={handleBlur}
           error={getFieldError('password')}
-          placeholder="Enter your password"
+          placeholder={t('auth.login.passwordPlaceholder')}
           autoComplete="current-password"
           showPasswordToggle
         />
 
         <div className="flex justify-end">
           <Link href="/auth/forgot-password" className="text-sm text-primary-600 hover:text-primary-700 transition-colors">
-            Forgot password?
+            {t('auth.login.forgotPassword')}
           </Link>
         </div>
 
         <Button type="submit" isLoading={isLoading}>
-          {isLoading ? 'Signing in...' : 'Sign in'}
+          {isLoading ? t('auth.login.signingIn') : t('common.signIn')}
         </Button>
       </form>
 
-      <Divider text="or continue with" />
+      <Divider text={t('auth.login.continueWith')} />
 
       {/* Social login buttons */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex justify-center">
         <Button
           type="button"
           variant="secondary"
-          className="flex items-center justify-center gap-2"
+          className="flex items-center justify-center gap-2 !w-auto !px-8"
           onClick={() => signIn('google', { callbackUrl: '/auth/callback?success=true' })}
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -122,12 +125,6 @@ export default function LoginPage() {
             <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
           </svg>
           Google
-        </Button>
-        <Button type="button" variant="secondary" className="flex items-center justify-center gap-2" disabled>
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-          </svg>
-          Phone
         </Button>
       </div>
     </AuthLayout>

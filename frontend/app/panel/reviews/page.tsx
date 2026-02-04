@@ -9,25 +9,27 @@ import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert, Select, SearchableSelect } from '@/components/ui'
 import { adminService, AdminReview, PaginationInfo, ReviewFilters, SortParams } from '@/services/admin'
-
-const RATING_OPTIONS = [
-  { value: '1', label: '1 Star' },
-  { value: '2', label: '2 Stars' },
-  { value: '3', label: '3 Stars' },
-  { value: '4', label: '4 Stars' },
-  { value: '5', label: '5 Stars' },
-]
-
-const FILTER_CONFIG = [
-  {
-    key: 'rating',
-    label: 'Rating',
-    options: RATING_OPTIONS,
-    placeholder: 'All Ratings',
-  },
-]
+import { useLanguage } from '@/hooks/useLanguage'
 
 export default function ReviewsPage() {
+  const { t } = useLanguage()
+
+  const RATING_OPTIONS = [
+    { value: '1', label: `1 ${t('admin.reviewsPage.star')}` },
+    { value: '2', label: `2 ${t('admin.reviewsPage.stars')}` },
+    { value: '3', label: `3 ${t('admin.reviewsPage.stars')}` },
+    { value: '4', label: `4 ${t('admin.reviewsPage.stars')}` },
+    { value: '5', label: `5 ${t('admin.reviewsPage.stars')}` },
+  ]
+
+  const FILTER_CONFIG = [
+    {
+      key: 'rating',
+      label: t('admin.reviewsPage.rating'),
+      options: RATING_OPTIONS,
+      placeholder: t('admin.reviewsPage.allRatings'),
+    },
+  ]
   const [reviews, setReviews] = useState<AdminReview[]>([])
   const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -140,7 +142,7 @@ export default function ReviewsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.userId || !formData.restaurantId) {
-      setFormError('Please select both a user and a restaurant')
+      setFormError(t('admin.reviewsPage.selectUserAndRestaurant'))
       return
     }
     try {
@@ -216,14 +218,14 @@ export default function ReviewsPage() {
   const columns = [
     {
       key: 'restaurant',
-      header: 'Restaurant',
+      header: t('admin.reviewsPage.restaurant'),
       render: (review: AdminReview) => (
         <p className="font-medium text-gray-900">{review.restaurant.name}</p>
       ),
     },
     {
       key: 'user',
-      header: 'Reviewer',
+      header: t('admin.reviewsPage.reviewer'),
       render: (review: AdminReview) => (
         <div>
           <p className="text-sm">{review.user.firstName} {review.user.lastName}</p>
@@ -233,13 +235,13 @@ export default function ReviewsPage() {
     },
     {
       key: 'rating',
-      header: 'Rating',
+      header: t('admin.reviewsPage.rating'),
       sortable: true,
       render: (review: AdminReview) => renderStars(review.rating),
     },
     {
       key: 'title',
-      header: 'Title',
+      header: t('admin.reviewsPage.title'),
       sortable: true,
       render: (review: AdminReview) => (
         <span className="text-gray-700">{review.title || '-'}</span>
@@ -247,7 +249,7 @@ export default function ReviewsPage() {
     },
     {
       key: 'content',
-      header: 'Content',
+      header: t('admin.reviewsPage.content'),
       render: (review: AdminReview) => (
         <span className="text-gray-500 truncate max-w-xs block text-sm">
           {review.content || '-'}
@@ -270,8 +272,8 @@ export default function ReviewsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reviews</h1>
-          <p className="text-gray-500 mt-1">Manage customer reviews</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('admin.reviewsPage.title')}</h1>
+          <p className="text-gray-500 mt-1">{t('admin.reviewsPage.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -284,7 +286,7 @@ export default function ReviewsPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add Review
+              {t('admin.reviewsPage.addReview')}
             </span>
           </Button>
         </div>
@@ -298,12 +300,12 @@ export default function ReviewsPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by title or content..."
+              placeholder={t('admin.reviewsPage.searchPlaceholder')}
               className="input-field"
             />
           </div>
           <Button type="submit" variant="secondary" className="!w-auto !px-6">
-            Search
+            {t('common.search')}
           </Button>
         </div>
       </form>
@@ -325,7 +327,7 @@ export default function ReviewsPage() {
         data={reviews}
         keyField="id"
         isLoading={isLoading}
-        emptyMessage="No reviews found"
+        emptyMessage={t('admin.reviewsPage.noReviewsFound')}
         sortConfig={sort.sortBy ? { key: sort.sortBy, direction: sort.sortOrder || 'asc' } : undefined}
         onSort={handleSort}
         actions={(review) => (
@@ -368,7 +370,7 @@ export default function ReviewsPage() {
       <Modal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        title="Add New Review"
+        title={t('admin.reviewsPage.addNewReview')}
         size="lg"
       >
         <form onSubmit={handleCreate} className="space-y-4">
@@ -376,29 +378,29 @@ export default function ReviewsPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <SearchableSelect
-              label="User"
+              label={t('admin.reviewsPage.user')}
               id="userId"
               value={formData.userId}
               onChange={(value) => setFormData({ ...formData, userId: value })}
               loadOptions={loadUserOptions}
-              placeholder="Search users..."
-              emptyMessage="No users found"
+              placeholder={t('admin.reviewsPage.searchUsers')}
+              emptyMessage={t('admin.reviewsPage.noUsersFound')}
               required
             />
             <SearchableSelect
-              label="Restaurant"
+              label={t('admin.reviewsPage.restaurant')}
               id="restaurantId"
               value={formData.restaurantId}
               onChange={(value) => setFormData({ ...formData, restaurantId: value })}
               loadOptions={loadRestaurantOptions}
-              placeholder="Search restaurants..."
-              emptyMessage="No restaurants found"
+              placeholder={t('admin.reviewsPage.searchRestaurants')}
+              emptyMessage={t('admin.reviewsPage.noRestaurantsFound')}
               required
             />
           </div>
 
           <Select
-            label="Rating"
+            label={t('admin.reviewsPage.rating')}
             id="rating"
             value={formData.rating}
             onChange={(e) => setFormData({ ...formData, rating: e.target.value })}
@@ -406,16 +408,16 @@ export default function ReviewsPage() {
           />
 
           <Input
-            label="Title"
+            label={t('admin.reviewsPage.title')}
             id="title"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            hint="(optional)"
+            hint={`(${t('common.optional').toLowerCase()})`}
           />
 
           <div>
             <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
-              Content <span className="text-gray-400 font-normal">(optional)</span>
+              {t('admin.reviewsPage.content')} <span className="text-gray-400 font-normal">({t('common.optional').toLowerCase()})</span>
             </label>
             <textarea
               id="content"
@@ -423,16 +425,16 @@ export default function ReviewsPage() {
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               rows={4}
               className="input-field resize-none"
-              placeholder="Review content..."
+              placeholder={t('admin.reviewsPage.reviewContent')}
             />
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowCreateModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Create Review
+              {t('admin.reviewsPage.createReview')}
             </Button>
           </div>
         </form>
@@ -442,7 +444,7 @@ export default function ReviewsPage() {
       <Modal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Edit Review"
+        title={t('admin.reviewsPage.editReview')}
         size="lg"
       >
         <form onSubmit={handleUpdate} className="space-y-4">
@@ -453,11 +455,11 @@ export default function ReviewsPage() {
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-500">Restaurant:</span>
+                  <span className="text-gray-500">{t('admin.reviewsPage.restaurant')}:</span>
                   <p>{selectedReview.restaurant.name}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Reviewer:</span>
+                  <span className="text-gray-500">{t('admin.reviewsPage.reviewer')}:</span>
                   <p>{selectedReview.user.firstName} {selectedReview.user.lastName}</p>
                 </div>
               </div>
@@ -465,7 +467,7 @@ export default function ReviewsPage() {
           )}
 
           <Select
-            label="Rating"
+            label={t('admin.reviewsPage.rating')}
             id="edit-rating"
             value={formData.rating}
             onChange={(e) => setFormData({ ...formData, rating: e.target.value })}
@@ -473,16 +475,16 @@ export default function ReviewsPage() {
           />
 
           <Input
-            label="Title"
+            label={t('admin.reviewsPage.title')}
             id="edit-title"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            hint="(optional)"
+            hint={`(${t('common.optional').toLowerCase()})`}
           />
 
           <div>
             <label htmlFor="edit-content" className="block text-sm font-medium text-gray-700 mb-2">
-              Content <span className="text-gray-400 font-normal">(optional)</span>
+              {t('admin.reviewsPage.content')} <span className="text-gray-400 font-normal">({t('common.optional').toLowerCase()})</span>
             </label>
             <textarea
               id="edit-content"
@@ -490,16 +492,16 @@ export default function ReviewsPage() {
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               rows={4}
               className="input-field resize-none"
-              placeholder="Review content..."
+              placeholder={t('admin.reviewsPage.reviewContent')}
             />
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowEditModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Save Changes
+              {t('admin.buttons.saveChanges')}
             </Button>
           </div>
         </form>
@@ -510,8 +512,8 @@ export default function ReviewsPage() {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
-        title="Delete Review"
-        message={`Are you sure you want to delete this review from ${selectedReview?.user.firstName} ${selectedReview?.user.lastName}? This action cannot be undone.`}
+        title={t('admin.reviewsPage.deleteReview')}
+        message={t('admin.reviewsPage.deleteReviewConfirm', { name: `${selectedReview?.user.firstName} ${selectedReview?.user.lastName}` })}
         isLoading={formLoading}
       />
 

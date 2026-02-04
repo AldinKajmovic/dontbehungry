@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { AuthLayout } from '@/components/ui/AuthLayout'
 import { Button } from '@/components/ui/Button'
 import { Alert } from '@/components/ui/Alert'
+import { LanguageToggle } from '@/components/ui/LanguageToggle'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function VerificationSentPage() {
@@ -52,6 +53,7 @@ export default function VerificationSentPage() {
       subtitle="We've sent you a verification link"
       icon={icon}
       backgroundGradient="green"
+      headerRight={<LanguageToggle />}
     >
       <div className="flex flex-col items-center py-6">
         <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-4">

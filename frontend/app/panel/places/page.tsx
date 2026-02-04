@@ -8,8 +8,10 @@ import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert } from '@/components/ui'
 import { adminService, AdminPlace, PaginationInfo, PlaceFilters, SortParams } from '@/services/admin'
+import { useLanguage } from '@/hooks/useLanguage'
 
 export default function PlacesPage() {
+  const { t } = useLanguage()
   const [places, setPlaces] = useState<AdminPlace[]>([])
   const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -181,7 +183,7 @@ export default function PlacesPage() {
   const columns = [
     {
       key: 'address',
-      header: 'Address',
+      header: t('admin.placesPage.streetAddress'),
       sortable: true,
       render: (place: AdminPlace) => (
         <p className="font-medium text-gray-900">{place.address}</p>
@@ -189,7 +191,7 @@ export default function PlacesPage() {
     },
     {
       key: 'city',
-      header: 'City',
+      header: t('admin.placesPage.city'),
       sortable: true,
       render: (place: AdminPlace) => (
         <span className="text-gray-700">{place.city}</span>
@@ -197,7 +199,7 @@ export default function PlacesPage() {
     },
     {
       key: 'state',
-      header: 'State',
+      header: t('admin.placesPage.state'),
       sortable: true,
       render: (place: AdminPlace) => (
         <span className="text-gray-500">{place.state || '-'}</span>
@@ -205,7 +207,7 @@ export default function PlacesPage() {
     },
     {
       key: 'country',
-      header: 'Country',
+      header: t('admin.placesPage.country'),
       sortable: true,
       render: (place: AdminPlace) => (
         <span className="text-gray-700">{place.country}</span>
@@ -213,7 +215,7 @@ export default function PlacesPage() {
     },
     {
       key: 'postalCode',
-      header: 'Postal Code',
+      header: t('admin.placesPage.postalCode'),
       sortable: true,
       render: (place: AdminPlace) => (
         <span className="text-gray-500">{place.postalCode || '-'}</span>
@@ -233,8 +235,8 @@ export default function PlacesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Places</h1>
-          <p className="text-gray-500 mt-1">Manage delivery locations</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('admin.placesPage.title')}</h1>
+          <p className="text-gray-500 mt-1">{t('admin.placesPage.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -247,7 +249,7 @@ export default function PlacesPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add Place
+              {t('admin.placesPage.addPlace')}
             </span>
           </Button>
         </div>
@@ -261,12 +263,12 @@ export default function PlacesPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by address, city, or country..."
+              placeholder={t('admin.placesPage.searchPlaceholder')}
               className="input-field"
             />
           </div>
           <Button type="submit" variant="secondary" className="!w-auto !px-6">
-            Search
+            {t('common.search')}
           </Button>
         </div>
       </form>
@@ -275,42 +277,42 @@ export default function PlacesPage() {
       <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
         <div className="flex flex-wrap items-end gap-4">
           <div className="min-w-[150px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.placesPage.city')}</label>
             <input
               type="text"
               value={filters.city || ''}
               onChange={(e) => handleFilterChange('city', e.target.value)}
-              placeholder="Filter by city..."
+              placeholder={t('admin.placesPage.filterByCity')}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
             />
           </div>
           <div className="min-w-[150px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.placesPage.state')}</label>
             <input
               type="text"
               value={filters.state || ''}
               onChange={(e) => handleFilterChange('state', e.target.value)}
-              placeholder="Filter by state..."
+              placeholder={t('admin.placesPage.filterByState')}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
             />
           </div>
           <div className="min-w-[150px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.placesPage.country')}</label>
             <input
               type="text"
               value={filters.country || ''}
               onChange={(e) => handleFilterChange('country', e.target.value)}
-              placeholder="Filter by country..."
+              placeholder={t('admin.placesPage.filterByCountry')}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
             />
           </div>
           <div className="min-w-[150px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.placesPage.postalCode')}</label>
             <input
               type="text"
               value={filters.postalCode || ''}
               onChange={(e) => handleFilterChange('postalCode', e.target.value)}
-              placeholder="Filter by postal code..."
+              placeholder={t('admin.placesPage.filterByPostalCode')}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
             />
           </div>
@@ -319,7 +321,7 @@ export default function PlacesPage() {
               onClick={handleClearFilters}
               className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              Clear Filters
+              {t('common.clearFilters')}
             </button>
           )}
         </div>
@@ -334,7 +336,7 @@ export default function PlacesPage() {
         data={places}
         keyField="id"
         isLoading={isLoading}
-        emptyMessage="No places found"
+        emptyMessage={t('admin.placesPage.noPlacesFound')}
         sortConfig={sort.sortBy ? { key: sort.sortBy, direction: sort.sortOrder || 'asc' } : undefined}
         onSort={handleSort}
         actions={(place) => (
@@ -377,14 +379,14 @@ export default function PlacesPage() {
       <Modal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        title="Add New Place"
+        title={t('admin.placesPage.addNewPlace')}
         size="lg"
       >
         <form onSubmit={handleCreate} className="space-y-4">
           {formError && <Alert type="error">{formError}</Alert>}
 
           <Input
-            label="Street Address"
+            label={t('admin.placesPage.streetAddress')}
             id="address"
             value={formData.address}
             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -394,44 +396,44 @@ export default function PlacesPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="City"
+              label={t('admin.placesPage.city')}
               id="city"
               value={formData.city}
               onChange={(e) => setFormData({ ...formData, city: e.target.value })}
               required
             />
             <Input
-              label="State/Province"
+              label={t('admin.placesPage.state')}
               id="state"
               value={formData.state}
               onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              hint="(optional)"
+              hint={`(${t('common.optional').toLowerCase()})`}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Country"
+              label={t('admin.placesPage.country')}
               id="country"
               value={formData.country}
               onChange={(e) => setFormData({ ...formData, country: e.target.value })}
               required
             />
             <Input
-              label="Postal Code"
+              label={t('admin.placesPage.postalCode')}
               id="postalCode"
               value={formData.postalCode}
               onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-              hint="(optional)"
+              hint={`(${t('common.optional').toLowerCase()})`}
             />
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowCreateModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Create Place
+              {t('admin.placesPage.createPlace')}
             </Button>
           </div>
         </form>
@@ -441,14 +443,14 @@ export default function PlacesPage() {
       <Modal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
-        title="Edit Place"
+        title={t('admin.placesPage.editPlace')}
         size="lg"
       >
         <form onSubmit={handleUpdate} className="space-y-4">
           {formError && <Alert type="error">{formError}</Alert>}
 
           <Input
-            label="Street Address"
+            label={t('admin.placesPage.streetAddress')}
             id="edit-address"
             value={formData.address}
             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -457,44 +459,44 @@ export default function PlacesPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="City"
+              label={t('admin.placesPage.city')}
               id="edit-city"
               value={formData.city}
               onChange={(e) => setFormData({ ...formData, city: e.target.value })}
               required
             />
             <Input
-              label="State/Province"
+              label={t('admin.placesPage.state')}
               id="edit-state"
               value={formData.state}
               onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              hint="(optional)"
+              hint={`(${t('common.optional').toLowerCase()})`}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Country"
+              label={t('admin.placesPage.country')}
               id="edit-country"
               value={formData.country}
               onChange={(e) => setFormData({ ...formData, country: e.target.value })}
               required
             />
             <Input
-              label="Postal Code"
+              label={t('admin.placesPage.postalCode')}
               id="edit-postalCode"
               value={formData.postalCode}
               onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-              hint="(optional)"
+              hint={`(${t('common.optional').toLowerCase()})`}
             />
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowEditModal(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" className="flex-1" isLoading={formLoading}>
-              Save Changes
+              {t('admin.buttons.saveChanges')}
             </Button>
           </div>
         </form>
@@ -505,8 +507,8 @@ export default function PlacesPage() {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
-        title="Delete Place"
-        message={`Are you sure you want to delete "${selectedPlace?.address}"? This may affect associated restaurants and addresses.`}
+        title={t('admin.placesPage.deletePlace')}
+        message={t('admin.placesPage.deletePlaceConfirm', { address: selectedPlace?.address || '' })}
         isLoading={formLoading}
       />
 

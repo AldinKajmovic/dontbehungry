@@ -22,7 +22,7 @@ export interface RegisterUserData {
   lastName: string
   email: string
   password: string
-  phone?: string
+  phone: string
   address?: string
   city?: string
   country?: string

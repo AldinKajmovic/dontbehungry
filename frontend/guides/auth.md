@@ -95,7 +95,7 @@ const handleRegister = async (data) => {
       lastName: 'Doe',
       email: 'john@example.com',
       password: 'password123',
-      phone: '+1234567890', // optional
+      phone: '+1234567890', // required
       address: '123 Main St', // optional
       city: 'New York',       // optional (required if address is set)
       country: 'USA',         // optional (required if address is set)
@@ -187,7 +187,7 @@ import { authService } from '@/services/auth'
 await authService.login({ email, password })
 
 // Register
-await authService.register({ firstName, lastName, email, password, phone? })
+await authService.register({ firstName, lastName, email, password, phone })
 
 // Register restaurant
 await authService.registerRestaurant({

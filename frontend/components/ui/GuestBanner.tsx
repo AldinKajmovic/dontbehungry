@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { useLanguage } from '@/hooks/useLanguage'
 
 export function GuestBanner() {
   const { isAuthenticated, isLoading } = useAuth()
+  const { t } = useLanguage()
   const [dismissed, setDismissed] = useState(false)
 
   // Don't show if user is authenticated, loading, or dismissed
@@ -29,10 +31,10 @@ export function GuestBanner() {
               />
             </svg>
             <p className="text-sm text-amber-800">
-              <span className="font-medium">Browsing as guest</span>
+              <span className="font-medium">{t('guest.banner')}</span>
               <span className="hidden sm:inline">
                 {' '}
-                — Create an account to place orders and track your deliveries.
+                — {t('guest.bannerSubtitle')}
               </span>
             </p>
           </div>

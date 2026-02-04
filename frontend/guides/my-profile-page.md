@@ -17,7 +17,7 @@ The My Profile page (`/my-profile`) allows authenticated users to manage their a
 2. **Basic Information**
    - Edit first name and last name
    - Edit email address (triggers re-verification)
-   - Edit phone number (optional)
+   - Edit phone number (required)
    - Shows email verification status
 
 3. **My Addresses**

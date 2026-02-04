@@ -4,15 +4,18 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
+import { useLanguage } from '@/hooks/useLanguage'
 import { publicService, PublicRestaurant, Category } from '@/services/public'
 import { RestaurantCard, CategoryIcon, MealModal } from '@/components/restaurants'
-import { GuestBanner } from '@/components/ui'
+import { GuestBanner, LanguageToggle } from '@/components/ui'
 import { CartDrawer } from '@/components/cart'
 import { NotificationBell } from '@/components/notifications'
+import { logger } from '@/utils/logger'
 
 export default function RestaurantsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth()
   const { itemCount, openCart } = useCart()
+  const { t } = useLanguage()
 
   const [restaurants, setRestaurants] = useState<PublicRestaurant[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -39,7 +42,7 @@ export default function RestaurantsPage() {
       const data = await publicService.getCategories()
       setCategories(data)
     } catch (error) {
-      console.error('Failed to load categories:', error)
+      logger.error('Failed to load categories', error)
     }
   }
 
@@ -57,7 +60,7 @@ export default function RestaurantsPage() {
       setRestaurants(response.items)
       setTotalPages(response.pagination.totalPages)
     } catch (error) {
-      console.error('Failed to load restaurants:', error)
+      logger.error('Failed to load restaurants', error)
     } finally {
       setIsLoading(false)
     }
@@ -117,7 +120,7 @@ export default function RestaurantsPage() {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Enter restaurant name..."
+                  placeholder={t('restaurants.searchPlaceholder')}
                   value={searchQuery}
                   onChange={handleSearch}
                   className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
@@ -137,6 +140,9 @@ export default function RestaurantsPage() {
                 </svg>
               </div>
             </div>
+
+            {/* Language Toggle */}
+            <LanguageToggle />
 
             {/* Auth-dependent UI - show nothing while loading to prevent flash */}
             {authLoading ? (
@@ -194,13 +200,13 @@ export default function RestaurantsPage() {
                   href="/auth/login"
                   className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
                 >
-                  Log in
+                  {t('common.logIn')}
                 </Link>
                 <Link
                   href="/auth/register"
                   className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
                 >
-                  Sign up
+                  {t('common.signUp')}
                 </Link>
               </div>
             )}
@@ -211,13 +217,13 @@ export default function RestaurantsPage() {
       <main className="max-w-7xl mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <div className="mb-4 text-sm">
-          <Link href="/" className="text-primary-600 hover:underline cursor-pointer">Home</Link>
+          <Link href="/" className="text-primary-600 hover:underline cursor-pointer">{t('common.home')}</Link>
           <span className="text-gray-400 mx-2">&gt;</span>
-          <span className="text-gray-600">Restaurants</span>
+          <span className="text-gray-600">{t('nav.restaurants')}</span>
         </div>
 
         {/* Title */}
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Restaurants</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('restaurants.title')}</h1>
 
         {/* Categories */}
         <div className="relative mb-8">
@@ -267,7 +273,7 @@ export default function RestaurantsPage() {
                   ${!selectedCategory ? 'text-primary-700' : 'text-gray-600'}
                 `}
               >
-                All
+                {t('restaurants.allCategories')}
               </span>
             </button>
 
@@ -295,8 +301,8 @@ export default function RestaurantsPage() {
         {/* Section Title */}
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
           {selectedCategory
-            ? categories.find((c) => c.id === selectedCategory)?.name || 'Restaurants'
-            : 'All Restaurants'}
+            ? categories.find((c) => c.id === selectedCategory)?.name || t('restaurants.title')
+            : t('restaurants.allRestaurants')}
         </h2>
 
         {/* Restaurant Grid */}
@@ -327,11 +333,11 @@ export default function RestaurantsPage() {
                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
               />
             </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No restaurants found</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('restaurants.noResults')}</h3>
             <p className="text-gray-500">
               {searchQuery
-                ? `No results for "${searchQuery}"`
-                : 'Try a different category or search term'}
+                ? t('restaurants.noResultsSearch', { query: searchQuery })
+                : t('restaurants.tryDifferent')}
             </p>
           </div>
         ) : (
@@ -354,17 +360,17 @@ export default function RestaurantsPage() {
               disabled={page === 1}
               className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
             >
-              Previous
+              {t('common.previous')}
             </button>
             <span className="px-4 py-2 text-sm text-gray-600">
-              Page {page} of {totalPages}
+              {t('common.page')} {page} {t('common.of')} {totalPages}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
               className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
             >
-              Next
+              {t('common.next')}
             </button>
           </div>
         )}

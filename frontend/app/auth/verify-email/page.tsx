@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { AuthLayout } from '@/components/ui/AuthLayout'
 import { Button } from '@/components/ui/Button'
+import { LanguageToggle } from '@/components/ui/LanguageToggle'
 import { authService } from '@/services/auth'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -51,6 +52,7 @@ function VerifyEmailContent() {
         subtitle="Please wait while we verify your email address"
         icon={icon}
         backgroundGradient="green"
+        headerRight={<LanguageToggle />}
       >
         <div className="flex flex-col items-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500" />
@@ -67,6 +69,7 @@ function VerifyEmailContent() {
         subtitle="Your email has been successfully verified"
         icon={icon}
         backgroundGradient="green"
+        headerRight={<LanguageToggle />}
       >
         <div className="flex flex-col items-center py-8">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
@@ -91,6 +94,7 @@ function VerifyEmailContent() {
       subtitle="We couldn't verify your email"
       icon={icon}
       backgroundGradient="orange"
+      headerRight={<LanguageToggle />}
     >
       <div className="flex flex-col items-center py-8">
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">

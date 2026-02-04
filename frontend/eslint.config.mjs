@@ -11,8 +11,19 @@ const compat = new FlatCompat({
   recommendedConfig: js.configs.recommended,
 })
 
+// Use separate extends to avoid circular reference in ESLint v9
 const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  {
+    ignores: ['.next/**', 'node_modules/**'],
+  },
+  ...compat.extends('next/core-web-vitals'),
+  ...compat.extends('next/typescript'),
+  {
+    rules: {
+      // Allow unused vars prefixed with underscore
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
 ]
 
 export default eslintConfig

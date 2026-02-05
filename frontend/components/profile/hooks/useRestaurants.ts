@@ -18,6 +18,8 @@ interface RestaurantFormState {
   minOrderAmount: string
   deliveryFee: string
   images: string[]
+  latitude?: number
+  longitude?: number
 }
 
 const INITIAL_FORM: RestaurantFormState = {
@@ -32,6 +34,8 @@ const INITIAL_FORM: RestaurantFormState = {
   minOrderAmount: '',
   deliveryFee: '',
   images: [],
+  latitude: undefined,
+  longitude: undefined,
 }
 
 export function useRestaurants() {
@@ -86,6 +90,26 @@ export function useRestaurants() {
     setForm((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
+    }))
+  }, [])
+
+  const handleAddressSelect = useCallback((addr: {
+    address: string
+    city: string
+    state: string
+    country: string
+    postalCode: string
+    latitude: number
+    longitude: number
+  }) => {
+    setForm((prev) => ({
+      ...prev,
+      address: addr.address,
+      city: addr.city,
+      country: addr.country,
+      postalCode: addr.postalCode,
+      latitude: addr.latitude,
+      longitude: addr.longitude,
     }))
   }, [])
 
@@ -223,6 +247,7 @@ export function useRestaurants() {
     deleteLoading,
     error,
     handleChange,
+    handleAddressSelect,
     setImages,
     removeImage,
     openAddModal,

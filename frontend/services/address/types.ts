@@ -9,6 +9,8 @@ export interface Address {
   postalCode: string | null
   notes: string | null
   isDefault: boolean
+  latitude: number | null
+  longitude: number | null
 }
 
 export interface AddAddressData {
@@ -19,6 +21,8 @@ export interface AddAddressData {
   postalCode?: string
   notes?: string
   isDefault?: boolean
+  latitude?: number
+  longitude?: number
 }
 
 export interface AddressResponse {

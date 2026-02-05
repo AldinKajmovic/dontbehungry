@@ -200,3 +200,30 @@ export interface CreateOrderResponse {
   message: string
   order: CreatedOrder
 }
+
+export interface DeliveryInfo {
+  distanceKm: number
+  distanceText: string
+  durationMinutes: number
+  durationText: string
+  baseFee: number
+  weatherSurcharge: number
+  totalFee: number
+  weatherCondition: string | null
+  isWeatherBad: boolean
+  estimatedDeliveryTime: string
+  note: string
+}
+
+export interface DeliveryInfoResponse {
+  success: true
+  deliveryInfo: DeliveryInfo
+}
+
+export interface DeliveryInfoFallbackResponse {
+  success: false
+  fallbackFee: number
+  message: string
+}
+
+export type GetDeliveryInfoResponse = DeliveryInfoResponse | DeliveryInfoFallbackResponse

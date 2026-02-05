@@ -15,6 +15,9 @@ export interface GetRestaurantsParams {
   sortOrder?: 'asc' | 'desc'
   categoryId?: string
   minRating?: number
+  latitude?: number
+  longitude?: number
+  maxDistanceKm?: number
 }
 
 class PublicService {
@@ -28,6 +31,9 @@ class PublicService {
     if (params.sortOrder) queryParams.set('sortOrder', params.sortOrder)
     if (params.categoryId) queryParams.set('categoryId', params.categoryId)
     if (params.minRating) queryParams.set('minRating', params.minRating.toString())
+    if (params.latitude) queryParams.set('latitude', params.latitude.toString())
+    if (params.longitude) queryParams.set('longitude', params.longitude.toString())
+    if (params.maxDistanceKm) queryParams.set('maxDistanceKm', params.maxDistanceKm.toString())
 
     const response = await api.get<PaginatedResponse<PublicRestaurant>>(
       `/api/public/restaurants?${queryParams.toString()}`

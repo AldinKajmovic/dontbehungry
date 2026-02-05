@@ -173,3 +173,27 @@ export async function deleteUser(id: string) {
   await getUserById(id)
   await prisma.user.delete({ where: { id } })
 }
+
+// ==================== USER ADDRESSES ====================
+
+import * as addressService from '../address.service'
+
+export async function getUserAddresses(userId: string) {
+  await getUserById(userId) 
+  return addressService.getUserAddresses(userId)
+}
+
+export async function addUserAddress(userId: string, data: addressService.AdressInput) {
+  await getUserById(userId) 
+  return addressService.addAddress(userId, data)
+}
+
+export async function updateUserAddress(userId: string, addressId: string, data: Partial<addressService.AdressInput>) {
+  await getUserById(userId)
+  return addressService.updateAddress(userId, addressId, data)
+}
+
+export async function deleteUserAddress(userId: string, addressId: string) {
+  await getUserById(userId)
+  return addressService.deleteAddress(userId, addressId)
+}

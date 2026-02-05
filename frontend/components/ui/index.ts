@@ -18,3 +18,5 @@ export { SearchableSelect } from './SearchableSelect';
 export { LanguageToggle } from './LanguageToggle';
 export { Toast } from './Toast';
 export { ToastContainer } from './ToastContainer';
+export { AddressMap } from './AddressMap';
+export { AddressAutocomplete } from './AddressAutocomplete';

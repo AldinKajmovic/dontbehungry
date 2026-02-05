@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { addressService, Address, AddAddressData } from '@/services/address'
 import { logger } from '@/utils/logger'
 
@@ -11,6 +11,8 @@ interface AddressForm {
   country: string
   postalCode: string
   notes: string
+  latitude?: number
+  longitude?: number
 }
 
 const initialAddressForm: AddressForm = {
@@ -20,6 +22,8 @@ const initialAddressForm: AddressForm = {
   country: '',
   postalCode: '',
   notes: '',
+  latitude: undefined,
+  longitude: undefined,
 }
 
 export function useCartAddresses(isCartOpen: boolean, isAuthenticated: boolean, hasItems: boolean) {
@@ -64,6 +68,27 @@ export function useCartAddresses(isCartOpen: boolean, isAuthenticated: boolean, 
     setAddressForm((prev) => ({ ...prev, [name]: value }))
   }
 
+  const handleAddressSelect = useCallback((addr: {
+    address: string
+    city: string
+    state: string
+    country: string
+    postalCode: string
+    latitude: number
+    longitude: number
+  }) => {
+    setAddressForm((prev) => ({
+      ...prev,
+      address: addr.address,
+      city: addr.city,
+      state: addr.state,
+      country: addr.country,
+      postalCode: addr.postalCode,
+      latitude: addr.latitude,
+      longitude: addr.longitude,
+    }))
+  }, [])
+
   const openAddAddressModal = () => {
     setAddressForm(initialAddressForm)
     setAddressError('')
@@ -94,6 +119,8 @@ export function useCartAddresses(isCartOpen: boolean, isAuthenticated: boolean, 
         state: addressForm.state || undefined,
         postalCode: addressForm.postalCode || undefined,
         notes: addressForm.notes || undefined,
+        latitude: addressForm.latitude,
+        longitude: addressForm.longitude,
       }
       const { address } = await addressService.addAddress(data)
       // Add new address to local state and select it
@@ -117,6 +144,7 @@ export function useCartAddresses(isCartOpen: boolean, isAuthenticated: boolean, 
     addressLoading,
     addressError,
     handleAddressChange,
+    handleAddressSelect,
     openAddAddressModal,
     closeAddressModal,
     handleAddressSubmit,

@@ -1,5 +1,7 @@
 import { prisma } from '../lib/prisma'
 import { NotFoundError, BadRequestError } from '../utils/errors'
+import { geocodeAddress as geocode } from '../utils/geocoding'
+import { logger } from '../utils/logger'
 
 export interface AdressInput {
   address: string
@@ -9,6 +11,8 @@ export interface AdressInput {
   postalCode?: string
   notes?: string
   isDefault?: boolean
+  latitude?: number
+  longitude?: number
 }
 
 export interface AddressResponse {
@@ -20,6 +24,8 @@ export interface AddressResponse {
   postalCode: string | null
   notes: string | null
   isDefault: boolean
+  latitude: number | null
+  longitude: number | null
 }
 
 export async function getUserAddresses(userId: string): Promise<AddressResponse[]> {
@@ -38,11 +44,13 @@ export async function getUserAddresses(userId: string): Promise<AddressResponse[
     postalCode: ua.place.postalCode,
     notes: ua.notes,
     isDefault: ua.isDefault,
+    latitude: ua.place.latitude ? Number(ua.place.latitude) : null,
+    longitude: ua.place.longitude ? Number(ua.place.longitude) : null,
   }))
 }
 
 export async function addAddress(userId: string, data: AdressInput): Promise<AddressResponse> {
-  const { address, city, state, country, postalCode, notes, isDefault } = data
+  const { address, city, state, country, postalCode, notes, isDefault, latitude, longitude } = data
 
   const existingAddresses = await prisma.userAddress.count({ where: { userId } })
   const shouldBeDefault = isDefault || existingAddresses === 0
@@ -63,6 +71,8 @@ export async function addAddress(userId: string, data: AdressInput): Promise<Add
         state: state || null,
         country,
         postalCode: postalCode || null,
+        latitude: latitude ?? null,
+        longitude: longitude ?? null,
       },
     })
 
@@ -77,6 +87,10 @@ export async function addAddress(userId: string, data: AdressInput): Promise<Add
     })
   })
 
+  if (!latitude || !longitude) {
+    geocodeAddressAsync(userAddress.placeId, address, city, country, state, postalCode)
+  }
+
   return {
     id: userAddress.id,
     address: userAddress.place.address,
@@ -86,6 +100,8 @@ export async function addAddress(userId: string, data: AdressInput): Promise<Add
     postalCode: userAddress.place.postalCode,
     notes: userAddress.notes,
     isDefault: userAddress.isDefault,
+    latitude: userAddress.place.latitude ? Number(userAddress.place.latitude) : null,
+    longitude: userAddress.place.longitude ? Number(userAddress.place.longitude) : null,
   }
 }
 
@@ -139,6 +155,8 @@ export async function updateAddress(userId: string, addressId: string, data: Par
     postalCode: updated.place.postalCode,
     notes: updated.notes,
     isDefault: updated.isDefault,
+    latitude: updated.place.latitude ? Number(updated.place.latitude) : null,
+    longitude: updated.place.longitude ? Number(updated.place.longitude) : null,
   }
 }
 
@@ -211,5 +229,32 @@ export async function setDefaultAddress(userId: string, addressId: string): Prom
     postalCode: userAddress.place.postalCode,
     notes: userAddress.notes,
     isDefault: true,
+    latitude: userAddress.place.latitude ? Number(userAddress.place.latitude) : null,
+    longitude: userAddress.place.longitude ? Number(userAddress.place.longitude) : null,
+  }
+}
+async function geocodeAddressAsync(
+  placeId: string,
+  address: string,
+  city: string,
+  country: string,
+  state?: string | null,
+  postalCode?: string | null
+): Promise<void> {
+  try {
+    const coords = await geocode(address, city, country, state, postalCode)
+
+    if (coords) {
+      await prisma.place.update({
+        where: { id: placeId },
+        data: {
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        },
+      })
+      logger.info('Address geocoded successfully', { placeId })
+    }
+  } catch (error) {
+    logger.error('Failed to geocode address', { placeId, error })
   }
 }

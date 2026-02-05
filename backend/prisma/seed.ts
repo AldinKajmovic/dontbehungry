@@ -23,13 +23,48 @@ const prisma = new PrismaClient({ adapter })
 ========================= */
 
 const SEED_CONFIG = {
-  users: 20,
-  restaurants: 10,
+  usersPerCity: 5,
+  restaurantsPerCity: 3,
   categoriesPerRestaurant: 12,
   menuItemsPerRestaurant: 15,
   ordersPerUser: 20,
   reviewsPerRestaurant: 5,
-  drivers: 30,
+  driversPerCity: 8,
+}
+
+/* =========================
+   CITY CLUSTERS
+========================= */
+
+// Croatian cities with their center coordinates - users and restaurants will be placed nearby
+const CITY_CLUSTERS = [
+  { name: 'Zagreb', country: 'Hrvatska', lat: 45.8150, lng: 15.9819 },
+  { name: 'Split', country: 'Hrvatska', lat: 43.5081, lng: 16.4402 },
+  { name: 'Rijeka', country: 'Hrvatska', lat: 45.3271, lng: 14.4422 },
+  { name: 'Osijek', country: 'Hrvatska', lat: 45.5550, lng: 18.6955 },
+]
+
+// Generate random coordinates within ~1km of city center (to stay on roads)
+function getRandomCoordsInCity(city: typeof CITY_CLUSTERS[0]): { lat: number; lng: number } {
+  // ~0.009 degrees ≈ 1km - keeps points in urban areas with roads
+  const latOffset = (Math.random() - 0.5) * 0.018
+  const lngOffset = (Math.random() - 0.5) * 0.018
+  return {
+    lat: city.lat + latOffset,
+    lng: city.lng + lngOffset,
+  }
+}
+
+// Generate a realistic Croatian street address
+function generateStreetAddress(): string {
+  const streets = [
+    'Ilica', 'Vlaška', 'Maksimirska', 'Radićeva', 'Savska',
+    'Dubrovačka', 'Dalmatinska', 'Kneza Mislava', 'Držićeva', 'Vukovarska',
+    'Heinzelova', 'Slavonska avenija', 'Ulica grada Vukovara', 'Trg bana Jelačića',
+    'Jurišićeva', 'Petrinjska', 'Gundulićeva', 'Teslina', 'Preradovićeva',
+  ]
+  const streetNumber = faker.number.int({ min: 1, max: 150 })
+  return `${faker.helpers.arrayElement(streets)} ${streetNumber}`
 }
 
 /* =========================
@@ -209,133 +244,153 @@ async function main() {
     },
   })
 
-  /* USERS */
-  const customers: { id: string }[] = []
-  for (let i = 0; i < SEED_CONFIG.users; i++) {
-    const user = await prisma.user.create({
-      data: {
-        email: `user${i}@test.com`,
-        passwordHash: customerHash,
-        firstName: localFaker.person.firstName(),
-        lastName: localFaker.person.lastName(),
-        phone: localFaker.phone.number(),
-        role: UserRole.CUSTOMER,
-        emailVerified: true,
-        phoneVerified: true,
-      },
-    })
-    customers.push(user)
-  }
-
-  /* DRIVERS */
+  /* SEED BY CITY CLUSTERS */
+  const customers: { id: string; cityIndex: number }[] = []
   const drivers: { id: string }[] = []
-  for (let i = 0; i < SEED_CONFIG.drivers; i++) {
-    drivers.push(
-      await prisma.user.create({
+  const restaurants: { id: string; cityIndex: number }[] = []
+  const menuMap = new Map<string, { id: string; price: number }[]>()
+
+  let userIndex = 0
+  let driverIndex = 0
+  let ownerIndex = 0
+
+  for (let cityIdx = 0; cityIdx < CITY_CLUSTERS.length; cityIdx++) {
+    const city = CITY_CLUSTERS[cityIdx]
+    console.log(`\n🏙️  Seeding ${city.name}...`)
+
+    /* DRIVERS for this city */
+    for (let i = 0; i < SEED_CONFIG.driversPerCity; i++) {
+      drivers.push(
+        await prisma.user.create({
+          data: {
+            email: `driver${driverIndex}@test.com`,
+            passwordHash: driverHash,
+            firstName: localFaker.person.firstName(),
+            lastName: localFaker.person.lastName(),
+            phone: localFaker.phone.number(),
+            role: UserRole.DELIVERY_DRIVER,
+            emailVerified: true,
+            phoneVerified: true,
+          },
+        })
+      )
+      driverIndex++
+    }
+
+    /* RESTAURANTS for this city */
+    console.log(`  📍 Creating ${SEED_CONFIG.restaurantsPerCity} restaurants in ${city.name}...`)
+    for (let i = 0; i < SEED_CONFIG.restaurantsPerCity; i++) {
+      const owner = await prisma.user.create({
         data: {
-          email: `driver${i}@test.com`,
-          passwordHash: driverHash,
+          email: `owner${ownerIndex}@test.com`,
+          passwordHash: ownerHash,
           firstName: localFaker.person.firstName(),
           lastName: localFaker.person.lastName(),
           phone: localFaker.phone.number(),
-          role: UserRole.DELIVERY_DRIVER,
+          role: UserRole.RESTAURANT_OWNER,
           emailVerified: true,
           phoneVerified: true,
         },
       })
-    )
-  }
+      ownerIndex++
 
-  /* RESTAURANTS + MENU */
-  const restaurants: { id: string }[] = []
-  const menuMap = new Map<string, { id: string; price: number }[]>()
-
-  for (let i = 0; i < SEED_CONFIG.restaurants; i++) {
-    const owner = await prisma.user.create({
-      data: {
-        email: `owner${i}@test.com`,
-        passwordHash: ownerHash,
-        firstName: localFaker.person.firstName(),
-        lastName: localFaker.person.lastName(),
-        phone: localFaker.phone.number(),
-        role: UserRole.RESTAURANT_OWNER,
-        emailVerified: true,
-        phoneVerified: true,
-      },
-    })
-
-    const place = await prisma.place.create({
-      data: {
-        address: localFaker.location.streetAddress(),
-        city: localFaker.location.city(),
-        country: 'Bosna i Hercegovina',
-      },
-    })
-
-    const restaurant = await prisma.restaurant.create({
-      data: {
-        name: `${localFaker.company.name()} Restoran`,
-        ownerId: owner.id,
-        placeId: place.id,
-        rating: faker.number.float({ min: 3, max: 5 }),
-        minOrderAmount: 10,
-        deliveryFee: 3,
-      },
-    })
-
-    restaurants.push(restaurant)
-
-    const assignedCategories = faker.helpers.arrayElements(
-      categories,
-      SEED_CONFIG.categoriesPerRestaurant
-    )
-
-    for (const c of assignedCategories) {
-      await prisma.restaurantCategory.create({
-        data: { restaurantId: restaurant.id, categoryId: c.id },
-      })
-    }
-
-    const items: { id: string; price: number }[] = []
-
-    for (let j = 0; j < SEED_CONFIG.menuItemsPerRestaurant; j++) {
-      const c = faker.helpers.arrayElement(assignedCategories)
-      const names = MENU_ITEMS_BY_CATEGORY[c.name] ?? ['Special']
-      const price = faker.number.float({ min: 5, max: 30 })
-
-      const item = await prisma.menuItem.create({
+      const coords = getRandomCoordsInCity(city)
+      const place = await prisma.place.create({
         data: {
-          name: `${faker.helpers.arrayElement(names)} #${j}`,
-          price,
-          restaurantId: restaurant.id,
-          categoryId: c.id,
-          isAvailable: true,
-          preparationTime: faker.number.int({ min: 5, max: 45 }),
+          address: generateStreetAddress(),
+          city: city.name,
+          country: city.country,
+          latitude: coords.lat,
+          longitude: coords.lng,
         },
       })
 
-      items.push({ id: item.id, price })
+      const restaurant = await prisma.restaurant.create({
+        data: {
+          name: `${localFaker.company.name()} Restoran`,
+          ownerId: owner.id,
+          placeId: place.id,
+          rating: faker.number.float({ min: 3, max: 5 }),
+          minOrderAmount: 10,
+          deliveryFee: 3,
+        },
+      })
+
+      restaurants.push({ id: restaurant.id, cityIndex: cityIdx })
+
+      const assignedCategories = faker.helpers.arrayElements(
+        categories,
+        SEED_CONFIG.categoriesPerRestaurant
+      )
+
+      for (const c of assignedCategories) {
+        await prisma.restaurantCategory.create({
+          data: { restaurantId: restaurant.id, categoryId: c.id },
+        })
+      }
+
+      const items: { id: string; price: number }[] = []
+
+      for (let j = 0; j < SEED_CONFIG.menuItemsPerRestaurant; j++) {
+        const c = faker.helpers.arrayElement(assignedCategories)
+        const names = MENU_ITEMS_BY_CATEGORY[c.name] ?? ['Special']
+        const price = faker.number.float({ min: 5, max: 30 })
+
+        const item = await prisma.menuItem.create({
+          data: {
+            name: `${faker.helpers.arrayElement(names)} #${j}`,
+            price,
+            restaurantId: restaurant.id,
+            categoryId: c.id,
+            isAvailable: true,
+            preparationTime: faker.number.int({ min: 5, max: 45 }),
+          },
+        })
+
+        items.push({ id: item.id, price })
+      }
+
+      menuMap.set(restaurant.id, items)
     }
 
-    menuMap.set(restaurant.id, items)
-  }
+    /* USERS + ADDRESSES for this city */
+    console.log(`  👥 Creating ${SEED_CONFIG.usersPerCity} users in ${city.name}...`)
+    for (let i = 0; i < SEED_CONFIG.usersPerCity; i++) {
+      const user = await prisma.user.create({
+        data: {
+          email: `user${userIndex}@test.com`,
+          passwordHash: customerHash,
+          firstName: localFaker.person.firstName(),
+          lastName: localFaker.person.lastName(),
+          phone: localFaker.phone.number(),
+          role: UserRole.CUSTOMER,
+          emailVerified: true,
+          phoneVerified: true,
+        },
+      })
+      customers.push({ id: user.id, cityIndex: cityIdx })
+      userIndex++
 
-  /* ADDRESSES */
-  for (const c of customers) {
-    const place = await prisma.place.create({
-      data: {
-        address: localFaker.location.streetAddress(),
-        city: localFaker.location.city(),
-        country: 'Bosna i Hercegovina',
-      },
-    })
+      // Create address near this city
+      const coords = getRandomCoordsInCity(city)
+      const place = await prisma.place.create({
+        data: {
+          address: generateStreetAddress(),
+          city: city.name,
+          country: city.country,
+          latitude: coords.lat,
+          longitude: coords.lng,
+        },
+      })
 
-    await prisma.userAddress.create({
-      data: { userId: c.id, placeId: place.id, isDefault: true },
-    })
+      await prisma.userAddress.create({
+        data: { userId: user.id, placeId: place.id, isDefault: true },
+      })
+    }
   }
 
   /* ORDERS */
+  console.log('\n📦 Creating orders...')
   for (const c of customers) {
     const address = await prisma.userAddress.findFirst({
       where: { userId: c.id },
@@ -343,8 +398,11 @@ async function main() {
     })
     if (!address) continue
 
+    // Get restaurants in the same city as this user
+    const cityRestaurants = restaurants.filter((r) => r.cityIndex === c.cityIndex)
+
     for (let i = 0; i < SEED_CONFIG.ordersPerUser; i++) {
-      const restaurant = faker.helpers.arrayElement(restaurants)
+      const restaurant = faker.helpers.arrayElement(cityRestaurants)
       const menuItems = menuMap.get(restaurant.id)!
       const picked = faker.helpers.arrayElements(menuItems, 3)
 

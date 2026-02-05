@@ -23,11 +23,25 @@ The main dashboard displays:
 Manage user accounts with full CRUD operations:
 - Create new users with password
 - Update user details and roles
+- **Add/Edit user address with autocomplete and map**
 - Delete users (with confirmation)
 - Search by email or name
 - Filter by role (Customer, Restaurant Owner, Delivery Driver, Admin)
 - Filter by verification status (Verified, Pending)
 - Pagination with configurable page size (5, 10, 25, 100)
+
+**Create/Edit Form Fields:**
+- First Name (required)
+- Last Name (required)
+- Email (required)
+- Password (required for create)
+- Phone (required)
+- Role (dropdown)
+- **User Address Section:**
+  - AddressAutocomplete with map preview
+  - Auto-fills city, country, postal code, coordinates
+  - Shows currently selected address
+- Restaurant fields (shown when RESTAURANT_OWNER selected)
 
 **Available Roles:**
 - `CUSTOMER` - Regular customers
@@ -39,6 +53,7 @@ Manage user accounts with full CRUD operations:
 
 Manage restaurant listings:
 - Create restaurants with owner and place selection via searchable dropdowns
+- **Create new places inline with AddressAutocomplete and map**
 - Update restaurant details, fees, owner, and place
 - Delete restaurants (cascades to menu items, orders, reviews)
 - Search by name or email
@@ -49,7 +64,12 @@ Manage restaurant listings:
 - Phone (optional)
 - Email (optional)
 - Owner (searchable dropdown - searches users by name)
-- Place (searchable dropdown - searches places by address)
+- **Place Section:**
+  - Toggle: "Select existing place" or "Create new place"
+  - Existing: Searchable dropdown (searches by address, city, country)
+  - New: AddressAutocomplete with map preview
+    - Auto-fills city, country, postal code, coordinates
+    - Shows selected address confirmation
 - Min Order Amount (optional)
 - Delivery Fee (optional)
 - **Gallery Section** - Up to 6 images for interior, exterior, food photos
@@ -343,6 +363,7 @@ const placeOptions = await adminService.getPlacesForSelect(search)
 | Entity | Methods |
 |--------|---------|
 | Users | `getUsers`, `getUserById`, `createUser`, `updateUser`, `deleteUser` |
+| User Addresses | `getUserAddresses`, `addUserAddress`, `updateUserAddress`, `deleteUserAddress` |
 | Restaurants | `getRestaurants`, `getRestaurantById`, `createRestaurant`, `updateRestaurant`, `deleteRestaurant` |
 | Categories | `getCategories`, `getCategoryById`, `createCategory`, `updateCategory`, `deleteCategory` |
 | Menu Items | `getMenuItems`, `getMenuItemById`, `createMenuItem`, `updateMenuItem`, `deleteMenuItem` |
@@ -447,4 +468,4 @@ The admin panel uses existing Tailwind CSS classes and follows the design patter
 
 ---
 
-*Last updated: January 2026*
+*Last updated: February 2026 - Added User Address management with AddressAutocomplete, Restaurant place creation with map*

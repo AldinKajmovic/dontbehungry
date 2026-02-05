@@ -93,6 +93,34 @@ export interface CreateUserInput {
 
 export type UpdateUserInput = Partial<Omit<AdminUser, 'id'>>
 
+// User Address types
+export interface UserAddress {
+  id: string
+  address: string
+  city: string
+  state: string | null
+  country: string
+  postalCode: string | null
+  notes: string | null
+  isDefault: boolean
+  latitude: number | null
+  longitude: number | null
+}
+
+export interface CreateUserAddressInput {
+  address: string
+  city: string
+  state?: string
+  country: string
+  postalCode?: string
+  notes?: string
+  isDefault?: boolean
+  latitude?: number
+  longitude?: number
+}
+
+export type UpdateUserAddressInput = Partial<CreateUserAddressInput>
+
 // Restaurant types
 export interface AdminRestaurant {
   id: string
@@ -309,6 +337,8 @@ export interface AdminPlace {
   state: string | null
   country: string
   postalCode: string | null
+  latitude: number | null
+  longitude: number | null
 }
 
 export type CreatePlaceInput = Partial<AdminPlace>

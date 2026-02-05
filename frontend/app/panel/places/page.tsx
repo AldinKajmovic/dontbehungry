@@ -6,7 +6,7 @@ import { Pagination } from '@/components/admin/Pagination'
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal'
 import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
-import { Modal, Input, Button, Alert } from '@/components/ui'
+import { Modal, Input, Button, Alert, AddressAutocomplete } from '@/components/ui'
 import { adminService, AdminPlace, PaginationInfo, PlaceFilters, SortParams } from '@/services/admin'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useToast } from '@/hooks/useToast'
@@ -36,6 +36,8 @@ export default function PlacesPage() {
     state: '',
     country: '',
     postalCode: '',
+    latitude: undefined as number | undefined,
+    longitude: undefined as number | undefined,
   })
   const [formError, setFormError] = useState('')
   const [formLoading, setFormLoading] = useState(false)
@@ -102,9 +104,29 @@ export default function PlacesPage() {
   const hasActiveFilters = Object.keys(filters).length > 0
 
   const openCreateModal = () => {
-    setFormData({ address: '', city: '', state: '', country: '', postalCode: '' })
+    setFormData({ address: '', city: '', state: '', country: '', postalCode: '', latitude: undefined, longitude: undefined })
     setFormError('')
     setShowCreateModal(true)
+  }
+
+  const handleAddressSelect = (addr: {
+    address: string
+    city: string
+    state: string
+    country: string
+    postalCode: string
+    latitude: number
+    longitude: number
+  }) => {
+    setFormData({
+      address: addr.address,
+      city: addr.city,
+      state: addr.state,
+      country: addr.country,
+      postalCode: addr.postalCode,
+      latitude: addr.latitude,
+      longitude: addr.longitude,
+    })
   }
 
   const openEditModal = (place: AdminPlace) => {
@@ -115,6 +137,8 @@ export default function PlacesPage() {
       state: place.state || '',
       country: place.country,
       postalCode: place.postalCode || '',
+      latitude: undefined,
+      longitude: undefined,
     })
     setFormError('')
     setShowEditModal(true)
@@ -393,48 +417,12 @@ export default function PlacesPage() {
         <form onSubmit={handleCreate} className="space-y-4">
           {formError && <Alert type="error">{formError}</Alert>}
 
-          <Input
+          <AddressAutocomplete
             label={t('admin.placesPage.streetAddress')}
-            id="address"
-            value={formData.address}
-            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            placeholder="123 Main Street"
-            required
+            placeholder={t('address.searchPlaceholder')}
+            onAddressSelect={handleAddressSelect}
+            height="150px"
           />
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label={t('admin.placesPage.city')}
-              id="city"
-              value={formData.city}
-              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              required
-            />
-            <Input
-              label={t('admin.placesPage.state')}
-              id="state"
-              value={formData.state}
-              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              hint={`(${t('common.optional').toLowerCase()})`}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label={t('admin.placesPage.country')}
-              id="country"
-              value={formData.country}
-              onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-              required
-            />
-            <Input
-              label={t('admin.placesPage.postalCode')}
-              id="postalCode"
-              value={formData.postalCode}
-              onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-              hint={`(${t('common.optional').toLowerCase()})`}
-            />
-          </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowCreateModal(false)}>
@@ -457,47 +445,13 @@ export default function PlacesPage() {
         <form onSubmit={handleUpdate} className="space-y-4">
           {formError && <Alert type="error">{formError}</Alert>}
 
-          <Input
+          <AddressAutocomplete
             label={t('admin.placesPage.streetAddress')}
-            id="edit-address"
-            value={formData.address}
-            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            required
+            placeholder={t('address.searchPlaceholder')}
+            initialAddress={selectedPlace ? `${selectedPlace.address}, ${selectedPlace.city}, ${selectedPlace.country}` : ''}
+            onAddressSelect={handleAddressSelect}
+            height="150px"
           />
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label={t('admin.placesPage.city')}
-              id="edit-city"
-              value={formData.city}
-              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              required
-            />
-            <Input
-              label={t('admin.placesPage.state')}
-              id="edit-state"
-              value={formData.state}
-              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              hint={`(${t('common.optional').toLowerCase()})`}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label={t('admin.placesPage.country')}
-              id="edit-country"
-              value={formData.country}
-              onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-              required
-            />
-            <Input
-              label={t('admin.placesPage.postalCode')}
-              id="edit-postalCode"
-              value={formData.postalCode}
-              onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-              hint={`(${t('common.optional').toLowerCase()})`}
-            />
-          </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowEditModal(false)}>

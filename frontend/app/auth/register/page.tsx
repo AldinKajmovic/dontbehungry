@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { CountryCode } from 'libphonenumber-js'
-import { Input, Button, PhoneInput, Alert, AuthLayout, LanguageToggle } from '@/components/ui'
+import { Input, Button, PhoneInput, Alert, AuthLayout, LanguageToggle, AddressAutocomplete } from '@/components/ui'
 import { registerSchema, extractZodErrors, formatPhoneE164, RegisterForm } from '@/services/validation'
 import { useFormValidation } from '@/hooks/useFormValidation'
 import { useAuth } from '@/hooks/useAuth'
@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [selectedCountry, setSelectedCountry] = useState<CountryCode>('US')
   const [serverError, setServerError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null)
   const { register } = useAuth()
   const { t } = useLanguage()
 
@@ -206,43 +207,17 @@ export default function RegisterPage() {
         {/* Delivery Address */}
         <div className="pt-4 border-t border-gray-200">
           <p className="text-sm font-medium text-gray-700 mb-3">{t('auth.register.deliveryAddress')}</p>
-          <div className="space-y-3">
-            <Input
-              label={t('auth.register.streetAddressLabel')}
-              id="address"
-              name="address"
-              value={formData.address || ''}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={getFieldError('address')}
-              placeholder={t('auth.register.streetAddressPlaceholder')}
-              autoComplete="street-address"
-            />
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                label={t('auth.register.cityLabel')}
-                id="city"
-                name="city"
-                value={formData.city || ''}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={getFieldError('city')}
-                placeholder={t('auth.register.cityPlaceholder')}
-                autoComplete="address-level2"
-              />
-              <Input
-                label={t('auth.register.countryLabel')}
-                id="country"
-                name="country"
-                value={formData.country || ''}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={getFieldError('country')}
-                placeholder={t('auth.register.countryPlaceholder')}
-                autoComplete="country-name"
-              />
-            </div>
-          </div>
+          <AddressAutocomplete
+            label={t('address.streetAddress')}
+            placeholder={t('address.searchPlaceholder')}
+            onAddressSelect={(addr) => {
+              setFieldValue('address', addr.address)
+              setFieldValue('city', addr.city)
+              setFieldValue('country', addr.country)
+              setCoordinates({ lat: addr.latitude, lng: addr.longitude })
+            }}
+            height="150px"
+          />
         </div>
 
         <Button type="submit" isLoading={isLoading} className="mt-2">

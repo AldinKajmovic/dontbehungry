@@ -124,6 +124,66 @@ export async function deleteUser(
   }
 }
 
+// ==================== USER ADDRESSES ====================
+
+type UserAddressParams = { userId: string; addressId?: string }
+
+export async function getUserAddresses(
+  req: Request<UserAddressParams>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const addresses = await adminService.getUserAddresses(req.params.userId)
+    res.json(addresses)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function addUserAddress(
+  req: Request<UserAddressParams>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const address = await adminService.addUserAddress(req.params.userId, req.body)
+    res.status(201).json(address)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function updateUserAddress(
+  req: Request<UserAddressParams>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const address = await adminService.updateUserAddress(
+      req.params.userId,
+      req.params.addressId!,
+      req.body
+    )
+    res.json(address)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function deleteUserAddress(
+  req: Request<UserAddressParams>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    await adminService.deleteUserAddress(req.params.userId, req.params.addressId!)
+    res.json({ message: 'Address deleted successfully' })
+  } catch (error) {
+    next(error)
+  }
+}
+
 // ==================== RESTAURANTS ====================
 
 export async function getRestaurants(

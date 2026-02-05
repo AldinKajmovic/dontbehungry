@@ -8,7 +8,7 @@ import { useLanguage } from '@/hooks/useLanguage'
 import { useToast } from '@/hooks/useToast'
 import { profileService } from '@/services/profile'
 import { logger } from '@/utils/logger'
-import { useCartAddresses } from './hooks'
+import { useCartAddresses, useDeliveryInfo } from './hooks'
 import { CartItemCard } from './CartItemCard'
 import { AddressSection } from './AddressSection'
 import { AddressModal } from './AddressModal'
@@ -27,10 +27,9 @@ export function CartDrawer() {
     paymentMethod,
     itemCount,
     subtotal,
-    deliveryFee,
+    deliveryFee: defaultDeliveryFee,
     tax,
     minOrderFee,
-    total,
     isCartOpen,
     closeCart,
     removeItem,
@@ -46,6 +45,21 @@ export function CartDrawer() {
 
   // Address management hook
   const addressState = useCartAddresses(isCartOpen, isAuthenticated, items.length > 0)
+
+  // Dynamic delivery info hook
+  const {
+    deliveryInfo,
+    isLoading: isLoadingDelivery,
+    fallbackFee,
+  } = useDeliveryInfo(
+    restaurant?.id || null,
+    addressState.selectedAddressId,
+    defaultDeliveryFee
+  )
+
+  // Calculate actual delivery fee and total
+  const actualDeliveryFee = deliveryInfo?.totalFee ?? fallbackFee
+  const total = subtotal + actualDeliveryFee + tax + minOrderFee
 
   // Prevent body scroll when drawer is open
   useEffect(() => {
@@ -211,9 +225,10 @@ export function CartDrawer() {
               itemCount={itemCount}
               subtotal={subtotal}
               tax={tax}
-              deliveryFee={deliveryFee}
+              deliveryInfo={deliveryInfo}
+              fallbackDeliveryFee={fallbackFee}
+              isLoadingDelivery={isLoadingDelivery}
               minOrderFee={minOrderFee}
-              total={total}
               minOrderAmount={restaurant?.minOrderAmount}
               formatPrice={formatPrice}
             />
@@ -254,6 +269,7 @@ export function CartDrawer() {
         onSubmit={addressState.handleAddressSubmit}
         form={addressState.addressForm}
         onChange={addressState.handleAddressChange}
+        onAddressSelect={addressState.handleAddressSelect}
         isLoading={addressState.addressLoading}
         error={addressState.addressError}
       />

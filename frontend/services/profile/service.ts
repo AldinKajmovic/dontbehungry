@@ -21,6 +21,7 @@ import {
   CreateOrderResponse,
   UpdateOrderStatusData,
   UpdateOrderStatusResponse,
+  GetDeliveryInfoResponse,
 } from './types'
 
 const BASE_PATH = '/api/profile'
@@ -182,6 +183,13 @@ class ProfileService {
     const response = await api.patch<UpdateOrderStatusResponse>(
       `${BASE_PATH}/my-restaurants/${restaurantId}/orders/${orderId}`,
       data
+    )
+    return response.data
+  }
+
+  async getDeliveryInfo(restaurantId: string, addressId: string): Promise<GetDeliveryInfoResponse> {
+    const response = await api.get<GetDeliveryInfoResponse>(
+      `${BASE_PATH}/delivery-info?restaurantId=${restaurantId}&addressId=${addressId}`
     )
     return response.data
   }

@@ -1,11 +1,18 @@
 import { prisma } from '../../lib/prisma'
 import { NotFoundError } from '../../utils/errors'
 import { PaginatedResponse } from '../../types'
+import { calculateRoute } from '../delivery.service'
 
 export interface PublicRestaurantFilters {
   categoryId?: string
   minRating?: number
+  latitude?: number
+  longitude?: number
+  maxDistanceKm?: number
 }
+
+// Delay helper for OSRM rate limiting
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export interface PublicPaginationParams {
   page: number
@@ -48,6 +55,72 @@ export async function getPublicRestaurants(
     ? { [sortBy]: sortOrder || 'asc' }
     : { name: 'asc' as const }
 
+  const { latitude, longitude, maxDistanceKm = 10 } = filters
+
+  // If location filtering is enabled, we need to fetch all matching restaurants
+  // and filter by distance, then apply pagination
+  if (latitude !== undefined && longitude !== undefined) {
+    const allItems = await prisma.restaurant.findMany({
+      where,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        logoUrl: true,
+        coverUrl: true,
+        rating: true,
+        deliveryFee: true,
+        minOrderAmount: true,
+        categories: {
+          include: { category: true },
+        },
+        place: {
+          select: { city: true, address: true, latitude: true, longitude: true },
+        },
+      },
+      orderBy,
+    })
+
+    const itemsWithDistance: Array<typeof allItems[0] & { distance: number }> = []
+
+    for (const item of allItems) {
+      const placeLat = item.place?.latitude ? Number(item.place.latitude) : null
+      const placeLng = item.place?.longitude ? Number(item.place.longitude) : null
+
+      if (placeLat === null || placeLng === null) continue
+
+      const route = await calculateRoute(
+        { latitude, longitude },
+        { latitude: placeLat, longitude: placeLng }
+      )
+
+      if (route && route.distanceKm <= maxDistanceKm) {
+        itemsWithDistance.push({
+          ...item,
+          distance: Math.round(route.distanceKm * 10) / 10,
+        })
+      }
+
+      // Rate limit: 40 req/min = 1.5s between calls
+      await delay(1500)
+    }
+    const filteredItems = itemsWithDistance.sort((a, b) => a.distance - b.distance)
+
+    const total = filteredItems.length
+    const paginatedItems = filteredItems.slice(skip, skip + limit)
+
+    return {
+      items: paginatedItems,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    }
+  }
+
+  // Default behavior without location filtering
   const [items, total] = await Promise.all([
     prisma.restaurant.findMany({
       where,

@@ -1,7 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/hooks/useLanguage'
-import { Input, Button, Alert, Modal } from '@/components/ui'
+import { Input, Button, Alert, Modal, AddressAutocomplete } from '@/components/ui'
 import { MyRestaurant } from '@/services/profile'
 
 interface RestaurantFormState {
@@ -26,6 +26,15 @@ interface RestaurantFormModalProps {
   formLoading: boolean
   error: string
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  handleAddressSelect?: (addr: {
+    address: string
+    city: string
+    state: string
+    country: string
+    postalCode: string
+    latitude: number
+    longitude: number
+  }) => void
   removeImage: (index: number) => void
   handleSubmit: (e: React.FormEvent) => void
 }
@@ -44,6 +53,7 @@ export function RestaurantFormModal({
   formLoading,
   error,
   handleChange,
+  handleAddressSelect,
   removeImage,
   handleSubmit,
 }: RestaurantFormModalProps) {
@@ -150,47 +160,12 @@ export function RestaurantFormModal({
 
         {!editingRestaurant && (
           <>
-            <p className="text-sm text-gray-600 font-medium mt-4 mb-2">Location</p>
-            <Input
-              label="Street Address"
-              type="text"
-              id="restaurantAddress"
-              name="address"
-              value={form.address}
-              onChange={handleChange}
-              placeholder="123 Main Street"
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                label="City"
-                type="text"
-                id="restaurantCity"
-                name="city"
-                value={form.city}
-                onChange={handleChange}
-                placeholder="New York"
-              />
-              <Input
-                label="Country"
-                type="text"
-                id="restaurantCountry"
-                name="country"
-                value={form.country}
-                onChange={handleChange}
-                placeholder="USA"
-              />
-            </div>
-
-            <Input
-              label="Postal Code"
-              type="text"
-              id="restaurantPostalCode"
-              name="postalCode"
-              value={form.postalCode}
-              onChange={handleChange}
-              placeholder="10001"
-              hint="(optional)"
+            <p className="text-sm text-gray-600 font-medium mt-4 mb-2">{t('admin.modals.location')}</p>
+            <AddressAutocomplete
+              label={t('address.streetAddress')}
+              placeholder={t('address.searchPlaceholder')}
+              onAddressSelect={handleAddressSelect || (() => {})}
+              height="150px"
             />
           </>
         )}

@@ -7,7 +7,7 @@ import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal'
 import { FilterBar } from '@/components/admin/FilterBar'
 import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
-import { Modal, Input, Button, Alert, Select } from '@/components/ui'
+import { Modal, Input, Button, Alert, Select, AddressAutocomplete } from '@/components/ui'
 import { adminService, AdminUser, PaginationInfo, UserFilters, SortParams } from '@/services/admin'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useToast } from '@/hooks/useToast'
@@ -69,6 +69,14 @@ export default function UsersPage() {
     lastName: '',
     phone: '',
     role: 'CUSTOMER',
+    // User address fields
+    userAddressId: '' as string, // Track existing address for updates
+    userAddress: '',
+    userCity: '',
+    userCountry: '',
+    userPostalCode: '',
+    userLatitude: undefined as number | undefined,
+    userLongitude: undefined as number | undefined,
     // Restaurant fields (only used when role is RESTAURANT_OWNER)
     restaurantName: '',
     restaurantDescription: '',
@@ -78,6 +86,8 @@ export default function UsersPage() {
     restaurantCity: '',
     restaurantCountry: '',
     restaurantPostalCode: '',
+    restaurantLatitude: undefined as number | undefined,
+    restaurantLongitude: undefined as number | undefined,
   })
   const [formError, setFormError] = useState('')
   const [formLoading, setFormLoading] = useState(false)
@@ -149,6 +159,13 @@ export default function UsersPage() {
       lastName: '',
       phone: '',
       role: 'CUSTOMER',
+      userAddressId: '',
+      userAddress: '',
+      userCity: '',
+      userCountry: '',
+      userPostalCode: '',
+      userLatitude: undefined,
+      userLongitude: undefined,
       restaurantName: '',
       restaurantDescription: '',
       restaurantPhone: '',
@@ -157,13 +174,46 @@ export default function UsersPage() {
       restaurantCity: '',
       restaurantCountry: '',
       restaurantPostalCode: '',
+      restaurantLatitude: undefined,
+      restaurantLongitude: undefined,
     })
     setFormError('')
     setShowCreateModal(true)
   }
 
-  const openEditModal = (user: AdminUser) => {
+  const openEditModal = async (user: AdminUser) => {
     setSelectedUser(user)
+    setFormError('')
+
+    // Fetch user's addresses
+    let defaultAddress = {
+      userAddressId: '',
+      userAddress: '',
+      userCity: '',
+      userCountry: '',
+      userPostalCode: '',
+      userLatitude: undefined as number | undefined,
+      userLongitude: undefined as number | undefined,
+    }
+
+    try {
+      const addresses = await adminService.getUserAddresses(user.id)
+      const defaultAddr = addresses.find(a => a.isDefault) || addresses[0]
+      if (defaultAddr) {
+        defaultAddress = {
+          userAddressId: defaultAddr.id,
+          userAddress: defaultAddr.address,
+          userCity: defaultAddr.city,
+          userCountry: defaultAddr.country,
+          userPostalCode: defaultAddr.postalCode || '',
+          userLatitude: defaultAddr.latitude || undefined,
+          userLongitude: defaultAddr.longitude || undefined,
+        }
+      }
+    } catch {
+      // Ignore errors loading addresses
+    }
+
     setFormData({
       email: user.email,
       password: '',
@@ -171,6 +221,7 @@ export default function UsersPage() {
       lastName: user.lastName,
       phone: user.phone || '',
       role: user.role,
+      ...defaultAddress,
       restaurantName: '',
       restaurantDescription: '',
       restaurantPhone: '',
@@ -179,8 +230,9 @@ export default function UsersPage() {
       restaurantCity: '',
       restaurantCountry: '',
       restaurantPostalCode: '',
+      restaurantLatitude: undefined,
+      restaurantLongitude: undefined,
     })
-    setFormError('')
     setShowEditModal(true)
   }
 
@@ -214,6 +266,23 @@ export default function UsersPage() {
         role: formData.role,
       })
 
+      // Add user address if provided
+      if (formData.userAddress && formData.userCity && formData.userCountry) {
+        try {
+          await adminService.addUserAddress(newUser.id, {
+            address: formData.userAddress,
+            city: formData.userCity,
+            country: formData.userCountry,
+            postalCode: formData.userPostalCode || undefined,
+            latitude: formData.userLatitude,
+            longitude: formData.userLongitude,
+            isDefault: true,
+          })
+        } catch {
+          // Address creation failed but user was created
+        }
+      }
+
       // If role is RESTAURANT_OWNER, create place and restaurant
       if (formData.role === 'RESTAURANT_OWNER') {
         try {
@@ -223,6 +292,8 @@ export default function UsersPage() {
             city: formData.restaurantCity,
             country: formData.restaurantCountry,
             postalCode: formData.restaurantPostalCode || undefined,
+            latitude: formData.restaurantLatitude,
+            longitude: formData.restaurantLongitude,
           })
 
           // Create restaurant with user as owner
@@ -265,6 +336,37 @@ export default function UsersPage() {
         role: formData.role,
       }
       const updatedUser = await adminService.updateUser(selectedUser.id, updateData)
+
+      // Update or add user address if provided
+      if (formData.userAddress && formData.userCity && formData.userCountry) {
+        try {
+          if (formData.userAddressId) {
+            // Update existing address
+            await adminService.updateUserAddress(selectedUser.id, formData.userAddressId, {
+              address: formData.userAddress,
+              city: formData.userCity,
+              country: formData.userCountry,
+              postalCode: formData.userPostalCode || undefined,
+              latitude: formData.userLatitude,
+              longitude: formData.userLongitude,
+            })
+          } else {
+            // Add new default address
+            await adminService.addUserAddress(selectedUser.id, {
+              address: formData.userAddress,
+              city: formData.userCity,
+              country: formData.userCountry,
+              postalCode: formData.userPostalCode || undefined,
+              latitude: formData.userLatitude,
+              longitude: formData.userLongitude,
+              isDefault: true,
+            })
+          }
+        } catch {
+          // Address update failed but user was updated
+        }
+      }
+
       setUsers((prev) => prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)))
       setShowEditModal(false)
       toast.success(t('toast.userUpdated'))
@@ -516,6 +618,32 @@ export default function UsersPage() {
             options={ROLE_OPTIONS}
           />
 
+          {/* User Address Section */}
+          <div className="border-t border-gray-200 pt-4 mt-4 space-y-4">
+            <p className="text-sm font-medium text-gray-700">{t('admin.modals.userAddress')} <span className="text-gray-400 font-normal">({t('common.optional')})</span></p>
+
+            <AddressAutocomplete
+              label={t('address.streetAddress')}
+              placeholder={t('address.searchPlaceholder')}
+              onAddressSelect={(addr) => setFormData({
+                ...formData,
+                userAddress: addr.address,
+                userCity: addr.city,
+                userCountry: addr.country,
+                userPostalCode: addr.postalCode,
+                userLatitude: addr.latitude,
+                userLongitude: addr.longitude,
+              })}
+              height="150px"
+            />
+
+            {formData.userAddress && (
+              <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                <strong>{t('address.selected')}:</strong> {formData.userAddress}, {formData.userCity}, {formData.userCountry}
+              </div>
+            )}
+          </div>
+
           {/* Restaurant fields - shown when RESTAURANT_OWNER is selected */}
           {formData.role === 'RESTAURANT_OWNER' && (
             <div className="border-t border-gray-200 pt-4 mt-4 space-y-4">
@@ -565,42 +693,26 @@ export default function UsersPage() {
 
               <p className="text-sm font-medium text-gray-700 mt-2">{t('admin.modals.location')}</p>
 
-              <Input
+              <AddressAutocomplete
                 label={t('address.streetAddress')}
-                id="restaurantAddress"
-                value={formData.restaurantAddress}
-                onChange={(e) => setFormData({ ...formData, restaurantAddress: e.target.value })}
-                placeholder={t('address.streetAddressPlaceholder')}
-                required
+                placeholder={t('address.searchPlaceholder')}
+                onAddressSelect={(addr) => setFormData({
+                  ...formData,
+                  restaurantAddress: addr.address,
+                  restaurantCity: addr.city,
+                  restaurantCountry: addr.country,
+                  restaurantPostalCode: addr.postalCode,
+                  restaurantLatitude: addr.latitude,
+                  restaurantLongitude: addr.longitude,
+                })}
+                height="150px"
               />
 
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label={t('address.city')}
-                  id="restaurantCity"
-                  value={formData.restaurantCity}
-                  onChange={(e) => setFormData({ ...formData, restaurantCity: e.target.value })}
-                  placeholder={t('address.cityPlaceholder')}
-                  required
-                />
-                <Input
-                  label={t('address.country')}
-                  id="restaurantCountry"
-                  value={formData.restaurantCountry}
-                  onChange={(e) => setFormData({ ...formData, restaurantCountry: e.target.value })}
-                  placeholder={t('address.countryPlaceholder')}
-                  required
-                />
-              </div>
-
-              <Input
-                label={t('address.postalCode')}
-                id="restaurantPostalCode"
-                value={formData.restaurantPostalCode}
-                onChange={(e) => setFormData({ ...formData, restaurantPostalCode: e.target.value })}
-                placeholder={t('address.postalCodePlaceholder')}
-                hint={`(${t('common.optional')})`}
-              />
+              {formData.restaurantAddress && (
+                <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                  <strong>{t('address.selected')}:</strong> {formData.restaurantAddress}, {formData.restaurantCity}, {formData.restaurantCountry}
+                </div>
+              )}
             </div>
           )}
 
@@ -667,6 +779,32 @@ export default function UsersPage() {
             onChange={(e) => setFormData({ ...formData, role: e.target.value })}
             options={ROLE_OPTIONS}
           />
+
+          {/* User Address Section */}
+          <div className="border-t border-gray-200 pt-4 mt-4 space-y-4">
+            <p className="text-sm font-medium text-gray-700">{t('admin.modals.userAddress')}</p>
+
+            {formData.userAddress && (
+              <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded mb-2">
+                <strong>{t('address.current')}:</strong> {formData.userAddress}, {formData.userCity}, {formData.userCountry}
+              </div>
+            )}
+
+            <AddressAutocomplete
+              label={t('address.newAddress')}
+              placeholder={t('address.searchPlaceholder')}
+              onAddressSelect={(addr) => setFormData({
+                ...formData,
+                userAddress: addr.address,
+                userCity: addr.city,
+                userCountry: addr.country,
+                userPostalCode: addr.postalCode,
+                userLatitude: addr.latitude,
+                userLongitude: addr.longitude,
+              })}
+              height="150px"
+            />
+          </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowEditModal(false)}>

@@ -25,6 +25,12 @@ router.post('/users', adminController.createUser)
 router.patch('/users/:id', adminController.updateUser)
 router.delete('/users/:id', adminController.deleteUser)
 
+// User Addresses
+router.get('/users/:userId/addresses', adminController.getUserAddresses)
+router.post('/users/:userId/addresses', adminController.addUserAddress)
+router.patch('/users/:userId/addresses/:addressId', adminController.updateUserAddress)
+router.delete('/users/:userId/addresses/:addressId', adminController.deleteUserAddress)
+
 // Restaurants CRUD
 router.get('/restaurants', adminController.getRestaurants)
 router.get('/restaurants/:id', adminController.getRestaurantById)

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import * as profileController from '../controllers/profile'
+import * as deliveryController from '../controllers/delivery.controller'
 import { authenticate } from '../middlewares/auth.middleware'
 import { sensitiveOpLimiter } from '../middlewares/rateLimiter'
 
@@ -33,6 +34,9 @@ router.delete('/my-restaurants/:restaurantId/menu-items/:itemId', profileControl
 
 // Categories for dropdown
 router.get('/categories', profileController.getCategories)
+
+// Delivery calculation
+router.get('/delivery-info', deliveryController.getDeliveryInfo)
 
 // Order endpoints
 router.post('/orders', profileController.createOrder)

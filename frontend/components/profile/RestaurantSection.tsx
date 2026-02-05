@@ -24,6 +24,7 @@ export function RestaurantSection() {
     deleteLoading,
     error,
     handleChange,
+    handleAddressSelect,
     removeImage,
     openAddModal,
     openEditModal,
@@ -165,6 +166,7 @@ export function RestaurantSection() {
         formLoading={formLoading}
         error={error}
         handleChange={handleChange}
+        handleAddressSelect={handleAddressSelect}
         removeImage={removeImage}
         handleSubmit={handleSubmit}
       />

@@ -1,7 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/hooks/useLanguage'
-import { Modal, Input, Button, Alert } from '@/components/ui'
+import { Modal, Button, Alert, AddressAutocomplete } from '@/components/ui'
 
 const LocationIcon = (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,6 +17,8 @@ interface AddressForm {
   country: string
   postalCode: string
   notes: string
+  latitude?: number
+  longitude?: number
 }
 
 interface AddressModalProps {
@@ -25,6 +27,15 @@ interface AddressModalProps {
   onSubmit: (e: React.FormEvent) => Promise<void>
   form: AddressForm
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  onAddressSelect?: (addr: {
+    address: string
+    city: string
+    state: string
+    country: string
+    postalCode: string
+    latitude: number
+    longitude: number
+  }) => void
   isLoading: boolean
   error: string
 }
@@ -35,6 +46,7 @@ export function AddressModal({
   onSubmit,
   form,
   onChange,
+  onAddressSelect,
   isLoading,
   error,
 }: AddressModalProps) {
@@ -54,59 +66,13 @@ export function AddressModal({
           <Alert type="error">{error}</Alert>
         )}
 
-        <Input
+        {/* Address Autocomplete with Map */}
+        <AddressAutocomplete
           label={t('address.streetAddress')}
-          id="cart-address"
-          name="address"
-          value={form.address}
-          onChange={onChange}
-          placeholder="123 Main Street, Apt 4"
-          autoComplete="street-address"
+          placeholder={t('address.searchPlaceholder')}
+          onAddressSelect={onAddressSelect || (() => {})}
+          height="150px"
         />
-
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label={t('address.city')}
-            id="cart-city"
-            name="city"
-            value={form.city}
-            onChange={onChange}
-            placeholder="New York"
-            autoComplete="address-level2"
-          />
-          <Input
-            label={t('address.state')}
-            id="cart-state"
-            name="state"
-            value={form.state}
-            onChange={onChange}
-            placeholder="NY"
-            hint={`(${t('common.optional')})`}
-            autoComplete="address-level1"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label={t('address.country')}
-            id="cart-country"
-            name="country"
-            value={form.country}
-            onChange={onChange}
-            placeholder="USA"
-            autoComplete="country-name"
-          />
-          <Input
-            label={t('address.postalCode')}
-            id="cart-postalCode"
-            name="postalCode"
-            value={form.postalCode}
-            onChange={onChange}
-            placeholder="10001"
-            hint={`(${t('common.optional')})`}
-            autoComplete="postal-code"
-          />
-        </div>
 
         <div>
           <label htmlFor="cart-notes" className="block text-sm font-medium text-gray-700 mb-2">

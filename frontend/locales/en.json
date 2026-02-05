@@ -73,7 +73,9 @@
     "noResultsSearch": "No results for \"{query}\"",
     "tryDifferent": "Try a different category or search term",
     "allRestaurants": "All Restaurants",
-    "allCategories": "All"
+    "allCategories": "All",
+    "calculatingDistances": "Finding restaurants near you",
+    "freeApiMessage": "Using free API - please be patient while we calculate restaurants in your vicinity"
   },
   "cart": {
     "title": "Your Cart",
@@ -100,7 +102,11 @@
     "orderNotesOptional": "Order Notes (Optional)",
     "orderNotesPlaceholder": "Any special instructions for your order...",
     "selectDeliveryAddress": "Please select a delivery address",
-    "smallOrderFeeNotice": "A ${fee} small order fee applies because your order is below the ${min} minimum."
+    "smallOrderFeeNotice": "A ${fee} small order fee applies because your order is below the ${min} minimum.",
+    "calculatingDelivery": "Calculating delivery...",
+    "badWeatherSurcharge": "Bad weather ({weather}) - surcharge added",
+    "weather": "weather",
+    "preparationNote": "* Delivery time includes 10 minutes for preparation"
   },
   "orders": {
     "title": "Order History",
@@ -361,7 +367,13 @@
     "addAddress": "Add Address",
     "editAddress": "Edit Address",
     "requiredFields": "Address, city, and country are required",
-    "setAsDefault": "Set as default"
+    "setAsDefault": "Set as default",
+    "locating": "Locating address...",
+    "dragPinToAdjust": "Drag the pin to adjust the exact location",
+    "searchPlaceholder": "Search for an address...",
+    "selected": "Selected",
+    "current": "Current",
+    "newAddress": "Change Address"
   },
   "restaurant": {
     "addNew": "Add New Restaurant",
@@ -561,6 +573,9 @@
       "searchPlaces": "Search places...",
       "noUsersFound": "No users found",
       "noPlacesFound": "No places found",
+      "selectExistingPlace": "Select existing place",
+      "createNewPlace": "Create new place",
+      "userAddress": "User Address",
       "gallery": "Gallery (Interior, Exterior, etc.)",
       "clickToAddImages": "Click to add images (up to 6)"
     },

@@ -170,6 +170,71 @@ Content-Type: application/json
 DELETE /api/admin/users/:id
 ```
 
+### User Addresses
+
+Manage addresses for any user.
+
+#### List User Addresses
+
+```
+GET /api/admin/users/:userId/addresses
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid-of-address",
+    "address": "123 Main Street",
+    "city": "New York",
+    "state": "NY",
+    "country": "USA",
+    "postalCode": "10001",
+    "notes": "Ring doorbell",
+    "isDefault": true,
+    "latitude": 40.7128,
+    "longitude": -74.0060
+  }
+]
+```
+
+#### Add User Address
+
+```
+POST /api/admin/users/:userId/addresses
+Content-Type: application/json
+
+{
+  "address": "123 Main Street",
+  "city": "New York",
+  "state": "NY",
+  "country": "USA",
+  "postalCode": "10001",
+  "notes": "Ring doorbell",
+  "isDefault": true,
+  "latitude": 40.7128,
+  "longitude": -74.0060
+}
+```
+
+#### Update User Address
+
+```
+PATCH /api/admin/users/:userId/addresses/:addressId
+Content-Type: application/json
+
+{
+  "address": "456 Oak Avenue",
+  "isDefault": true
+}
+```
+
+#### Delete User Address
+
+```
+DELETE /api/admin/users/:userId/addresses/:addressId
+```
+
 ### Restaurants
 
 #### List Restaurants

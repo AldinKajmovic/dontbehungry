@@ -6,11 +6,17 @@ import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { useLanguage } from '@/hooks/useLanguage'
 import { publicService, PublicRestaurant, Category } from '@/services/public'
+import { addressService } from '@/services/address'
 import { RestaurantCard, CategoryIcon, MealModal } from '@/components/restaurants'
 import { GuestBanner, LanguageToggle } from '@/components/ui'
 import { CartDrawer } from '@/components/cart'
 import { NotificationBell } from '@/components/notifications'
 import { logger } from '@/utils/logger'
+
+interface UserCoordinates {
+  latitude: number
+  longitude: number
+}
 
 export default function RestaurantsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth()
@@ -26,16 +32,48 @@ export default function RestaurantsPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [selectedRestaurant, setSelectedRestaurant] = useState<PublicRestaurant | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [userCoordinates, setUserCoordinates] = useState<UserCoordinates | null>(null)
+  const [coordinatesLoaded, setCoordinatesLoaded] = useState(false)
 
   const categoryScrollRef = useRef<HTMLDivElement>(null)
+
+  // Load user's default address when authenticated
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      loadUserDefaultAddress()
+    } else if (!isAuthenticated && !authLoading) {
+      setUserCoordinates(null)
+      setCoordinatesLoaded(true) // Not authenticated, no coordinates needed
+    }
+  }, [isAuthenticated, authLoading])
+
+  const loadUserDefaultAddress = async () => {
+    try {
+      const { addresses } = await addressService.getAddresses()
+      const defaultAddress = addresses.find((addr) => addr.isDefault) || addresses[0]
+      if (defaultAddress?.latitude && defaultAddress?.longitude) {
+        setUserCoordinates({
+          latitude: defaultAddress.latitude,
+          longitude: defaultAddress.longitude,
+        })
+      }
+    } catch (error) {
+      logger.error('Failed to load user address', error)
+    } finally {
+      setCoordinatesLoaded(true)
+    }
+  }
 
   useEffect(() => {
     loadCategories()
   }, [])
 
   useEffect(() => {
-    loadRestaurants()
-  }, [selectedCategory, searchQuery, page])
+    // Wait for auth and coordinates to be ready before loading restaurants
+    if (!authLoading && coordinatesLoaded) {
+      loadRestaurants()
+    }
+  }, [selectedCategory, searchQuery, page, userCoordinates, authLoading, coordinatesLoaded])
 
   const loadCategories = async () => {
     try {
@@ -56,6 +94,10 @@ export default function RestaurantsPage() {
         categoryId: selectedCategory || undefined,
         sortBy: 'rating',
         sortOrder: 'desc',
+        // Only filter by distance when user is logged in with coordinates
+        latitude: userCoordinates?.latitude,
+        longitude: userCoordinates?.longitude,
+        maxDistanceKm: userCoordinates ? 10 : undefined,
       })
       setRestaurants(response.items)
       setTotalPages(response.pagination.totalPages)
@@ -98,6 +140,15 @@ export default function RestaurantsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Full-screen loading overlay for logged-in users */}
+      {isAuthenticated && (isLoading || !coordinatesLoaded) && (
+        <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
+          <div className="w-20 h-20 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-6" />
+          <p className="text-xl font-semibold text-gray-800 mb-2">{t('restaurants.calculatingDistances')}</p>
+          <p className="text-gray-600 text-center max-w-md px-4">{t('restaurants.freeApiMessage')}</p>
+        </div>
+      )}
+
       {/* Guest Banner */}
       <GuestBanner />
 
@@ -298,15 +349,17 @@ export default function RestaurantsPage() {
           </button>
         </div>
 
-        {/* Section Title */}
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          {selectedCategory
-            ? categories.find((c) => c.id === selectedCategory)?.name || t('restaurants.title')
-            : t('restaurants.allRestaurants')}
-        </h2>
+        {/* Section Title - hide when authenticated and loading */}
+        {!(isAuthenticated && (isLoading || !coordinatesLoaded)) && (
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            {selectedCategory
+              ? categories.find((c) => c.id === selectedCategory)?.name || t('restaurants.title')
+              : t('restaurants.allRestaurants')}
+          </h2>
+        )}
 
-        {/* Restaurant Grid */}
-        {isLoading ? (
+        {/* Restaurant Grid - hide completely when authenticated and loading */}
+        {isAuthenticated && (isLoading || !coordinatesLoaded) ? null : isLoading ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="rounded-xl overflow-hidden bg-white shadow-md animate-pulse">

@@ -96,3 +96,23 @@ export function createSelectLoader<T>(
     return toSelectOptions(response.items, getValue, getLabel)
   }
 }
+
+export interface PaginatedSelectResult {
+  options: SelectOption[]
+  hasMore: boolean
+}
+
+export function createPaginatedSelectLoader<T>(
+  fetchFn: (params: GetListParams) => Promise<PaginatedResponse<T>>,
+  getValue: (item: T) => string,
+  getLabel: (item: T) => string,
+  limit = 25
+) {
+  return async (search?: string, page: number = 1): Promise<PaginatedSelectResult> => {
+    const response = await fetchFn({ page, limit, search })
+    return {
+      options: toSelectOptions(response.items, getValue, getLabel),
+      hasMore: page < response.pagination.totalPages,
+    }
+  }
+}

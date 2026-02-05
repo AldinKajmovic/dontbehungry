@@ -8,6 +8,9 @@ import {
   CreateUserInput,
   UpdateUserInput,
   UserFilters,
+  UserAddress,
+  CreateUserAddressInput,
+  UpdateUserAddressInput,
   AdminRestaurant,
   CreateRestaurantInput,
   UpdateRestaurantInput,
@@ -105,6 +108,26 @@ class AdminService {
   createUser = usersCrud.create
   updateUser = usersCrud.update
   deleteUser = usersCrud.delete
+
+  // ============ User Addresses ============
+  async getUserAddresses(userId: string): Promise<UserAddress[]> {
+    const res = await api.get<UserAddress[]>(`${PATHS.users}/${userId}/addresses`)
+    return res.data
+  }
+
+  async addUserAddress(userId: string, data: CreateUserAddressInput): Promise<UserAddress> {
+    const res = await api.post<UserAddress>(`${PATHS.users}/${userId}/addresses`, data)
+    return res.data
+  }
+
+  async updateUserAddress(userId: string, addressId: string, data: UpdateUserAddressInput): Promise<UserAddress> {
+    const res = await api.patch<UserAddress>(`${PATHS.users}/${userId}/addresses/${addressId}`, data)
+    return res.data
+  }
+
+  async deleteUserAddress(userId: string, addressId: string): Promise<void> {
+    await api.delete(`${PATHS.users}/${userId}/addresses/${addressId}`)
+  }
 
   // ============ Restaurants ============
   getRestaurants = (page?: number, limit?: number, search?: string, filters?: RestaurantFilters, sort?: SortParams) =>

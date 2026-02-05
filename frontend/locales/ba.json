@@ -73,7 +73,9 @@
     "noResultsSearch": "Nema rezultata za \"{query}\"",
     "tryDifferent": "Pokušajte s drugom kategorijom ili pojmom za pretragu",
     "allRestaurants": "Svi restorani",
-    "allCategories": "Sve"
+    "allCategories": "Sve",
+    "calculatingDistances": "Pronalazimo restorane u vašoj blizini",
+    "freeApiMessage": "Koristimo besplatni API - molimo budite strpljivi dok izračunavamo restorane u vašoj blizini"
   },
   "cart": {
     "title": "Vaša korpa",
@@ -100,7 +102,11 @@
     "orderNotesOptional": "Napomene za narudžbu (Opcionalno)",
     "orderNotesPlaceholder": "Bilo kakve posebne upute za vašu narudžbu...",
     "selectDeliveryAddress": "Molimo odaberite adresu za dostavu",
-    "smallOrderFeeNotice": "Naknada za malu narudžbu od ${fee} se primjenjuje jer je vaša narudžba ispod minimalnog iznosa od ${min}."
+    "smallOrderFeeNotice": "Naknada za malu narudžbu od ${fee} se primjenjuje jer je vaša narudžba ispod minimalnog iznosa od ${min}.",
+    "calculatingDelivery": "Izračunavanje dostave...",
+    "badWeatherSurcharge": "Loše vrijeme ({weather}) - doplata dodana",
+    "weather": "vrijeme",
+    "preparationNote": "* Vrijeme dostave uključuje 10 minuta za pripremu"
   },
   "orders": {
     "title": "Istorija narudžbi",
@@ -361,7 +367,13 @@
     "addAddress": "Dodaj adresu",
     "editAddress": "Uredi adresu",
     "requiredFields": "Adresa, grad i država su obavezni",
-    "setAsDefault": "Postavi kao zadano"
+    "setAsDefault": "Postavi kao zadano",
+    "locating": "Pronalaženje adrese...",
+    "dragPinToAdjust": "Povucite marker da prilagodite tačnu lokaciju",
+    "searchPlaceholder": "Pretraži adresu...",
+    "selected": "Odabrano",
+    "current": "Trenutna",
+    "newAddress": "Promijeni adresu"
   },
   "restaurant": {
     "addNew": "Dodaj novi restoran",
@@ -561,6 +573,9 @@
       "searchPlaces": "Pretraži mjesta...",
       "noUsersFound": "Nema pronađenih korisnika",
       "noPlacesFound": "Nema pronađenih mjesta",
+      "selectExistingPlace": "Odaberi postojeće mjesto",
+      "createNewPlace": "Kreiraj novo mjesto",
+      "userAddress": "Adresa korisnika",
       "gallery": "Galerija (Interijer, Eksterijer, itd.)",
       "clickToAddImages": "Kliknite za dodavanje slika (do 6)"
     },

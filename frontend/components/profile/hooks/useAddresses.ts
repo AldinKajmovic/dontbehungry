@@ -11,6 +11,8 @@ interface AddressFormState {
   country: string
   postalCode: string
   notes: string
+  latitude?: number
+  longitude?: number
 }
 
 const INITIAL_FORM: AddressFormState = {
@@ -20,6 +22,8 @@ const INITIAL_FORM: AddressFormState = {
   country: '',
   postalCode: '',
   notes: '',
+  latitude: undefined,
+  longitude: undefined,
 }
 
 export function useAddresses() {
@@ -57,6 +61,27 @@ export function useAddresses() {
     setForm((prev) => ({ ...prev, [name]: value }))
   }, [])
 
+  const handleAddressSelect = useCallback((addr: {
+    address: string
+    city: string
+    state: string
+    country: string
+    postalCode: string
+    latitude: number
+    longitude: number
+  }) => {
+    setForm((prev) => ({
+      ...prev,
+      address: addr.address,
+      city: addr.city,
+      state: addr.state,
+      country: addr.country,
+      postalCode: addr.postalCode,
+      latitude: addr.latitude,
+      longitude: addr.longitude,
+    }))
+  }, [])
+
   const openAddModal = useCallback(() => {
     setEditingAddress(null)
     setForm(INITIAL_FORM)
@@ -73,6 +98,8 @@ export function useAddresses() {
       country: address.country,
       postalCode: address.postalCode || '',
       notes: address.notes || '',
+      latitude: address.latitude ?? undefined,
+      longitude: address.longitude ?? undefined,
     })
     setError('')
     setShowModal(true)
@@ -96,11 +123,22 @@ export function useAddresses() {
     }
 
     try {
+      const submitData = {
+        address: form.address,
+        city: form.city,
+        state: form.state || undefined,
+        country: form.country,
+        postalCode: form.postalCode || undefined,
+        notes: form.notes || undefined,
+        latitude: form.latitude,
+        longitude: form.longitude,
+      }
+
       if (editingAddress) {
-        const { address } = await addressService.updateAddress(editingAddress.id, form)
+        const { address } = await addressService.updateAddress(editingAddress.id, submitData)
         setAddresses((prev) => prev.map((a) => (a.id === address.id ? address : a)))
       } else {
-        const { address } = await addressService.addAddress(form)
+        const { address } = await addressService.addAddress(submitData)
         setAddresses((prev) => [...prev, address])
       }
       closeModal()
@@ -140,6 +178,7 @@ export function useAddresses() {
     formLoading,
     error,
     handleChange,
+    handleAddressSelect,
     openAddModal,
     openEditModal,
     closeModal,

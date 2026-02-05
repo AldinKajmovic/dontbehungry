@@ -18,10 +18,13 @@ export async function getRestaurants(
     const sortOrder = (req.query.sortOrder as 'asc' | 'desc') || 'asc'
     const categoryId = req.query.categoryId as string | undefined
     const minRating = req.query.minRating ? parseFloat(req.query.minRating as string) : undefined
+    const latitude = req.query.latitude ? parseFloat(req.query.latitude as string) : undefined
+    const longitude = req.query.longitude ? parseFloat(req.query.longitude as string) : undefined
+    const maxDistanceKm = req.query.maxDistanceKm ? parseFloat(req.query.maxDistanceKm as string) : undefined
 
     const result = await publicRestaurantsService.getPublicRestaurants(
       { page, limit, search, sortBy, sortOrder },
-      { categoryId, minRating }
+      { categoryId, minRating, latitude, longitude, maxDistanceKm }
     )
 
     res.json(result)

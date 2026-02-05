@@ -7,7 +7,7 @@ import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal'
 import { RangeFilter } from '@/components/admin/RangeFilter'
 import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
-import { Modal, Input, Button, Alert, SearchableSelect } from '@/components/ui'
+import { Modal, Input, Button, Alert, SearchableSelect, AddressAutocomplete } from '@/components/ui'
 import { adminService, AdminRestaurant, PaginationInfo, RestaurantFilters, SortParams } from '@/services/admin'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useToast } from '@/hooks/useToast'
@@ -41,6 +41,14 @@ export default function RestaurantsPage() {
     minOrderAmount: '',
     deliveryFee: '',
     images: [] as string[],
+    // New place fields (for creating inline)
+    createNewPlace: false,
+    newPlaceAddress: '',
+    newPlaceCity: '',
+    newPlaceCountry: '',
+    newPlacePostalCode: '',
+    newPlaceLatitude: undefined as number | undefined,
+    newPlaceLongitude: undefined as number | undefined,
   })
   const [formError, setFormError] = useState('')
   const [formLoading, setFormLoading] = useState(false)
@@ -117,6 +125,13 @@ export default function RestaurantsPage() {
       minOrderAmount: '',
       deliveryFee: '',
       images: [],
+      createNewPlace: false,
+      newPlaceAddress: '',
+      newPlaceCity: '',
+      newPlaceCountry: '',
+      newPlacePostalCode: '',
+      newPlaceLatitude: undefined,
+      newPlaceLongitude: undefined,
     })
     setFormError('')
     setShowCreateModal(true)
@@ -139,6 +154,13 @@ export default function RestaurantsPage() {
       minOrderAmount: restaurant.minOrderAmount || '',
       deliveryFee: restaurant.deliveryFee || '',
       images,
+      createNewPlace: false,
+      newPlaceAddress: '',
+      newPlaceCity: '',
+      newPlaceCountry: '',
+      newPlacePostalCode: '',
+      newPlaceLatitude: undefined,
+      newPlaceLongitude: undefined,
     })
     setFormError('')
     setShowEditModal(true)
@@ -151,20 +173,49 @@ export default function RestaurantsPage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.ownerId || !formData.placeId) {
-      setFormError('Please select both an owner and a place')
+
+    // Validate: need owner and either existing place or new place address
+    if (!formData.ownerId) {
+      setFormError('Please select an owner')
       return
     }
+
+    if (!formData.createNewPlace && !formData.placeId) {
+      setFormError('Please select a place or create a new one')
+      return
+    }
+
+    if (formData.createNewPlace && (!formData.newPlaceAddress || !formData.newPlaceCity || !formData.newPlaceCountry)) {
+      setFormError('Please provide address, city, and country for the new place')
+      return
+    }
+
     try {
       setFormLoading(true)
       setFormError('')
+
+      let placeId = formData.placeId
+
+      // If creating a new place, create it first
+      if (formData.createNewPlace) {
+        const newPlace = await adminService.createPlace({
+          address: formData.newPlaceAddress,
+          city: formData.newPlaceCity,
+          country: formData.newPlaceCountry,
+          postalCode: formData.newPlacePostalCode || undefined,
+          latitude: formData.newPlaceLatitude,
+          longitude: formData.newPlaceLongitude,
+        })
+        placeId = newPlace.id
+      }
+
       const newRestaurant = await adminService.createRestaurant({
         name: formData.name,
         description: formData.description || undefined,
         phone: formData.phone || undefined,
         email: formData.email || undefined,
         ownerId: formData.ownerId,
-        placeId: formData.placeId,
+        placeId,
         minOrderAmount: formData.minOrderAmount ? parseFloat(formData.minOrderAmount) : undefined,
         deliveryFee: formData.deliveryFee ? parseFloat(formData.deliveryFee) : undefined,
         logoUrl: formData.images[0] || null,
@@ -184,20 +235,47 @@ export default function RestaurantsPage() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedRestaurant) return
-    if (!formData.ownerId || !formData.placeId) {
-      setFormError('Please select both an owner and a place')
+    if (!formData.ownerId) {
+      setFormError('Please select an owner')
       return
     }
+
+    if (!formData.createNewPlace && !formData.placeId) {
+      setFormError('Please select a place or create a new one')
+      return
+    }
+
+    if (formData.createNewPlace && (!formData.newPlaceAddress || !formData.newPlaceCity || !formData.newPlaceCountry)) {
+      setFormError('Please provide address, city, and country for the new place')
+      return
+    }
+
     try {
       setFormLoading(true)
       setFormError('')
+
+      let placeId = formData.placeId
+
+      // If creating a new place, create it first
+      if (formData.createNewPlace) {
+        const newPlace = await adminService.createPlace({
+          address: formData.newPlaceAddress,
+          city: formData.newPlaceCity,
+          country: formData.newPlaceCountry,
+          postalCode: formData.newPlacePostalCode || undefined,
+          latitude: formData.newPlaceLatitude,
+          longitude: formData.newPlaceLongitude,
+        })
+        placeId = newPlace.id
+      }
+
       const updatedRestaurant = await adminService.updateRestaurant(selectedRestaurant.id, {
         name: formData.name,
         description: formData.description || null,
         phone: formData.phone || null,
         email: formData.email || null,
         ownerId: formData.ownerId,
-        placeId: formData.placeId,
+        placeId,
         minOrderAmount: formData.minOrderAmount ? parseFloat(formData.minOrderAmount) : null,
         deliveryFee: formData.deliveryFee ? parseFloat(formData.deliveryFee) : null,
         logoUrl: formData.images[0] || null,
@@ -485,27 +563,76 @@ export default function RestaurantsPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <SearchableSelect
-              label={t('admin.filters.owner')}
-              id="ownerId"
-              value={formData.ownerId}
-              onChange={(value) => setFormData({ ...formData, ownerId: value })}
-              loadOptions={loadOwnerOptions}
-              placeholder={t('admin.modals.searchUsers')}
-              emptyMessage={t('admin.modals.noUsersFound')}
-              required
-            />
-            <SearchableSelect
-              label={t('admin.modals.place')}
-              id="placeId"
-              value={formData.placeId}
-              onChange={(value) => setFormData({ ...formData, placeId: value })}
-              loadOptions={loadPlaceOptions}
-              placeholder={t('admin.modals.searchPlaces')}
-              emptyMessage={t('admin.modals.noPlacesFound')}
-              required
-            />
+          <SearchableSelect
+            label={t('admin.filters.owner')}
+            id="ownerId"
+            value={formData.ownerId}
+            onChange={(value) => setFormData({ ...formData, ownerId: value })}
+            loadOptions={loadOwnerOptions}
+            placeholder={t('admin.modals.searchUsers')}
+            emptyMessage={t('admin.modals.noUsersFound')}
+            required
+          />
+
+          {/* Place selection: toggle between existing and new */}
+          <div className="border-t border-gray-200 pt-4 mt-4">
+            <div className="flex items-center gap-4 mb-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="placeMode"
+                  checked={!formData.createNewPlace}
+                  onChange={() => setFormData({ ...formData, createNewPlace: false })}
+                  className="w-4 h-4 text-primary-600"
+                />
+                <span className="text-sm font-medium text-gray-700">{t('admin.modals.selectExistingPlace')}</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="placeMode"
+                  checked={formData.createNewPlace}
+                  onChange={() => setFormData({ ...formData, createNewPlace: true, placeId: '' })}
+                  className="w-4 h-4 text-primary-600"
+                />
+                <span className="text-sm font-medium text-gray-700">{t('admin.modals.createNewPlace')}</span>
+              </label>
+            </div>
+
+            {!formData.createNewPlace ? (
+              <SearchableSelect
+                label={t('admin.modals.place')}
+                id="placeId"
+                value={formData.placeId}
+                onChange={(value) => setFormData({ ...formData, placeId: value })}
+                loadOptions={loadPlaceOptions}
+                placeholder={t('admin.modals.searchPlaces')}
+                emptyMessage={t('admin.modals.noPlacesFound')}
+                required
+              />
+            ) : (
+              <div className="space-y-4">
+                <AddressAutocomplete
+                  label={t('address.streetAddress')}
+                  placeholder={t('address.searchPlaceholder')}
+                  onAddressSelect={(addr) => setFormData({
+                    ...formData,
+                    newPlaceAddress: addr.address,
+                    newPlaceCity: addr.city,
+                    newPlaceCountry: addr.country,
+                    newPlacePostalCode: addr.postalCode,
+                    newPlaceLatitude: addr.latitude,
+                    newPlaceLongitude: addr.longitude,
+                  })}
+                  height="150px"
+                />
+                {formData.newPlaceAddress && (
+                  <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                    <strong>{t('address.selected')}:</strong> {formData.newPlaceAddress}, {formData.newPlaceCity}, {formData.newPlaceCountry}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4 items-start">
@@ -633,29 +760,78 @@ export default function RestaurantsPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <SearchableSelect
-              label={t('admin.filters.owner')}
-              id="edit-ownerId"
-              value={formData.ownerId}
-              onChange={(value) => setFormData({ ...formData, ownerId: value })}
-              loadOptions={loadOwnerOptions}
-              placeholder={t('admin.modals.searchUsers')}
-              emptyMessage={t('admin.modals.noUsersFound')}
-              initialLabel={selectedRestaurant ? `${selectedRestaurant.owner.firstName} ${selectedRestaurant.owner.lastName}` : undefined}
-              required
-            />
-            <SearchableSelect
-              label={t('admin.modals.place')}
-              id="edit-placeId"
-              value={formData.placeId}
-              onChange={(value) => setFormData({ ...formData, placeId: value })}
-              loadOptions={loadPlaceOptions}
-              placeholder={t('admin.modals.searchPlaces')}
-              emptyMessage={t('admin.modals.noPlacesFound')}
-              initialLabel={selectedRestaurant ? `${selectedRestaurant.place.address}, ${selectedRestaurant.place.city}` : undefined}
-              required
-            />
+          <SearchableSelect
+            label={t('admin.filters.owner')}
+            id="edit-ownerId"
+            value={formData.ownerId}
+            onChange={(value) => setFormData({ ...formData, ownerId: value })}
+            loadOptions={loadOwnerOptions}
+            placeholder={t('admin.modals.searchUsers')}
+            emptyMessage={t('admin.modals.noUsersFound')}
+            initialLabel={selectedRestaurant ? `${selectedRestaurant.owner.firstName} ${selectedRestaurant.owner.lastName}` : undefined}
+            required
+          />
+
+          {/* Place selection: toggle between existing and new */}
+          <div className="border-t border-gray-200 pt-4 mt-4">
+            <div className="flex items-center gap-4 mb-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="edit-placeMode"
+                  checked={!formData.createNewPlace}
+                  onChange={() => setFormData({ ...formData, createNewPlace: false })}
+                  className="w-4 h-4 text-primary-600"
+                />
+                <span className="text-sm font-medium text-gray-700">{t('admin.modals.selectExistingPlace')}</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="edit-placeMode"
+                  checked={formData.createNewPlace}
+                  onChange={() => setFormData({ ...formData, createNewPlace: true, placeId: '' })}
+                  className="w-4 h-4 text-primary-600"
+                />
+                <span className="text-sm font-medium text-gray-700">{t('admin.modals.createNewPlace')}</span>
+              </label>
+            </div>
+
+            {!formData.createNewPlace ? (
+              <SearchableSelect
+                label={t('admin.modals.place')}
+                id="edit-placeId"
+                value={formData.placeId}
+                onChange={(value) => setFormData({ ...formData, placeId: value })}
+                loadOptions={loadPlaceOptions}
+                placeholder={t('admin.modals.searchPlaces')}
+                emptyMessage={t('admin.modals.noPlacesFound')}
+                initialLabel={selectedRestaurant ? `${selectedRestaurant.place.address}, ${selectedRestaurant.place.city}` : undefined}
+                required
+              />
+            ) : (
+              <div className="space-y-4">
+                <AddressAutocomplete
+                  label={t('address.streetAddress')}
+                  placeholder={t('address.searchPlaceholder')}
+                  onAddressSelect={(addr) => setFormData({
+                    ...formData,
+                    newPlaceAddress: addr.address,
+                    newPlaceCity: addr.city,
+                    newPlaceCountry: addr.country,
+                    newPlacePostalCode: addr.postalCode,
+                    newPlaceLatitude: addr.latitude,
+                    newPlaceLongitude: addr.longitude,
+                  })}
+                  height="150px"
+                />
+                {formData.newPlaceAddress && (
+                  <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                    <strong>{t('address.selected')}:</strong> {formData.newPlaceAddress}, {formData.newPlaceCity}, {formData.newPlaceCountry}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4 items-start">

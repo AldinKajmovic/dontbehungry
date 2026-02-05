@@ -1,7 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/hooks/useLanguage'
-import { Input, Button, Alert, Section, Modal } from '@/components/ui'
+import { Input, Button, Alert, Section, Modal, AddressAutocomplete } from '@/components/ui'
 import { useAddresses } from './hooks'
 
 const LocationIcon = (
@@ -22,6 +22,7 @@ export function AddressSection() {
     formLoading,
     error,
     handleChange,
+    handleAddressSelect,
     openAddModal,
     openEditModal,
     closeModal,
@@ -152,59 +153,19 @@ export function AddressSection() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && <Alert type="error">{error}</Alert>}
 
-          <Input
+          {/* Address Autocomplete with Map */}
+          <AddressAutocomplete
             label={t('address.streetAddress')}
-            id="address"
-            name="address"
-            value={form.address}
-            onChange={handleChange}
-            placeholder={t('address.streetAddressPlaceholder')}
-            autoComplete="street-address"
+            placeholder={t('address.searchPlaceholder')}
+            initialAddress={editingAddress ? `${form.address}, ${form.city}, ${form.country}` : ''}
+            initialCoordinates={
+              editingAddress?.latitude && editingAddress?.longitude
+                ? { lat: editingAddress.latitude, lng: editingAddress.longitude }
+                : null
+            }
+            onAddressSelect={handleAddressSelect}
+            height="150px"
           />
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label={t('address.city')}
-              id="city"
-              name="city"
-              value={form.city}
-              onChange={handleChange}
-              placeholder={t('address.cityPlaceholder')}
-              autoComplete="address-level2"
-            />
-            <Input
-              label={t('address.state')}
-              id="state"
-              name="state"
-              value={form.state}
-              onChange={handleChange}
-              placeholder={t('address.statePlaceholder')}
-              hint={`(${t('common.optional')})`}
-              autoComplete="address-level1"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label={t('address.country')}
-              id="country"
-              name="country"
-              value={form.country}
-              onChange={handleChange}
-              placeholder={t('address.countryPlaceholder')}
-              autoComplete="country-name"
-            />
-            <Input
-              label={t('address.postalCode')}
-              id="postalCode"
-              name="postalCode"
-              value={form.postalCode}
-              onChange={handleChange}
-              placeholder={t('address.postalCodePlaceholder')}
-              hint={`(${t('common.optional')})`}
-              autoComplete="postal-code"
-            />
-          </div>
 
           <div>
             <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">

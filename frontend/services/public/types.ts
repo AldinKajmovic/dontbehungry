@@ -29,6 +29,7 @@ export interface PublicRestaurant {
   minOrderAmount: string | number | null
   categories: RestaurantCategory[]
   place: RestaurantPlace
+  distance?: number 
 }
 
 export interface MenuItem {

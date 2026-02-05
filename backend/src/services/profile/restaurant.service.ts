@@ -1,6 +1,8 @@
 // Restaurant owner CRUD: getMyRestaurants, createMyRestaurant, updateMyRestaurant, deleteMyRestaurant
 import { prisma } from '../../lib/prisma'
 import { NotFoundError } from '../../utils/errors'
+import { geocodeAddress } from '../../utils/geocoding'
+import { logger } from '../../utils/logger'
 import {
   MyRestaurantResponse,
   CreateMyRestaurantData,
@@ -109,7 +111,34 @@ export async function createMyRestaurant(userId: string, data: CreateMyRestauran
     select: restaurantSelect,
   })
 
+  geocodePlaceAsync(place.id, data.address.trim(), data.city.trim(), data.country.trim(), data.postalCode?.trim())
+
   return formatRestaurant(restaurant)
+}
+
+async function geocodePlaceAsync(
+  placeId: string,
+  address: string,
+  city: string,
+  country: string,
+  postalCode?: string | null
+): Promise<void> {
+  try {
+    const coords = await geocodeAddress(address, city, country, null, postalCode)
+
+    if (coords) {
+      await prisma.place.update({
+        where: { id: placeId },
+        data: {
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        },
+      })
+      logger.info('Restaurant address geocoded successfully', { placeId })
+    }
+  } catch (error) {
+    logger.error('Failed to geocode restaurant address', { placeId, error })
+  }
 }
 
 export async function updateMyRestaurant(userId: string, restaurantId: string, data: UpdateMyRestaurantData): Promise<MyRestaurantResponse> {

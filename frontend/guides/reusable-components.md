@@ -14,6 +14,8 @@ This guide documents the reusable UI components in `/components/ui/` designed to
 | RestaurantCard | Restaurant listing card | restaurants page |
 | CategoryIcon | Category filter button | restaurants page |
 | MealModal | Meal details modal | restaurants page |
+| AddressAutocomplete | Address input with map | my-profile, admin panel |
+| SearchableSelect | Searchable dropdown | admin panel |
 
 ---
 
@@ -282,6 +284,106 @@ import type { ModalAction, StatusAction } from '@/components/ui'
 
 ---
 
+## AddressAutocomplete
+
+Address input with Nominatim geocoding and Leaflet map preview.
+
+### Props
+
+```typescript
+interface AddressAutocompleteProps {
+  label?: string
+  placeholder?: string
+  onAddressSelect: (address: {
+    address: string
+    city: string
+    country: string
+    postalCode: string
+    latitude: number
+    longitude: number
+  }) => void
+  height?: string              // Map height (default: '200px')
+  initialAddress?: string      // Pre-fill search input
+}
+```
+
+### Usage
+
+```tsx
+import { AddressAutocomplete } from '@/components/ui'
+
+<AddressAutocomplete
+  label="Delivery Address"
+  placeholder="Search for an address..."
+  onAddressSelect={(addr) => {
+    setAddress(addr.address)
+    setCity(addr.city)
+    setCountry(addr.country)
+    setPostalCode(addr.postalCode)
+    setLatitude(addr.latitude)
+    setLongitude(addr.longitude)
+  }}
+  height="150px"
+/>
+```
+
+### Features
+- Debounced search (300ms) using Nominatim API
+- Dropdown with address suggestions
+- Interactive Leaflet map with draggable marker
+- Auto-fills address components (city, country, postal code)
+- Captures coordinates for distance calculations
+
+---
+
+## SearchableSelect
+
+Dynamic dropdown with async search and lazy loading.
+
+### Props
+
+```typescript
+interface SearchableSelectProps {
+  label?: string
+  hint?: string
+  error?: string
+  value: string
+  onChange: (value: string, label?: string) => void
+  placeholder?: string
+  required?: boolean
+  disabled?: boolean
+  emptyMessage?: string
+  loadOptions: (search: string) => Promise<SelectOption[]>
+  id?: string
+  initialLabel?: string
+}
+```
+
+### Usage
+
+```tsx
+import { SearchableSelect } from '@/components/ui'
+
+<SearchableSelect
+  label="User"
+  value={selectedUserId}
+  onChange={(value, label) => setSelectedUserId(value)}
+  loadOptions={(search) => adminService.getUsersForSelect(search)}
+  placeholder="Search users..."
+  emptyMessage="No users found"
+  required
+/>
+```
+
+### Features
+- Debounced search (300ms) to reduce API calls
+- Loads options on focus and search
+- Clear button to reset selection
+- Shows loading state while fetching
+- Click outside to close
+
+---
+
 ## Design Decisions
 
 1. **Consistent styling**: All components follow the existing Tailwind patterns (rounded-xl, shadow-sm, color-100/600 pairs)
@@ -291,4 +393,4 @@ import type { ModalAction, StatusAction } from '@/components/ui'
 
 ---
 
-*Last updated: January 2026*
+*Last updated: February 2026 - Added AddressAutocomplete and SearchableSelect documentation*

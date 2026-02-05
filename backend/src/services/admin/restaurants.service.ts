@@ -1,7 +1,7 @@
 import { prisma } from '../../lib/prisma'
 import { NotFoundError } from '../../utils/errors'
 import { PaginatedResponse } from '../../types'
-import { PaginationParams, RestaurantFilters, CreateRestaurantData, UpdateRestaurantData } from '../../validators/admin.validator'
+import { PaginationParams, RestaurantFilters, CreateRestaurantData, UpdateRestaurantData } from '../../validators/admin'
 
 export async function getRestaurants(params: PaginationParams, filters: RestaurantFilters = {}): Promise<PaginatedResponse<object>> {
   const { page, limit, search, sortBy, sortOrder } = params

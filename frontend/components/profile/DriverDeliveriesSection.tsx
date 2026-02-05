@@ -1,0 +1,172 @@
+'use client'
+
+import { Button, Section } from '@/components/ui'
+import { useDriverDeliveries } from './hooks'
+import { formatDate, getStatusColor } from './utils'
+
+export function DriverDeliveriesSection() {
+  const {
+    deliveries,
+    loading,
+    show,
+    isDriver,
+    page,
+    totalPages,
+    total,
+    status,
+    toggleShow,
+    handleStatusChange,
+    goToPage,
+  } = useDriverDeliveries()
+
+  if (!isDriver) return null
+
+  return (
+    <Section
+      title="My Deliveries"
+      description="View your assigned deliveries"
+      headerAction={
+        <Button
+          type="button"
+          variant="secondary"
+          className="!w-auto !py-2 !px-4 text-sm"
+          onClick={toggleShow}
+        >
+          <span className="flex items-center gap-2">
+            {show ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
+            {show ? 'Hide' : 'Show'} Deliveries
+          </span>
+        </Button>
+      }
+    >
+      {show && (
+        <div className="space-y-4">
+          {/* Status Filter */}
+          <div className="flex flex-wrap gap-3 items-center">
+            <label htmlFor="driverDeliveriesStatus" className="text-sm font-medium text-gray-700">
+              Filter by status:
+            </label>
+            <select
+              id="driverDeliveriesStatus"
+              value={status}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent min-w-[180px]"
+            >
+              <option value="">All Statuses</option>
+              <option value="PENDING">Pending</option>
+              <option value="CONFIRMED">Confirmed</option>
+              <option value="PREPARING">Preparing</option>
+              <option value="READY_FOR_PICKUP">Ready for Pickup</option>
+              <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+              <option value="DELIVERED">Delivered</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+          </div>
+
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin h-6 w-6 border-2 border-primary-500 border-t-transparent rounded-full" />
+            </div>
+          ) : deliveries.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                </svg>
+              </div>
+              <p className="text-gray-500">No deliveries found</p>
+            </div>
+          ) : (
+            <>
+              <p className="text-sm text-gray-500">{total} deliver{total !== 1 ? 'ies' : 'y'} found</p>
+              <div className="space-y-3">
+                {deliveries.map((delivery) => (
+                  <div
+                    key={delivery.id}
+                    className="p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          <p className="font-medium text-gray-900">
+                            Order for {delivery.customerFirstName || 'Customer'}
+                          </p>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(delivery.status)}`}>
+                            {delivery.status.replace(/_/g, ' ')}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-1">
+                          From: <span className="font-medium">{delivery.restaurant.name}</span>
+                        </p>
+                        <p className="text-sm text-gray-500 mb-2">
+                          {formatDate(delivery.createdAt)}
+                        </p>
+                        <div className="flex items-start gap-2 text-sm text-gray-600">
+                          <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <p>{delivery.deliveryPlace.address}, {delivery.deliveryPlace.city}</p>
+                        </div>
+                        <div className="text-sm text-gray-600 mt-2">
+                          <p className="font-medium">Items: {delivery.orderItems.length}</p>
+                        </div>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="font-semibold text-primary-600">${delivery.totalAmount}</p>
+                        {delivery.deliveredAt && (
+                          <p className="text-xs text-green-600 mt-1">
+                            Delivered: {formatDate(delivery.deliveredAt)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                  <p className="text-sm text-gray-500">
+                    Page {page} of {totalPages}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => goToPage(page - 1)}
+                      disabled={page === 1 || loading}
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => goToPage(page + 1)}
+                      disabled={page >= totalPages || loading}
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </Section>
+  )
+}

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import * as profileController from '../controllers/profile.controller'
+import * as profileController from '../controllers/profile'
 import { authenticate } from '../middlewares/auth.middleware'
 import { sensitiveOpLimiter } from '../middlewares/rateLimiter'
 

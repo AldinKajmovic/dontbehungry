@@ -10,9 +10,11 @@ import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert, Select, SearchableSelect } from '@/components/ui'
 import { adminService, AdminMenuItem, PaginationInfo, MenuItemFilters, SortParams } from '@/services/admin'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useToast } from '@/hooks/useToast'
 
 export default function MenuItemsPage() {
   const { t } = useLanguage()
+  const { toast } = useToast()
 
   const AVAILABILITY_OPTIONS = [
     { value: '', label: t('admin.menuItemsPage.allItems') },
@@ -167,8 +169,10 @@ export default function MenuItemsPage() {
       // Add new item to local state
       setMenuItems((prev) => [newItem, ...prev])
       setShowCreateModal(false)
+      toast.success(t('toast.menuItemSaved'))
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to create menu item')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }
@@ -193,8 +197,10 @@ export default function MenuItemsPage() {
       // Update local state with response data
       setMenuItems((prev) => prev.map((item) => (item.id === updatedItem.id ? updatedItem : item)))
       setShowEditModal(false)
+      toast.success(t('toast.menuItemSaved'))
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to update menu item')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }
@@ -208,8 +214,10 @@ export default function MenuItemsPage() {
       // Remove from local state
       setMenuItems((prev) => prev.filter((item) => item.id !== selectedItem.id))
       setShowDeleteModal(false)
+      toast.success(t('toast.menuItemDeleted'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete menu item')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }

@@ -6,7 +6,7 @@ import {
   ReviewFilters,
   MenuItemFilters,
   PlaceFilters,
-} from '../../validators/admin.validator'
+} from '../../validators/admin'
 
 const MAX_REPORT_ITEMS = 1000
 

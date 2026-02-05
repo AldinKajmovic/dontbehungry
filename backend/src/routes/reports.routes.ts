@@ -33,7 +33,7 @@ import {
   validateReviewFilters,
   validateMenuItemFilters,
   validatePlaceFilters,
-} from '../validators/admin.validator'
+} from '../validators/admin'
 import {
   validateEmailReportData,
   validateCombinedReportData,

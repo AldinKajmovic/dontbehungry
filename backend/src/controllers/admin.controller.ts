@@ -23,7 +23,7 @@ import {
   validateUpdateReview,
   validateCreatePlace,
   validateUpdatePayment,
-} from '../validators/admin.validator'
+} from '../validators/admin'
 
 // Type for routes with ID parameter
 type IdParams = { id: string }

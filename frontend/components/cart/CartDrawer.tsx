@@ -3,31 +3,24 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/hooks/useCart'
-import { PaymentMethod } from '@/providers/CartProvider'
 import { useAuth } from '@/hooks/useAuth'
 import { useLanguage } from '@/hooks/useLanguage'
-import { addressService, Address, AddAddressData } from '@/services/address'
+import { useToast } from '@/hooks/useToast'
 import { profileService } from '@/services/profile'
-import { Modal, Input, Button, Alert } from '@/components/ui'
 import { logger } from '@/utils/logger'
-
-const PAYMENT_METHODS: { value: PaymentMethod; labelKey: string; descriptionKey: string }[] = [
-  { value: 'CASH', labelKey: 'payment.cash', descriptionKey: 'payment.cashDescription' },
-  { value: 'CREDIT_CARD', labelKey: 'payment.creditCard', descriptionKey: 'payment.creditCardDescription' },
-  { value: 'DIGITAL_WALLET', labelKey: 'payment.digitalWallet', descriptionKey: 'payment.digitalWalletDescription' },
-]
-
-const LocationIcon = (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-  </svg>
-)
+import { useCartAddresses } from './hooks'
+import { CartItemCard } from './CartItemCard'
+import { AddressSection } from './AddressSection'
+import { AddressModal } from './AddressModal'
+import { PaymentMethodSection } from './PaymentMethodSection'
+import { OrderNotesSection } from './OrderNotesSection'
+import { CartSummary } from './CartSummary'
 
 export function CartDrawer() {
   const router = useRouter()
   const { isAuthenticated } = useAuth()
   const { t } = useLanguage()
+  const { toast } = useToast()
   const {
     items,
     restaurant,
@@ -46,33 +39,13 @@ export function CartDrawer() {
     clearCart,
   } = useCart()
 
-  const [addresses, setAddresses] = useState<Address[]>([])
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
-  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false)
   const [isPlacingOrder, setIsPlacingOrder] = useState(false)
   const [orderError, setOrderError] = useState<string | null>(null)
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [notes, setNotes] = useState('')
 
-  // Address modal state
-  const [showAddressModal, setShowAddressModal] = useState(false)
-  const [addressForm, setAddressForm] = useState({
-    address: '',
-    city: '',
-    state: '',
-    country: '',
-    postalCode: '',
-    notes: '',
-  })
-  const [addressLoading, setAddressLoading] = useState(false)
-  const [addressError, setAddressError] = useState('')
-
-  // Load addresses when drawer opens
-  useEffect(() => {
-    if (isCartOpen && isAuthenticated && items.length > 0) {
-      loadAddresses()
-    }
-  }, [isCartOpen, isAuthenticated, items.length])
+  // Address management hook
+  const addressState = useCartAddresses(isCartOpen, isAuthenticated, items.length > 0)
 
   // Prevent body scroll when drawer is open
   useEffect(() => {
@@ -84,87 +57,12 @@ export function CartDrawer() {
     }
   }, [isCartOpen])
 
-  const loadAddresses = async () => {
-    setIsLoadingAddresses(true)
-    try {
-      const { addresses: loadedAddresses } = await addressService.getAddresses()
-      setAddresses(loadedAddresses)
-      // Select default address if available
-      const defaultAddress = loadedAddresses.find((a) => a.isDefault)
-      if (defaultAddress) {
-        setSelectedAddressId(defaultAddress.id)
-      } else if (loadedAddresses.length > 0) {
-        setSelectedAddressId(loadedAddresses[0].id)
-      }
-    } catch (error) {
-      logger.error('Failed to load addresses', error)
-    } finally {
-      setIsLoadingAddresses(false)
-    }
-  }
-
-  // Address modal functions
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setAddressForm((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const openAddAddressModal = () => {
-    setAddressForm({
-      address: '',
-      city: '',
-      state: '',
-      country: '',
-      postalCode: '',
-      notes: '',
-    })
-    setAddressError('')
-    setShowAddressModal(true)
-  }
-
-  const closeAddressModal = () => {
-    setShowAddressModal(false)
-    setAddressError('')
-  }
-
-  const handleAddressSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setAddressLoading(true)
-    setAddressError('')
-
-    if (!addressForm.address || !addressForm.city || !addressForm.country) {
-      setAddressError('Address, city, and country are required')
-      setAddressLoading(false)
-      return
-    }
-
-    try {
-      const data: AddAddressData = {
-        address: addressForm.address,
-        city: addressForm.city,
-        country: addressForm.country,
-        state: addressForm.state || undefined,
-        postalCode: addressForm.postalCode || undefined,
-        notes: addressForm.notes || undefined,
-      }
-      const { address } = await addressService.addAddress(data)
-      // Add new address to local state and select it
-      setAddresses((prev) => [...prev, address])
-      setSelectedAddressId(address.id)
-      closeAddressModal()
-    } catch (err) {
-      setAddressError(err instanceof Error ? err.message : 'Failed to save address')
-    } finally {
-      setAddressLoading(false)
-    }
-  }
-
   const formatPrice = (price: number): string => {
     return price.toFixed(2)
   }
 
   const handlePlaceOrder = async () => {
-    if (!restaurant || items.length === 0 || !selectedAddressId) {
+    if (!restaurant || items.length === 0 || !addressState.selectedAddressId) {
       setOrderError(t('cart.selectDeliveryAddress'))
       return
     }
@@ -175,7 +73,7 @@ export function CartDrawer() {
     try {
       await profileService.createOrder({
         restaurantId: restaurant.id,
-        deliveryAddressId: selectedAddressId,
+        deliveryAddressId: addressState.selectedAddressId,
         paymentMethod,
         notes: notes.trim() || undefined,
         items: items.map((item) => ({
@@ -187,6 +85,7 @@ export function CartDrawer() {
 
       setOrderSuccess(true)
       clearCart()
+      toast.success(t('toast.orderPlaced'))
 
       // Redirect to orders page after a short delay
       setTimeout(() => {
@@ -203,7 +102,7 @@ export function CartDrawer() {
 
   if (!isCartOpen) return null
 
-  const canCheckout = items.length > 0 && selectedAddressId && !isPlacingOrder
+  const canCheckout = items.length > 0 && addressState.selectedAddressId && !isPlacingOrder
 
   return (
     <div className="fixed inset-0 z-50">
@@ -264,177 +163,36 @@ export function CartDrawer() {
               {/* Cart Items */}
               <div className="space-y-3">
                 {items.map((item) => (
-                  <div key={item.id} className="flex gap-3 p-3 bg-gray-50 rounded-xl">
-                    {/* Image */}
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
-                      {item.imageUrl ? (
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Details */}
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 text-sm">{item.name}</h4>
-                      <p className="text-primary-600 font-semibold text-sm">
-                        ${formatPrice(item.price * item.quantity)}
-                      </p>
-
-                      {/* Quantity Controls */}
-                      <div className="flex items-center gap-2 mt-2">
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                          </svg>
-                        </button>
-                        <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Remove */}
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="self-start p-1 text-gray-400 hover:text-red-500 transition-colors"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
+                  <CartItemCard
+                    key={item.id}
+                    item={item}
+                    onUpdateQuantity={updateQuantity}
+                    onRemove={removeItem}
+                    formatPrice={formatPrice}
+                  />
                 ))}
               </div>
 
               {/* Delivery Address */}
-              <div className="border-t pt-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium text-gray-900">{t('cart.deliveryAddress')}</h3>
-                  <button
-                    onClick={openAddAddressModal}
-                    className="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center gap-1"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    {t('cart.addNew')}
-                  </button>
-                </div>
-                {isLoadingAddresses ? (
-                  <div className="flex justify-center py-4">
-                    <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
-                  </div>
-                ) : addresses.length === 0 ? (
-                  <div className="text-center py-4">
-                    <p className="text-gray-500 text-sm mb-2">{t('cart.noSavedAddresses')}</p>
-                    <button
-                      onClick={openAddAddressModal}
-                      className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-                    >
-                      {t('cart.addAnAddress')}
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {addresses.map((address) => (
-                      <label
-                        key={address.id}
-                        className={`
-                          flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors
-                          ${selectedAddressId === address.id
-                            ? 'border-primary-500 bg-primary-50'
-                            : 'border-gray-200 hover:border-gray-300'
-                          }
-                        `}
-                      >
-                        <input
-                          type="radio"
-                          name="address"
-                          checked={selectedAddressId === address.id}
-                          onChange={() => setSelectedAddressId(address.id)}
-                          className="mt-1 text-primary-600 focus:ring-primary-500"
-                        />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">{address.address}</p>
-                          <p className="text-sm text-gray-500">{address.city}, {address.country}</p>
-                          {address.notes && (
-                            <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
-                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                              </svg>
-                              {address.notes}
-                            </p>
-                          )}
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <AddressSection
+                addresses={addressState.addresses}
+                selectedAddressId={addressState.selectedAddressId}
+                isLoading={addressState.isLoadingAddresses}
+                onSelectAddress={addressState.setSelectedAddressId}
+                onAddNew={addressState.openAddAddressModal}
+              />
 
               {/* Payment Method */}
-              <div className="border-t pt-4">
-                <h3 className="font-medium text-gray-900 mb-3">{t('cart.paymentMethod')}</h3>
-                <p className="text-sm text-gray-500 mb-3">
-                  {t('cart.paymentOnDelivery')}
-                </p>
-                <div className="space-y-2">
-                  {PAYMENT_METHODS.map((method) => (
-                    <label
-                      key={method.value}
-                      className={`
-                        flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors
-                        ${paymentMethod === method.value
-                          ? 'border-primary-500 bg-primary-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        checked={paymentMethod === method.value}
-                        onChange={() => setPaymentMethod(method.value)}
-                        className="mt-1 text-primary-600 focus:ring-primary-500"
-                      />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">{t(method.labelKey)}</p>
-                        <p className="text-xs text-gray-500">{t(method.descriptionKey)}</p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
+              <PaymentMethodSection
+                selectedMethod={paymentMethod}
+                onSelect={setPaymentMethod}
+              />
 
               {/* Order Notes */}
-              <div className="border-t pt-4">
-                <h3 className="font-medium text-gray-900 mb-3">{t('cart.orderNotesOptional')}</h3>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder={t('cart.orderNotesPlaceholder')}
-                  className="w-full p-3 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-                  rows={2}
-                />
-              </div>
+              <OrderNotesSection
+                notes={notes}
+                onChange={setNotes}
+              />
 
               {/* Error Message */}
               {orderError && (
@@ -449,40 +207,16 @@ export function CartDrawer() {
         {/* Footer */}
         {items.length > 0 && !orderSuccess && (
           <div className="border-t p-4 space-y-3 bg-gray-50">
-            {/* Summary */}
-            <div className="space-y-1 text-sm">
-              <div className="flex justify-between text-gray-600">
-                <span>{t('cart.subtotal')} ({itemCount} {t('common.items')})</span>
-                <span>${formatPrice(subtotal)}</span>
-              </div>
-              <div className="flex justify-between text-gray-600">
-                <span>{t('cart.tax')} (20%)</span>
-                <span>${formatPrice(tax)}</span>
-              </div>
-              <div className="flex justify-between text-gray-600">
-                <span>{t('cart.deliveryFee')}</span>
-                <span>${formatPrice(deliveryFee)}</span>
-              </div>
-              {minOrderFee > 0 && (
-                <div className="flex justify-between text-amber-600">
-                  <span>{t('cart.smallOrderFee')}</span>
-                  <span>${formatPrice(minOrderFee)}</span>
-                </div>
-              )}
-              <div className="flex justify-between font-semibold text-gray-900 text-base pt-2 border-t">
-                <span>{t('cart.total')}</span>
-                <span>${formatPrice(total)}</span>
-              </div>
-            </div>
-
-            {/* Small Order Fee Notice */}
-            {minOrderFee > 0 && restaurant && (
-              <div className="p-2 bg-amber-50 border border-amber-200 rounded-lg">
-                <p className="text-xs text-amber-700">
-                  A ${formatPrice(minOrderFee)} small order fee applies because your order is below the ${formatPrice(restaurant.minOrderAmount)} minimum.
-                </p>
-              </div>
-            )}
+            <CartSummary
+              itemCount={itemCount}
+              subtotal={subtotal}
+              tax={tax}
+              deliveryFee={deliveryFee}
+              minOrderFee={minOrderFee}
+              total={total}
+              minOrderAmount={restaurant?.minOrderAmount}
+              formatPrice={formatPrice}
+            />
 
             {/* Checkout Button */}
             <button
@@ -514,108 +248,15 @@ export function CartDrawer() {
       </div>
 
       {/* Add Address Modal */}
-      <Modal
-        isOpen={showAddressModal}
-        onClose={closeAddressModal}
-        title={t('address.addNew')}
-        icon={LocationIcon}
-        iconColor="primary"
-        size="lg"
-      >
-        <form onSubmit={handleAddressSubmit} className="space-y-4">
-          {addressError && (
-            <Alert type="error">{addressError}</Alert>
-          )}
-
-          <Input
-            label={t('address.streetAddress')}
-            id="cart-address"
-            name="address"
-            value={addressForm.address}
-            onChange={handleAddressChange}
-            placeholder="123 Main Street, Apt 4"
-            autoComplete="street-address"
-          />
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label={t('address.city')}
-              id="cart-city"
-              name="city"
-              value={addressForm.city}
-              onChange={handleAddressChange}
-              placeholder="New York"
-              autoComplete="address-level2"
-            />
-            <Input
-              label={t('address.state')}
-              id="cart-state"
-              name="state"
-              value={addressForm.state}
-              onChange={handleAddressChange}
-              placeholder="NY"
-              hint={`(${t('common.optional')})`}
-              autoComplete="address-level1"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label={t('address.country')}
-              id="cart-country"
-              name="country"
-              value={addressForm.country}
-              onChange={handleAddressChange}
-              placeholder="USA"
-              autoComplete="country-name"
-            />
-            <Input
-              label={t('address.postalCode')}
-              id="cart-postalCode"
-              name="postalCode"
-              value={addressForm.postalCode}
-              onChange={handleAddressChange}
-              placeholder="10001"
-              hint={`(${t('common.optional')})`}
-              autoComplete="postal-code"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="cart-notes" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('address.deliveryNotes')} <span className="text-gray-400 font-normal">({t('common.optional')})</span>
-            </label>
-            <textarea
-              id="cart-notes"
-              name="notes"
-              value={addressForm.notes}
-              onChange={handleAddressChange}
-              placeholder={t('address.deliveryNotesPlaceholder')}
-              rows={2}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 resize-none"
-            />
-          </div>
-
-          <div className="flex gap-3 pt-2">
-            <Button
-              type="button"
-              variant="secondary"
-              className="flex-1"
-              onClick={closeAddressModal}
-              disabled={addressLoading}
-            >
-              {t('common.cancel')}
-            </Button>
-            <Button
-              type="submit"
-              className="flex-1"
-              isLoading={addressLoading}
-            >
-              {addressLoading ? t('common.loading') : t('address.addAddress')}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      <AddressModal
+        isOpen={addressState.showAddressModal}
+        onClose={addressState.closeAddressModal}
+        onSubmit={addressState.handleAddressSubmit}
+        form={addressState.addressForm}
+        onChange={addressState.handleAddressChange}
+        isLoading={addressState.addressLoading}
+        error={addressState.addressError}
+      />
     </div>
   )
 }

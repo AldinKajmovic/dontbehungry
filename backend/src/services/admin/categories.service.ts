@@ -1,7 +1,7 @@
 import { prisma } from '../../lib/prisma'
 import { NotFoundError, ConflictError } from '../../utils/errors'
 import { PaginatedResponse } from '../../types'
-import { PaginationParams, CreateCategoryData, UpdateCategoryData } from '../../validators/admin.validator'
+import { PaginationParams, CreateCategoryData, UpdateCategoryData } from '../../validators/admin'
 
 export async function getCategories(params: PaginationParams): Promise<PaginatedResponse<object>> {
   const { page, limit, search, sortBy, sortOrder } = params

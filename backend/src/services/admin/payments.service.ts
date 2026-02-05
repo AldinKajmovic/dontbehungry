@@ -1,7 +1,7 @@
 import { prisma } from '../../lib/prisma'
 import { NotFoundError } from '../../utils/errors'
 import { PaginatedResponse } from '../../types'
-import { PaginationParams, UpdatePaymentData } from '../../validators/admin.validator'
+import { PaginationParams, UpdatePaymentData } from '../../validators/admin'
 import { PaymentStatus } from '@prisma/client'
 
 export async function getPayments(params: PaginationParams): Promise<PaginatedResponse<object>> {

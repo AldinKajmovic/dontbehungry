@@ -2,7 +2,7 @@ import { prisma } from '../../lib/prisma'
 import { NotFoundError, ConflictError } from '../../utils/errors'
 import { hashPassword } from '../../utils/password'
 import { PaginatedResponse } from '../../types'
-import { PaginationParams, UserFilters, CreateUserData, UpdateUserData } from '../../validators/admin.validator'
+import { PaginationParams, UserFilters, CreateUserData, UpdateUserData } from '../../validators/admin'
 import { UserRole } from '@prisma/client'
 
 export async function getUsers(params: PaginationParams, filters: UserFilters = {}): Promise<PaginatedResponse<object>> {

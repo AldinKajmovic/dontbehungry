@@ -9,9 +9,11 @@ import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert } from '@/components/ui'
 import { adminService, AdminCategory, PaginationInfo, SortParams } from '@/services/admin'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useToast } from '@/hooks/useToast'
 
 export default function CategoriesPage() {
   const { t } = useLanguage()
+  const { toast } = useToast()
   const [categories, setCategories] = useState<AdminCategory[]>([])
   const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -111,8 +113,10 @@ export default function CategoriesPage() {
       })
       setCategories((prev) => [newCategory, ...prev])
       setShowCreateModal(false)
+      toast.success(t('toast.categoryCreated'))
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to create category')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }
@@ -131,8 +135,10 @@ export default function CategoriesPage() {
       })
       setCategories((prev) => prev.map((c) => (c.id === updatedCategory.id ? updatedCategory : c)))
       setShowEditModal(false)
+      toast.success(t('toast.categoryUpdated'))
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to update category')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }
@@ -145,8 +151,10 @@ export default function CategoriesPage() {
       await adminService.deleteCategory(selectedCategory.id)
       setCategories((prev) => prev.filter((c) => c.id !== selectedCategory.id))
       setShowDeleteModal(false)
+      toast.success(t('toast.categoryDeleted'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete category')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }

@@ -10,9 +10,11 @@ import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert, Select } from '@/components/ui'
 import { adminService, AdminUser, PaginationInfo, UserFilters, SortParams } from '@/services/admin'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useToast } from '@/hooks/useToast'
 
 export default function UsersPage() {
   const { t } = useLanguage()
+  const { toast } = useToast()
 
   const ROLE_OPTIONS = [
     { value: 'CUSTOMER', label: t('admin.roles.CUSTOMER') },
@@ -240,8 +242,10 @@ export default function UsersPage() {
 
       setUsers((prev) => [newUser, ...prev])
       setShowCreateModal(false)
+      toast.success(t('toast.userCreated'))
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to create user')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }
@@ -263,8 +267,10 @@ export default function UsersPage() {
       const updatedUser = await adminService.updateUser(selectedUser.id, updateData)
       setUsers((prev) => prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)))
       setShowEditModal(false)
+      toast.success(t('toast.userUpdated'))
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to update user')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }
@@ -277,8 +283,10 @@ export default function UsersPage() {
       await adminService.deleteUser(selectedUser.id)
       setUsers((prev) => prev.filter((u) => u.id !== selectedUser.id))
       setShowDeleteModal(false)
+      toast.success(t('toast.userDeleted'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete user')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }

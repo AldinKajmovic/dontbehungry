@@ -1,7 +1,7 @@
 import { prisma } from '../../lib/prisma'
 import { NotFoundError } from '../../utils/errors'
 import { PaginatedResponse } from '../../types'
-import { PaginationParams, OrderFilters, UpdateOrderData } from '../../validators/admin.validator'
+import { PaginationParams, OrderFilters, UpdateOrderData } from '../../validators/admin'
 import { OrderStatus, Prisma } from '@prisma/client'
 import {
   notifyDeliveryAssigned,

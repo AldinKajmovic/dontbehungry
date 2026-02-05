@@ -16,3 +16,5 @@ export { Divider } from './Divider';
 export { Select } from './Select';
 export { SearchableSelect } from './SearchableSelect';
 export { LanguageToggle } from './LanguageToggle';
+export { Toast } from './Toast';
+export { ToastContainer } from './ToastContainer';

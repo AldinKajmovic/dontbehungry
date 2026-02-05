@@ -132,7 +132,7 @@ export const PAYMENT_STATUS_COLORS: Record<string, string> = {
   REFUNDED: 'bg-blue-100 text-blue-700',
 }
 
-// Pre-defined status options for orders (with English labels for backwards compatibility)
+// Pre-defined status options for orders (English labels, use getOrderStatusOptions for i18n)
 export const ORDER_STATUS_OPTIONS: StatusOption[] = [
   { value: 'PENDING', label: 'Pending', colorClass: 'bg-yellow-100 text-yellow-700' },
   { value: 'CONFIRMED', label: 'Confirmed', colorClass: 'bg-blue-100 text-blue-700' },
@@ -143,7 +143,7 @@ export const ORDER_STATUS_OPTIONS: StatusOption[] = [
   { value: 'CANCELLED', label: 'Cancelled', colorClass: 'bg-red-100 text-red-700' },
 ]
 
-// Pre-defined status options for payments (with English labels for backwards compatibility)
+// Pre-defined status options for payments (English labels, use getPaymentStatusOptions for i18n)
 export const PAYMENT_STATUS_OPTIONS: StatusOption[] = [
   { value: 'PENDING', label: 'Pending', colorClass: 'bg-yellow-100 text-yellow-700' },
   { value: 'COMPLETED', label: 'Completed', colorClass: 'bg-green-100 text-green-700' },

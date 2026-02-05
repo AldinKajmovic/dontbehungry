@@ -10,9 +10,11 @@ import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert, SearchableSelect } from '@/components/ui'
 import { adminService, AdminRestaurant, PaginationInfo, RestaurantFilters, SortParams } from '@/services/admin'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useToast } from '@/hooks/useToast'
 
 export default function RestaurantsPage() {
   const { t } = useLanguage()
+  const { toast } = useToast()
   const [restaurants, setRestaurants] = useState<AdminRestaurant[]>([])
   const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -170,8 +172,10 @@ export default function RestaurantsPage() {
       })
       setRestaurants((prev) => [newRestaurant, ...prev])
       setShowCreateModal(false)
+      toast.success(t('toast.restaurantCreated'))
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to create restaurant')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }
@@ -201,8 +205,10 @@ export default function RestaurantsPage() {
       })
       setRestaurants((prev) => prev.map((r) => (r.id === updatedRestaurant.id ? updatedRestaurant : r)))
       setShowEditModal(false)
+      toast.success(t('toast.restaurantUpdated'))
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to update restaurant')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }
@@ -215,8 +221,10 @@ export default function RestaurantsPage() {
       await adminService.deleteRestaurant(selectedRestaurant.id)
       setRestaurants((prev) => prev.filter((r) => r.id !== selectedRestaurant.id))
       setShowDeleteModal(false)
+      toast.success(t('toast.restaurantDeleted'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete restaurant')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }

@@ -10,9 +10,11 @@ import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert, Select, SearchableSelect } from '@/components/ui'
 import { adminService, AdminReview, PaginationInfo, ReviewFilters, SortParams } from '@/services/admin'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useToast } from '@/hooks/useToast'
 
 export default function ReviewsPage() {
   const { t } = useLanguage()
+  const { toast } = useToast()
 
   const RATING_OPTIONS = [
     { value: '1', label: `1 ${t('admin.reviewsPage.star')}` },
@@ -157,8 +159,10 @@ export default function ReviewsPage() {
       })
       setReviews((prev) => [newReview, ...prev])
       setShowCreateModal(false)
+      toast.success(t('toast.reviewCreated'))
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to create review')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }
@@ -177,8 +181,10 @@ export default function ReviewsPage() {
       })
       setReviews((prev) => prev.map((r) => (r.id === updatedReview.id ? updatedReview : r)))
       setShowEditModal(false)
+      toast.success(t('toast.reviewUpdated'))
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to update review')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }
@@ -191,8 +197,10 @@ export default function ReviewsPage() {
       await adminService.deleteReview(selectedReview.id)
       setReviews((prev) => prev.filter((r) => r.id !== selectedReview.id))
       setShowDeleteModal(false)
+      toast.success(t('toast.reviewDeleted'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete review')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }

@@ -9,9 +9,11 @@ import { EmailReportModal } from '@/components/admin/EmailReportModal'
 import { Modal, Input, Button, Alert } from '@/components/ui'
 import { adminService, AdminPlace, PaginationInfo, PlaceFilters, SortParams } from '@/services/admin'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useToast } from '@/hooks/useToast'
 
 export default function PlacesPage() {
   const { t } = useLanguage()
+  const { toast } = useToast()
   const [places, setPlaces] = useState<AdminPlace[]>([])
   const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -137,8 +139,10 @@ export default function PlacesPage() {
       })
       setPlaces((prev) => [newPlace, ...prev])
       setShowCreateModal(false)
+      toast.success(t('toast.placeCreated'))
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to create place')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }
@@ -159,8 +163,10 @@ export default function PlacesPage() {
       })
       setPlaces((prev) => prev.map((p) => (p.id === updatedPlace.id ? updatedPlace : p)))
       setShowEditModal(false)
+      toast.success(t('toast.placeUpdated'))
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to update place')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }
@@ -173,8 +179,10 @@ export default function PlacesPage() {
       await adminService.deletePlace(selectedPlace.id)
       setPlaces((prev) => prev.filter((p) => p.id !== selectedPlace.id))
       setShowDeleteModal(false)
+      toast.success(t('toast.placeDeleted'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete place')
+      toast.error(t('toast.error'))
     } finally {
       setFormLoading(false)
     }

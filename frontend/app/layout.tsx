@@ -7,6 +7,8 @@ import { CartProvider } from '@/providers/CartProvider'
 import { SocketProvider } from '@/providers/SocketProvider'
 import { NotificationProvider } from '@/providers/NotificationProvider'
 import { LanguageProvider } from '@/providers/LanguageProvider'
+import { ToastProvider } from '@/providers/ToastProvider'
+import { ToastContainer } from '@/components/ui'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -28,7 +30,12 @@ export default function RootLayout({
             <AuthProvider>
               <SocketProvider>
                 <NotificationProvider>
-                  <CartProvider>{children}</CartProvider>
+                  <ToastProvider>
+                    <CartProvider>
+                      {children}
+                      <ToastContainer />
+                    </CartProvider>
+                  </ToastProvider>
                 </NotificationProvider>
               </SocketProvider>
             </AuthProvider>

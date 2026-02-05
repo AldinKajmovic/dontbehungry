@@ -776,6 +776,113 @@ GET /api/profile/driver-orders?status=DELIVERED&page=1&limit=5
 
 ---
 
+## Driver Availability Endpoints
+
+These endpoints allow delivery drivers to manage their work status and view hours worked.
+
+### Toggle Availability
+
+Toggles the driver's availability status (online/offline).
+
+**Endpoint:** `POST /api/profile/availability/toggle`
+
+**Authentication:** Required (must have DELIVERY_DRIVER role)
+
+**Response (Going Online):**
+```json
+{
+  "message": "You are now online",
+  "isOnline": true,
+  "currentShift": {
+    "id": "uuid",
+    "startTime": "2025-01-15T09:00:00.000Z",
+    "elapsedMinutes": 0
+  }
+}
+```
+
+**Response (Going Offline):**
+```json
+{
+  "message": "You are now offline",
+  "isOnline": false,
+  "currentShift": null
+}
+```
+
+**Note:** When going offline, the shift end time is automatically adjusted based on the driver's last delivery. If the last delivery was more than 10 minutes before the toggle, the shift ends at the last delivery time.
+
+**Error Responses:**
+- `403 Forbidden` - User is not a delivery driver
+- `404 Not Found` - User not found
+
+---
+
+### Get Availability Status
+
+Returns the driver's current availability status.
+
+**Endpoint:** `GET /api/profile/availability/status`
+
+**Authentication:** Required (must have DELIVERY_DRIVER role)
+
+**Response:**
+```json
+{
+  "isOnline": true,
+  "currentShift": {
+    "id": "uuid",
+    "startTime": "2025-01-15T09:00:00.000Z",
+    "elapsedMinutes": 45
+  }
+}
+```
+
+**Error Responses:**
+- `403 Forbidden` - User is not a delivery driver
+- `404 Not Found` - User not found
+
+---
+
+### Get Monthly Hours
+
+Returns aggregated hours worked per month.
+
+**Endpoint:** `GET /api/profile/availability/hours`
+
+**Authentication:** Required (must have DELIVERY_DRIVER role)
+
+**Query Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `months` | integer | Number of months to retrieve (1-12, default: 6) |
+
+**Response:**
+```json
+{
+  "months": [
+    {
+      "month": "2025-01",
+      "year": 2025,
+      "monthNumber": 1,
+      "monthName": "January",
+      "totalMinutes": 2400,
+      "totalHours": 40,
+      "shiftCount": 12
+    }
+  ],
+  "totalMinutes": 14400,
+  "totalHours": 240
+}
+```
+
+**Error Responses:**
+- `400 Bad Request` - Invalid months parameter (must be 1-12)
+- `403 Forbidden` - User is not a delivery driver
+- `404 Not Found` - User not found
+
+---
+
 ## File Structure
 
 ```
@@ -882,4 +989,4 @@ const driverDeliveries = await profileService.getDriverOrderHistory({
 
 ---
 
-*Last updated: January 2026*
+*Last updated: February 2026*

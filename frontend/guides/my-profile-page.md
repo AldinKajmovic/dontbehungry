@@ -144,6 +144,26 @@ Modal form for creating or editing menu items:
 
 ### Delivery Drivers Only
 
+**Availability Section**
+
+Delivery drivers can manage their work status:
+
+- **Status Indicator**: Green pulsing dot when online, gray when offline
+- **Toggle Button**: "Go Online" / "Go Offline" button
+- **Current Shift Display**: Shows elapsed time (e.g., "2h 30m") while online
+- **Monthly Hours Table**: Shows hours worked per month for the last 6 months
+  - Month name and year
+  - Number of shifts
+  - Total hours worked
+  - Footer with totals
+
+The availability state is stored server-side, so:
+- Shift continues even if browser session times out
+- Driver must explicitly click "Go Offline" to end shift
+- System auto-closes shifts after 12 hours of inactivity
+
+See [driver-availability.md](./driver-availability.md) for detailed documentation.
+
 **My Deliveries Section**
 
 Delivery drivers can view their assigned deliveries:

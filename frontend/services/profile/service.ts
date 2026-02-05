@@ -22,6 +22,9 @@ import {
   UpdateOrderStatusData,
   UpdateOrderStatusResponse,
   GetDeliveryInfoResponse,
+  AvailabilityStatus,
+  ToggleAvailabilityResponse,
+  MonthlyHoursResponse,
 } from './types'
 
 const BASE_PATH = '/api/profile'
@@ -190,6 +193,28 @@ class ProfileService {
   async getDeliveryInfo(restaurantId: string, addressId: string): Promise<GetDeliveryInfoResponse> {
     const response = await api.get<GetDeliveryInfoResponse>(
       `${BASE_PATH}/delivery-info?restaurantId=${restaurantId}&addressId=${addressId}`
+    )
+    return response.data
+  }
+
+  // Driver Availability
+  async toggleAvailability(): Promise<ToggleAvailabilityResponse> {
+    const response = await api.post<ToggleAvailabilityResponse>(
+      `${BASE_PATH}/availability/toggle`
+    )
+    return response.data
+  }
+
+  async getAvailabilityStatus(): Promise<AvailabilityStatus> {
+    const response = await api.get<AvailabilityStatus>(
+      `${BASE_PATH}/availability/status`
+    )
+    return response.data
+  }
+
+  async getMonthlyHours(months: number = 6): Promise<MonthlyHoursResponse> {
+    const response = await api.get<MonthlyHoursResponse>(
+      `${BASE_PATH}/availability/hours?months=${months}`
     )
     return response.data
   }

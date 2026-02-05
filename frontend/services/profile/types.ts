@@ -227,3 +227,36 @@ export interface DeliveryInfoFallbackResponse {
 }
 
 export type GetDeliveryInfoResponse = DeliveryInfoResponse | DeliveryInfoFallbackResponse
+
+// Driver Availability Types
+
+export interface AvailabilityStatus {
+  isOnline: boolean
+  currentShift: {
+    id: string
+    startTime: string
+    elapsedMinutes: number
+    firstOrderTime: string | null
+    workedMinutes: number
+  } | null
+}
+
+export interface ToggleAvailabilityResponse extends AvailabilityStatus {
+  message: string
+}
+
+export interface MonthlyHours {
+  month: string // YYYY-MM format
+  year: number
+  monthNumber: number
+  monthName: string
+  totalMinutes: number
+  totalHours: number
+  shiftCount: number
+}
+
+export interface MonthlyHoursResponse {
+  months: MonthlyHours[]
+  totalMinutes: number
+  totalHours: number
+}

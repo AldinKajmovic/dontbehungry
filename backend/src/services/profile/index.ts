@@ -39,3 +39,12 @@ export {
   getRestaurantOrders,
   updateRestaurantOrderStatus,
 } from './orderHistory.service'
+
+// Availability services
+export {
+  toggleAvailability,
+  getAvailabilityStatus,
+  getMonthlyHours,
+  closeStaleShifts,
+} from './availability.service'
+export type { AvailabilityStatus, MonthlyHours, MonthlyHoursResponse } from './availability.service'

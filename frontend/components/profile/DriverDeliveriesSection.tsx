@@ -3,8 +3,10 @@
 import { Button, Section } from '@/components/ui'
 import { useDriverDeliveries } from './hooks'
 import { formatDate, getStatusColor } from './utils'
+import { useLanguage } from '@/hooks/useLanguage'
 
 export function DriverDeliveriesSection() {
+  const { t } = useLanguage()
   const {
     deliveries,
     loading,
@@ -23,8 +25,8 @@ export function DriverDeliveriesSection() {
 
   return (
     <Section
-      title="My Deliveries"
-      description="View your assigned deliveries"
+      title={t('profile.deliveries.title')}
+      description={t('profile.deliveries.description')}
       headerAction={
         <Button
           type="button"
@@ -42,7 +44,7 @@ export function DriverDeliveriesSection() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             )}
-            {show ? 'Hide' : 'Show'} Deliveries
+            {show ? t('profile.deliveries.hide') : t('profile.deliveries.show')}
           </span>
         </Button>
       }
@@ -52,7 +54,7 @@ export function DriverDeliveriesSection() {
           {/* Status Filter */}
           <div className="flex flex-wrap gap-3 items-center">
             <label htmlFor="driverDeliveriesStatus" className="text-sm font-medium text-gray-700">
-              Filter by status:
+              {t('profile.deliveries.filterByStatus')}
             </label>
             <select
               id="driverDeliveriesStatus"
@@ -60,14 +62,14 @@ export function DriverDeliveriesSection() {
               onChange={(e) => handleStatusChange(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent min-w-[180px]"
             >
-              <option value="">All Statuses</option>
-              <option value="PENDING">Pending</option>
-              <option value="CONFIRMED">Confirmed</option>
-              <option value="PREPARING">Preparing</option>
-              <option value="READY_FOR_PICKUP">Ready for Pickup</option>
-              <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
-              <option value="DELIVERED">Delivered</option>
-              <option value="CANCELLED">Cancelled</option>
+              <option value="">{t('profile.deliveries.allStatuses')}</option>
+              <option value="PENDING">{t('orders.status.PENDING')}</option>
+              <option value="CONFIRMED">{t('orders.status.CONFIRMED')}</option>
+              <option value="PREPARING">{t('orders.status.PREPARING')}</option>
+              <option value="READY_FOR_PICKUP">{t('orders.status.READY_FOR_PICKUP')}</option>
+              <option value="OUT_FOR_DELIVERY">{t('orders.status.OUT_FOR_DELIVERY')}</option>
+              <option value="DELIVERED">{t('orders.status.DELIVERED')}</option>
+              <option value="CANCELLED">{t('orders.status.CANCELLED')}</option>
             </select>
           </div>
 
@@ -82,11 +84,16 @@ export function DriverDeliveriesSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
                 </svg>
               </div>
-              <p className="text-gray-500">No deliveries found</p>
+              <p className="text-gray-500">{t('profile.deliveries.noDeliveries')}</p>
             </div>
           ) : (
             <>
-              <p className="text-sm text-gray-500">{total} deliver{total !== 1 ? 'ies' : 'y'} found</p>
+              <p className="text-sm text-gray-500">
+                {total === 1
+                  ? t('profile.deliveries.deliveriesFoundSingular', { count: total })
+                  : t('profile.deliveries.deliveriesFoundPlural', { count: total })
+                }
+              </p>
               <div className="space-y-3">
                 {deliveries.map((delivery) => (
                   <div
@@ -97,14 +104,14 @@ export function DriverDeliveriesSection() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
                           <p className="font-medium text-gray-900">
-                            Order for {delivery.customerFirstName || 'Customer'}
+                            {t('profile.deliveries.orderFor')} {delivery.customerFirstName || 'Customer'}
                           </p>
                           <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(delivery.status)}`}>
-                            {delivery.status.replace(/_/g, ' ')}
+                            {t(`orders.status.${delivery.status}`)}
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 mb-1">
-                          From: <span className="font-medium">{delivery.restaurant.name}</span>
+                          {t('profile.deliveries.from')}: <span className="font-medium">{delivery.restaurant.name}</span>
                         </p>
                         <p className="text-sm text-gray-500 mb-2">
                           {formatDate(delivery.createdAt)}
@@ -117,14 +124,14 @@ export function DriverDeliveriesSection() {
                           <p>{delivery.deliveryPlace.address}, {delivery.deliveryPlace.city}</p>
                         </div>
                         <div className="text-sm text-gray-600 mt-2">
-                          <p className="font-medium">Items: {delivery.orderItems.length}</p>
+                          <p className="font-medium">{t('profile.deliveries.items')}: {delivery.orderItems.length}</p>
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="font-semibold text-primary-600">${delivery.totalAmount}</p>
                         {delivery.deliveredAt && (
                           <p className="text-xs text-green-600 mt-1">
-                            Delivered: {formatDate(delivery.deliveredAt)}
+                            {t('profile.deliveries.delivered')}: {formatDate(delivery.deliveredAt)}
                           </p>
                         )}
                       </div>
@@ -137,7 +144,7 @@ export function DriverDeliveriesSection() {
               {totalPages > 1 && (
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                   <p className="text-sm text-gray-500">
-                    Page {page} of {totalPages}
+                    {t('profile.deliveries.page')} {page} {t('profile.deliveries.of')} {totalPages}
                   </p>
                   <div className="flex items-center gap-2">
                     <button

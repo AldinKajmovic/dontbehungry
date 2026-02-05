@@ -12,6 +12,7 @@ import {
   AddressSection,
   OrderHistorySection,
   DriverDeliveriesSection,
+  DriverAvailabilitySection,
   RestaurantSection,
   AccountInfoSection,
   AdminSection,
@@ -89,6 +90,9 @@ export default function MyProfilePage() {
 
         {/* Order History - For customers only */}
         {!isAdmin && !isRestaurantOwner && !isDeliveryDriver && <OrderHistorySection />}
+
+        {/* Driver Availability - For drivers only */}
+        {isDeliveryDriver && <DriverAvailabilitySection />}
 
         {/* Driver Deliveries - For drivers only */}
         {isDeliveryDriver && <DriverDeliveriesSection />}

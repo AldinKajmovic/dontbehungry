@@ -50,6 +50,12 @@ enum TokenType {
   PASSWORD_RESET
 }
 
+enum ShiftStatus {
+  ACTIVE
+  COMPLETED
+  AUTO_CLOSED
+}
+
 // ==================== USER & AUTH ====================
 
 model User {
@@ -75,6 +81,7 @@ model User {
   refreshTokens      RefreshToken[]
   verificationTokens VerificationToken[]
   notifications      Notification[]
+  driverShifts       DriverShift[]       @relation("DriverShifts")
 
   @@index([email])
   @@index([role])
@@ -229,6 +236,7 @@ model Order {
   estimatedDelivery DateTime?
   deliveredAt       DateTime?
   createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 
   // Relations
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -344,5 +352,24 @@ model VerificationToken {
   @@index([token])
   @@index([userId])
   @@index([type])
+}
+
+// ==================== DRIVER SHIFTS ====================
+
+model DriverShift {
+  id              String      @id @default(uuid())
+  driverId        String
+  startTime       DateTime    @default(now())
+  endTime         DateTime?
+  status          ShiftStatus @default(ACTIVE)
+  durationMinutes Int?
+  autoCloseReason String?
+
+  // Relations
+  driver User @relation("DriverShifts", fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@index([driverId])
+  @@index([driverId, status])
+  @@index([startTime])
 }
 

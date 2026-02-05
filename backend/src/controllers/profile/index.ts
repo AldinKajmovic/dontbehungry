@@ -33,3 +33,10 @@ export {
   getRestaurantOrders,
   updateRestaurantOrderStatus,
 } from './order.controller'
+
+// Availability controllers
+export {
+  toggleAvailability,
+  getAvailabilityStatus,
+  getMonthlyHours,
+} from './availability.controller'

@@ -40,6 +40,7 @@ import {
   AdminPayment,
   UpdatePaymentInput,
   SortParams,
+  OnlineDriversResponse,
 } from './types'
 
 // API paths
@@ -229,6 +230,12 @@ class AdminService {
       value: item.id,
       label: `${item.name} ($${parseFloat(item.price).toFixed(2)})`,
     }))
+  }
+
+  // ============ Online Drivers ============
+  async getOnlineDrivers(): Promise<OnlineDriversResponse> {
+    const response = await api.get<OnlineDriversResponse>('/api/admin/drivers/online')
+    return response.data
   }
 }
 

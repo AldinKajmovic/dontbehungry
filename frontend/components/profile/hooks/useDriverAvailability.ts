@@ -5,6 +5,9 @@ import { useAuth } from '@/hooks/useAuth'
 import { useLanguage } from '@/hooks/useLanguage'
 import { profileService } from '@/services/profile'
 import { AvailabilityStatus, MonthlyHours } from '@/services/profile/types'
+import { logger } from '@/utils/logger'
+
+const LOCATION_UPDATE_INTERVAL = 60000 // 60 seconds
 
 export function useDriverAvailability() {
   const { user } = useAuth()
@@ -19,8 +22,11 @@ export function useDriverAvailability() {
   const [loading, setLoading] = useState(false)
   const [toggling, setToggling] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [locationError, setLocationError] = useState<string | null>(null)
 
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const locationTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const watchIdRef = useRef<number | null>(null)
 
   // Fetch availability status
   const fetchStatus = useCallback(async () => {
@@ -114,6 +120,64 @@ export function useDriverAvailability() {
     }
   }, [isOnline, currentShift])
 
+  // Report location every 60 seconds when online
+  const reportLocation = useCallback(async () => {
+    if (!isOnline || !isDriver) return
+
+    if (!navigator.geolocation) {
+      setLocationError(t('profile.availability.locationNotSupported'))
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          setLocationError(null)
+          await profileService.updateMyLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            heading: position.coords.heading ?? undefined,
+          })
+        } catch (err) {
+          logger.error('Failed to update location', err)
+        }
+      },
+      (err) => {
+        logger.error('Geolocation error', err)
+        setLocationError(t('profile.availability.locationError'))
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 30000,
+      }
+    )
+  }, [isOnline, isDriver, t])
+
+  // Start location reporting when online
+  useEffect(() => {
+    if (isOnline && isDriver) {
+      // Report immediately
+      reportLocation()
+
+      // Then report every 60 seconds
+      locationTimerRef.current = setInterval(reportLocation, LOCATION_UPDATE_INTERVAL)
+
+      return () => {
+        if (locationTimerRef.current) {
+          clearInterval(locationTimerRef.current)
+        }
+      }
+    } else {
+      // Clear any existing timer
+      if (locationTimerRef.current) {
+        clearInterval(locationTimerRef.current)
+        locationTimerRef.current = null
+      }
+      setLocationError(null)
+    }
+  }, [isOnline, isDriver, reportLocation])
+
   // Format elapsed time as HH:MM
   const formatElapsedTime = useCallback((minutes: number) => {
     const hours = Math.floor(minutes / 60)
@@ -133,6 +197,7 @@ export function useDriverAvailability() {
     loading,
     toggling,
     error,
+    locationError,
     toggle,
     refresh: fetchStatus,
   }

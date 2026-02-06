@@ -241,11 +241,6 @@ export async function getSocketToken(
       throw new BadRequestError('Unauthorized', 'User not authenticated')
     }
 
-    // Don't issue socket tokens for admin users, too many notifications, spam
-    if (req.user.role === 'ADMIN' || req.user.role === 'SUPER_ADMIN') {
-      throw new BadRequestError('Not allowed', 'Admin users cannot connect to socket')
-    }
-
     const token = await authService.generateSocketToken(req.user)
 
     res.json({ token })

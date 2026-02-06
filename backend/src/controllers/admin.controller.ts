@@ -710,3 +710,18 @@ export async function updatePayment(
     next(error)
   }
 }
+
+// ==================== DRIVERS ====================
+
+export async function getOnlineDrivers(
+  _req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const result = await adminService.getOnlineDriversWithLocations()
+    res.json(result)
+  } catch (error) {
+    next(error)
+  }
+}

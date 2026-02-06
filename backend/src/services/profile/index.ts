@@ -48,3 +48,10 @@ export {
   closeStaleShifts,
 } from './availability.service'
 export type { AvailabilityStatus, MonthlyHours, MonthlyHoursResponse } from './availability.service'
+
+// Location services
+export {
+  updateDriverLocation,
+  getDriverLocationForOrder,
+} from './location.service'
+export type { UpdateLocationData, DriverLocationResponse, LocationUpdateEvent } from './location.service'

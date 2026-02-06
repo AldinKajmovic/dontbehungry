@@ -33,7 +33,8 @@
     "page": "Page",
     "of": "of",
     "items": "items",
-    "optional": "optional"
+    "optional": "optional",
+    "refresh": "Refresh"
   },
   "nav": {
     "home": "Home",
@@ -132,6 +133,26 @@
     "filters": {
       "fromDate": "From Date",
       "toDate": "To Date"
+    },
+    "tracking": {
+      "trackDriver": "Track Driver",
+      "title": "Driver Location",
+      "close": "Close",
+      "driver": "Driver",
+      "destination": "Destination",
+      "lastUpdated": "Updated",
+      "justNow": "Just now",
+      "oneMinuteAgo": "1 min ago",
+      "minutesAgo": "{count} min ago",
+      "waitingForLocation": "Waiting for driver location",
+      "driverWillAppear": "The driver's location will appear here once they start updating their position.",
+      "loadingLocation": "Loading driver location...",
+      "errorLoading": "Failed to load location",
+      "tryAgain": "Try again",
+      "locationStale": "Location outdated",
+      "locationStaleWarning": "Driver location may be outdated",
+      "locationStaleDescription": "The driver hasn't updated their location in over 2 minutes. They may be in an area with poor connectivity.",
+      "deliveringTo": "Delivering to"
     }
   },
   "auth": {
@@ -318,6 +339,9 @@
       "showingLast6Months": "Showing last 6 months. Hours are calculated from first order to last delivery.",
       "fetchError": "Failed to fetch availability status",
       "toggleError": "Failed to toggle availability",
+      "locationNotSupported": "Geolocation is not supported by your browser",
+      "locationError": "Unable to get your location. Please check your browser permissions.",
+      "locationWarning": "Location sharing issue",
       "months": {
         "january": "January",
         "february": "February",
@@ -810,6 +834,22 @@
       "filterByPostalCode": "Filter by postal code...",
       "createPlace": "Create Place",
       "deletePlaceConfirm": "Are you sure you want to delete \"{address}\"? This may affect associated restaurants and addresses."
+    },
+    "drivers": {
+      "title": "Driver Monitoring",
+      "subtitle": "Track all online drivers in real-time",
+      "onlineDrivers": "Online Drivers",
+      "online": "online",
+      "noDriversOnline": "No drivers are currently online",
+      "liveUpdates": "Live updates",
+      "connecting": "Connecting...",
+      "activeOrders": "Active orders",
+      "orders": "orders",
+      "noPhone": "No phone",
+      "noLocation": "No location data",
+      "driverMarker": "Driver",
+      "selectedDriver": "Selected driver",
+      "errorLoading": "Failed to load online drivers"
     }
   },
   "language": {

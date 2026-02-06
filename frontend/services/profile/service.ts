@@ -25,6 +25,8 @@ import {
   AvailabilityStatus,
   ToggleAvailabilityResponse,
   MonthlyHoursResponse,
+  GetDriverLocationResponse,
+  UpdateLocationData,
 } from './types'
 
 const BASE_PATH = '/api/profile'
@@ -215,6 +217,21 @@ class ProfileService {
   async getMonthlyHours(months: number = 6): Promise<MonthlyHoursResponse> {
     const response = await api.get<MonthlyHoursResponse>(
       `${BASE_PATH}/availability/hours?months=${months}`
+    )
+    return response.data
+  }
+
+  async getDriverLocation(orderId: string): Promise<GetDriverLocationResponse> {
+    const response = await api.get<GetDriverLocationResponse>(
+      `${BASE_PATH}/orders/${orderId}/driver-location`
+    )
+    return response.data
+  }
+
+  async updateMyLocation(data: UpdateLocationData): Promise<{ message: string }> {
+    const response = await api.post<{ message: string }>(
+      `${BASE_PATH}/location`,
+      data
     )
     return response.data
   }

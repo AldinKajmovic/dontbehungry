@@ -8,6 +8,7 @@ import { useSocket } from '@/providers/SocketProvider'
 import { profileService, OrderHistoryItem } from '@/services/profile'
 import { NotificationBell } from '@/components/notifications'
 import { LanguageToggle } from '@/components/ui'
+import { OrderTrackingModal } from '@/components/orders'
 import { Notification } from '@/services/notification'
 import { logger } from '@/utils/logger'
 
@@ -71,6 +72,9 @@ export default function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState('')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
+
+  // Tracking modal
+  const [trackingOrder, setTrackingOrder] = useState<OrderHistoryItem | null>(null)
 
   // Ref to track current page for socket callback
   const pageRef = useRef(page)
@@ -342,6 +346,22 @@ export default function OrdersPage() {
                             {order.payment.method.replace(/_/g, ' ')}
                           </p>
                         )}
+
+                        {/* Track Driver Button */}
+                        {order.status === 'OUT_FOR_DELIVERY' &&
+                          order.deliveryPlace.latitude &&
+                          order.deliveryPlace.longitude && (
+                            <button
+                              onClick={() => setTrackingOrder(order)}
+                              className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition-colors"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              {t('orders.tracking.trackDriver')}
+                            </button>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -378,6 +398,20 @@ export default function OrdersPage() {
           )}
         </div>
       </main>
+
+      {/* Tracking Modal */}
+      {trackingOrder && trackingOrder.deliveryPlace.latitude && trackingOrder.deliveryPlace.longitude && (
+        <OrderTrackingModal
+          orderId={trackingOrder.id}
+          destination={{
+            lat: trackingOrder.deliveryPlace.latitude,
+            lng: trackingOrder.deliveryPlace.longitude,
+            address: trackingOrder.deliveryPlace.address,
+            city: trackingOrder.deliveryPlace.city,
+          }}
+          onClose={() => setTrackingOrder(null)}
+        />
+      )}
     </div>
   )
 }

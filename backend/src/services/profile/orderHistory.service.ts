@@ -3,6 +3,8 @@ import { prisma } from '../../lib/prisma'
 import { NotFoundError } from '../../utils/errors'
 import { validateStatusTransition } from '../../utils/orderStatus'
 import { notifyOrderStatusChange, notifyDeliveryReady } from '../notification.service'
+import { removeOrderFromDriverQueues } from './orderBroadcast.service'
+import { logger } from '../../utils/logger'
 import {
   OrderHistoryFilters,
   OrderHistoryItem,
@@ -305,6 +307,13 @@ export async function updateRestaurantOrderStatus(
 
   if (data.status === 'READY_FOR_PICKUP' && order.driverId) {
     notifyDeliveryReady(order.driverId, orderId, restaurant.name)
+  }
+
+  // If cancelled and no driver was assigned, remove from driver queues
+  if (data.status === 'CANCELLED' && !order.driverId) {
+    removeOrderFromDriverQueues(orderId, 'cancelled').catch((err) => {
+      logger.error('Failed to remove cancelled order from driver queues', err, { orderId })
+    })
   }
 
   return updated

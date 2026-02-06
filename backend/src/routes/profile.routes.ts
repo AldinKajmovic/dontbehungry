@@ -45,6 +45,11 @@ router.get('/driver-orders', profileController.getDriverOrderHistory)
 router.get('/my-restaurants/:restaurantId/orders', profileController.getRestaurantOrders)
 router.patch('/my-restaurants/:restaurantId/orders/:orderId', profileController.updateRestaurantOrderStatus)
 
+// Driver order assignment endpoints
+router.get('/available-orders', profileController.getAvailableOrdersHandler)
+router.post('/orders/:orderId/accept', profileController.acceptOrderHandler)
+router.post('/orders/:orderId/deny', profileController.denyOrderHandler)
+
 // Driver availability endpoints
 router.post('/availability/toggle', profileController.toggleAvailability)
 router.get('/availability/status', profileController.getAvailabilityStatus)

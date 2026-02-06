@@ -850,6 +850,22 @@
       "errorLoading": "Nije moguće učitati vozače"
     }
   },
+  "driver": {
+    "orderQueue": {
+      "title": "Dostupne narudžbe",
+      "empty": "Trenutno nema dostupnih narudžbi",
+      "accept": "Prihvati",
+      "deny": "Odbij",
+      "denyConfirm": "Jeste li sigurni?",
+      "accepting": "Prihvaćanje...",
+      "accepted": "Narudžba prihvaćena!",
+      "alreadyTaken": "Ovu narudžbu je već preuzeo drugi dostavljač",
+      "alreadyHaveOrder": "Već imate aktivnu narudžbu",
+      "acceptError": "Greška pri prihvaćanju narudžbe. Pokušajte ponovo.",
+      "items": "stavki",
+      "distance": "Udaljenost"
+    }
+  },
   "language": {
     "select": "Odaberi jezik",
     "english": "English",

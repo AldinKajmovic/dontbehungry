@@ -27,6 +27,8 @@ import {
   MonthlyHoursResponse,
   GetDriverLocationResponse,
   UpdateLocationData,
+  AcceptOrderResponse,
+  AvailableOrdersResponse,
 } from './types'
 
 const BASE_PATH = '/api/profile'
@@ -232,6 +234,27 @@ class ProfileService {
     const response = await api.post<{ message: string }>(
       `${BASE_PATH}/location`,
       data
+    )
+    return response.data
+  }
+
+  async getAvailableOrders(page = 1, limit = 10): Promise<AvailableOrdersResponse> {
+    const response = await api.get<AvailableOrdersResponse>(
+      `${BASE_PATH}/available-orders?page=${page}&limit=${limit}`
+    )
+    return response.data
+  }
+
+  async acceptOrder(orderId: string): Promise<AcceptOrderResponse> {
+    const response = await api.post<AcceptOrderResponse>(
+      `${BASE_PATH}/orders/${orderId}/accept`
+    )
+    return response.data
+  }
+
+  async denyOrder(orderId: string): Promise<{ message: string }> {
+    const response = await api.post<{ message: string }>(
+      `${BASE_PATH}/orders/${orderId}/deny`
     )
     return response.data
   }

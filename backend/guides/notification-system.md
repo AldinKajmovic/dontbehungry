@@ -138,6 +138,18 @@ Delete a notification.
 }
 ```
 
+## Driver Order Assignment Events
+
+In addition to persisted notifications, the system uses ephemeral socket events for the driver order queue. These events are not stored in the Notification table — they are real-time only.
+
+| Event | Direction | Payload | Purpose |
+|---|---|---|---|
+| `order:available` | Server → Eligible drivers | `{ orderId, restaurantName, restaurantAddress, deliveryAddress, totalAmount, itemCount, createdAt, estimatedDistance }` | New order broadcast to nearby online drivers |
+| `order:accepted` | Server → All online drivers + customer + restaurant owner | `{ orderId, driverName }` | A driver accepted an order |
+| `order:removed` | Server → All online drivers | `{ orderId, reason }` | Order cancelled or admin-assigned a driver |
+
+These events are emitted by `orderBroadcast.service.ts`. See `backend/guides/order-assignment.md` for full details.
+
 ## Socket Events
 
 ### Client to Server
@@ -164,6 +176,7 @@ const socket = io('http://localhost:3001', {
 When an order is created:
 1. Fetches restaurant owner ID
 2. Calls `notifyNewOrder()` to create and emit notification
+3. Calls `broadcastOrderToNearbyDrivers()` (fire-and-forget) to emit `order:available` to eligible drivers
 
 ### Order Status Update (profile.service.ts)
 

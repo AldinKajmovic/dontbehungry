@@ -12,6 +12,8 @@ import {
   notifyRestaurantOrderStatusChange,
 } from '../notification.service'
 import { validateStatusTransition } from '../../utils/orderStatus'
+import { removeOrderFromDriverQueues } from '../profile/orderBroadcast.service'
+import { logger } from '../../utils/logger'
 
 export async function getOrders(params: PaginationParams, filters: OrderFilters = {}): Promise<PaginatedResponse<object>> {
   const { page, limit, search, sortBy, sortOrder } = params
@@ -175,6 +177,12 @@ export async function updateOrder(id: string, data: UpdateOrderData) {
 
   const driverChanged = data.driverId && data.driverId !== existingOrder.driverId
   if (driverChanged && newDriver) {
+    // Remove from driver queues since admin assigned a driver
+    // When admin assigns a driver, it won't broadcast to other drivers because it already has a driver
+    removeOrderFromDriverQueues(id, 'assigned').catch((err) => {
+      logger.error('Failed to remove admin-assigned order from driver queues', err, { orderId: id })
+    })
+
     const driverName = `${newDriver.firstName} ${newDriver.lastName}`
     const deliveryAddress = existingOrder.deliveryPlace?.address || 'N/A'
 

@@ -83,6 +83,7 @@ model User {
   notifications      Notification[]
   driverShifts       DriverShift[]       @relation("DriverShifts")
   driverLocation     DriverLocation?     @relation("DriverLocation")
+  orderDenials       OrderDenial[]       @relation("DriverDenials")
 
   @@index([email])
   @@index([role])
@@ -246,6 +247,7 @@ model Order {
   driver        User?       @relation("DeliveryDriver", fields: [driverId], references: [id], onDelete: SetNull)
   orderItems    OrderItem[]
   payment       Payment?
+  denials       OrderDenial[]
 
   @@index([userId])
   @@index([restaurantId])
@@ -387,6 +389,22 @@ model DriverLocation {
   // Relations
   driver User @relation("DriverLocation", fields: [driverId], references: [id], onDelete: Cascade)
 
+  @@index([driverId])
+}
+
+// ==================== ORDER DENIALS ====================
+
+model OrderDenial {
+  id       String @id @default(uuid())
+  orderId  String
+  driverId String
+
+  // Relations
+  order  Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  driver User  @relation("DriverDenials", fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, driverId])
+  @@index([orderId])
   @@index([driverId])
 }
 

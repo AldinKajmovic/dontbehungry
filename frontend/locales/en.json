@@ -852,6 +852,22 @@
       "errorLoading": "Failed to load online drivers"
     }
   },
+  "driver": {
+    "orderQueue": {
+      "title": "Available Orders",
+      "empty": "No available orders right now",
+      "accept": "Accept",
+      "deny": "Deny",
+      "denyConfirm": "Are you sure?",
+      "accepting": "Accepting...",
+      "accepted": "Order accepted!",
+      "alreadyTaken": "This order was already taken by another driver",
+      "alreadyHaveOrder": "You already have an active order",
+      "acceptError": "Failed to accept order. Please try again.",
+      "items": "items",
+      "distance": "Distance"
+    }
+  },
   "language": {
     "select": "Select language",
     "english": "English",

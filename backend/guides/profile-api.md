@@ -776,6 +776,69 @@ GET /api/profile/driver-orders?status=DELIVERED&page=1&limit=5
 
 ---
 
+## Driver Order Assignment Endpoints
+
+These endpoints allow delivery drivers to view, accept, and deny available orders. See `backend/guides/order-assignment.md` for full architecture details.
+
+### Get Available Orders
+
+Returns PENDING orders within 10km that the driver hasn't denied.
+
+**Endpoint:** `GET /api/profile/available-orders`
+
+**Authentication:** Required (must have DELIVERY_DRIVER role)
+
+**Response:**
+```json
+{
+  "orders": [
+    {
+      "orderId": "uuid",
+      "restaurantName": "Pizza Palace",
+      "restaurantAddress": "123 Main St, Sarajevo",
+      "deliveryAddress": "456 Oak Ave, Sarajevo",
+      "totalAmount": "25.50",
+      "itemCount": 3,
+      "createdAt": "2026-02-06T10:00:00.000Z",
+      "estimatedDistance": 2.4
+    }
+  ]
+}
+```
+
+### Accept Order
+
+Atomically assigns the order to the driver. Returns 409 if already taken by another driver.
+
+**Endpoint:** `POST /api/profile/orders/:orderId/accept`
+
+**Authentication:** Required (must have DELIVERY_DRIVER role)
+
+**Success Response (200):**
+```json
+{ "success": true, "message": "Order accepted successfully" }
+```
+
+**Conflict Response (409):**
+```json
+{ "success": false, "message": "Order is no longer available" }
+```
+
+### Deny Order
+
+Records a denial. The order remains available for other drivers. Idempotent.
+
+**Endpoint:** `POST /api/profile/orders/:orderId/deny`
+
+**Authentication:** Required (must have DELIVERY_DRIVER role)
+
+**Response:**
+```json
+{ "message": "Order denied" }
+```
+
+---
+
 ## Driver Availability Endpoints
 
 These endpoints allow delivery drivers to manage their work status and view hours worked.

@@ -136,6 +136,7 @@ function calculateWorkedMinutes(shiftStart: Date, lastWorkTime: Date | null): nu
 
 
 export async function toggleAvailability(driverId: string): Promise<AvailabilityStatus> {
+  // When starting new shift, remove any orders from previous shifts
   const user = await prisma.user.findUnique({
     where: { id: driverId },
     select: { id: true, role: true },
@@ -190,6 +191,16 @@ export async function toggleAvailability(driverId: string): Promise<Availability
       currentShift: null,
     }
   } else {
+    await prisma.order.updateMany({
+      where: {
+        driverId,
+        status: { notIn: ['DELIVERED', 'CANCELLED'] },
+      },
+      data: {
+        driverId: null,
+      },
+    })
+
     const newShift = await prisma.driverShift.create({
       data: {
         driverId,

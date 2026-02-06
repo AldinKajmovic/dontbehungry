@@ -79,9 +79,12 @@ router.post('/places', adminController.createPlace)
 router.patch('/places/:id', adminController.updatePlace)
 router.delete('/places/:id', adminController.deletePlace)
 
-// Payments 
+// Payments
 router.get('/payments', adminController.getPayments)
 router.get('/payments/:id', adminController.getPaymentById)
 router.patch('/payments/:id', adminController.updatePayment)
+
+// Drivers
+router.get('/drivers/online', adminController.getOnlineDrivers)
 
 export default router

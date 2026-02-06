@@ -364,3 +364,35 @@ export interface AdminPayment {
 }
 
 export type UpdatePaymentInput = Partial<AdminPayment>
+
+// Driver types
+export interface OnlineDriverLocation {
+  id: string
+  firstName: string
+  lastName: string
+  phone: string | null
+  location: {
+    latitude: number
+    longitude: number
+    heading: number | null
+    updatedAt: string
+  } | null
+  shiftStartTime: string
+  activeOrdersCount: number
+}
+
+export interface OnlineDriversResponse {
+  drivers: OnlineDriverLocation[]
+  totalOnline: number
+}
+
+export interface AdminDriverLocationEvent {
+  driverId: string
+  driverName: string
+  location: {
+    latitude: number
+    longitude: number
+    heading: number | null
+  }
+  timestamp: string
+}

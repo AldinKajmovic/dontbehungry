@@ -28,6 +28,8 @@ const orderHistorySelect = {
     select: {
       address: true,
       city: true,
+      latitude: true,
+      longitude: true,
     },
   },
   orderItems: {
@@ -56,7 +58,7 @@ function formatOrderHistoryItem(order: {
   createdAt: Date
   deliveredAt: Date | null
   restaurant: { id: string; name: string }
-  deliveryPlace: { address: string; city: string }
+  deliveryPlace: { address: string; city: string; latitude: { toNumber(): number } | null; longitude: { toNumber(): number } | null }
   orderItems: Array<{ quantity: number; unitPrice: { toString(): string }; menuItem: { name: string } }>
   payment: { status: string; method: string } | null
 }): OrderHistoryItem {
@@ -67,7 +69,12 @@ function formatOrderHistoryItem(order: {
     createdAt: order.createdAt.toISOString(),
     deliveredAt: order.deliveredAt?.toISOString() ?? null,
     restaurant: order.restaurant,
-    deliveryPlace: order.deliveryPlace,
+    deliveryPlace: {
+      address: order.deliveryPlace.address,
+      city: order.deliveryPlace.city,
+      latitude: order.deliveryPlace.latitude?.toNumber() ?? null,
+      longitude: order.deliveryPlace.longitude?.toNumber() ?? null,
+    },
     orderItems: order.orderItems.map((item) => ({
       name: item.menuItem.name,
       quantity: item.quantity,

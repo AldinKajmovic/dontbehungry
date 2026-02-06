@@ -98,7 +98,7 @@ export interface OrderHistoryItem {
   createdAt: string
   deliveredAt: string | null
   restaurant: { id: string; name: string }
-  deliveryPlace: { address: string; city: string }
+  deliveryPlace: { address: string; city: string; latitude: number | null; longitude: number | null }
   orderItems: Array<{ name: string; quantity: number; unitPrice: string }>
   payment: { status: string; method: string } | null
 }

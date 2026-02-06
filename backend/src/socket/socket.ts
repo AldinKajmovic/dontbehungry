@@ -10,6 +10,7 @@ interface AuthenticatedSocket extends Socket {
 }
 
 const userSockets = new Map<string, Set<string>>()
+const adminSockets = new Set<string>()
 
 let io: Server | null = null
 
@@ -30,11 +31,6 @@ export function initializeSocket(httpServer: HttpServer): Server {
 
     try {
       const payload = verifyToken(token)
-
-      if (payload.role === 'ADMIN' || payload.role === 'SUPER_ADMIN') {
-        return next(new Error('Authentication error: Admin users cannot connect'))
-      }
-
       socket.user = payload
       next()
     } catch {
@@ -44,25 +40,38 @@ export function initializeSocket(httpServer: HttpServer): Server {
 
   io.on('connection', (socket: AuthenticatedSocket) => {
     const userId = socket.user?.userId
+    const userRole = socket.user?.role
 
     if (userId) {
+      const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN'
 
-      if (!userSockets.has(userId)) {
-        userSockets.set(userId, new Set())
+      if (isAdmin) {
+        // Track admin sockets separately
+        adminSockets.add(socket.id)
+        logger.debug('Admin connected', { userId, socketId: socket.id })
+      } else {
+        // Track regular user sockets
+        if (!userSockets.has(userId)) {
+          userSockets.set(userId, new Set())
+        }
+        userSockets.get(userId)!.add(socket.id)
+        logger.debug('User connected', { userId, socketId: socket.id })
       }
-      userSockets.get(userId)!.add(socket.id)
-
-      logger.debug('User connected', { userId, socketId: socket.id })
 
       socket.on('disconnect', () => {
-        const sockets = userSockets.get(userId)
-        if (sockets) {
-          sockets.delete(socket.id)
-          if (sockets.size === 0) {
-            userSockets.delete(userId)
+        if (isAdmin) {
+          adminSockets.delete(socket.id)
+          logger.debug('Admin disconnected', { userId, socketId: socket.id })
+        } else {
+          const sockets = userSockets.get(userId)
+          if (sockets) {
+            sockets.delete(socket.id)
+            if (sockets.size === 0) {
+              userSockets.delete(userId)
+            }
           }
+          logger.debug('User disconnected', { userId, socketId: socket.id })
         }
-        logger.debug('User disconnected', { userId, socketId: socket.id })
       })
     }
   })
@@ -89,4 +98,12 @@ export function emitToUser(userId: string, event: string, data: unknown): void {
 export function isUserConnected(userId: string): boolean {
   const sockets = userSockets.get(userId)
   return !!sockets && sockets.size > 0
+}
+
+export function emitToAdmins(event: string, data: unknown): void {
+  if (io && adminSockets.size > 0) {
+    adminSockets.forEach((socketId) => {
+      io!.to(socketId).emit(event, data)
+    })
+  }
 }

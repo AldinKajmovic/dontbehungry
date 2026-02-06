@@ -82,6 +82,7 @@ model User {
   verificationTokens VerificationToken[]
   notifications      Notification[]
   driverShifts       DriverShift[]       @relation("DriverShifts")
+  driverLocation     DriverLocation?     @relation("DriverLocation")
 
   @@index([email])
   @@index([role])
@@ -371,5 +372,21 @@ model DriverShift {
   @@index([driverId])
   @@index([driverId, status])
   @@index([startTime])
+}
+
+// ==================== DRIVER LOCATION ====================
+
+model DriverLocation {
+  id        String   @id @default(uuid())
+  driverId  String   @unique
+  latitude  Decimal  @db.Decimal(10, 8)
+  longitude Decimal  @db.Decimal(11, 8)
+  heading   Int?     // Direction 0-360 degrees
+  updatedAt DateTime @default(now()) @updatedAt
+
+  // Relations
+  driver User @relation("DriverLocation", fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@index([driverId])
 }
 

@@ -50,4 +50,8 @@ router.post('/availability/toggle', profileController.toggleAvailability)
 router.get('/availability/status', profileController.getAvailabilityStatus)
 router.get('/availability/hours', profileController.getMonthlyHours)
 
+// Driver location endpoints
+router.post('/location', profileController.updateLocation)
+router.get('/orders/:orderId/driver-location', profileController.getDriverLocation)
+
 export default router

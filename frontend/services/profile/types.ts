@@ -124,7 +124,7 @@ export interface OrderHistoryItem {
   createdAt: string
   deliveredAt: string | null
   restaurant: { id: string; name: string }
-  deliveryPlace: { address: string; city: string }
+  deliveryPlace: { address: string; city: string; latitude: number | null; longitude: number | null }
   orderItems: Array<{ name: string; quantity: number; unitPrice: string }>
   payment: { status: string; method: string } | null
   customerFirstName?: string // Only for driver orders
@@ -259,4 +259,38 @@ export interface MonthlyHoursResponse {
   months: MonthlyHours[]
   totalMinutes: number
   totalHours: number
+}
+
+// Driver Location Types
+
+export interface DriverLocationResponse {
+  driverId: string
+  driverName: string
+  latitude: number
+  longitude: number
+  heading: number | null
+  updatedAt: string
+  isStale: boolean
+}
+
+export interface GetDriverLocationResponse {
+  location: DriverLocationResponse | null
+}
+
+export interface UpdateLocationData {
+  latitude: number
+  longitude: number
+  heading?: number
+}
+
+export interface LocationUpdateEvent {
+  orderId: string
+  driverId: string
+  driverName: string
+  location: {
+    latitude: number
+    longitude: number
+    heading: number | null
+  }
+  timestamp: string
 }

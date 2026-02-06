@@ -40,3 +40,9 @@ export {
   getAvailabilityStatus,
   getMonthlyHours,
 } from './availability.controller'
+
+// Location controllers
+export {
+  updateLocation,
+  getDriverLocation,
+} from './location.controller'

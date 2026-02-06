@@ -33,7 +33,8 @@
     "page": "Stranica",
     "of": "od",
     "items": "stavki",
-    "optional": "Opcionalno"
+    "optional": "Opcionalno",
+    "refresh": "Osvježi"
   },
   "nav": {
     "home": "Početna",
@@ -132,6 +133,26 @@
     "filters": {
       "fromDate": "Od datuma",
       "toDate": "Do datuma"
+    },
+    "tracking": {
+      "trackDriver": "Prati dostavljača",
+      "title": "Lokacija dostavljača",
+      "close": "Zatvori",
+      "driver": "Dostavljač",
+      "destination": "Odredište",
+      "lastUpdated": "Ažurirano",
+      "justNow": "Upravo sada",
+      "oneMinuteAgo": "Prije 1 min",
+      "minutesAgo": "Prije {count} min",
+      "waitingForLocation": "Čekanje na lokaciju dostavljača",
+      "driverWillAppear": "Lokacija dostavljača će se pojaviti ovdje kada počne ažurirati svoju poziciju.",
+      "loadingLocation": "Učitavanje lokacije dostavljača...",
+      "errorLoading": "Greška pri učitavanju lokacije",
+      "tryAgain": "Pokušaj ponovo",
+      "locationStale": "Zastarjela lokacija",
+      "locationStaleWarning": "Lokacija dostavljača možda nije ažurna",
+      "locationStaleDescription": "Dostavljač nije ažurirao lokaciju više od 2 minute. Možda se nalazi u području sa lošom mrežom.",
+      "deliveringTo": "Dostavlja na"
     }
   },
   "auth": {
@@ -318,6 +339,9 @@
       "showingLast6Months": "Prikaz posljednjih 6 mjeseci. Sati se računaju od prve do posljednje narudžbe.",
       "fetchError": "Greška pri dohvaćanju statusa dostupnosti",
       "toggleError": "Greška pri promjeni dostupnosti",
+      "locationNotSupported": "Vaš preglednik ne podržava geolokaciju",
+      "locationError": "Nije moguće dobiti vašu lokaciju. Provjerite dozvole preglednika.",
+      "locationWarning": "Problem sa dijeljenjem lokacije",
       "months": {
         "january": "Januar",
         "february": "Februar",
@@ -808,6 +832,22 @@
       "filterByPostalCode": "Filtriraj po poštanskom broju...",
       "createPlace": "Kreiraj mjesto",
       "deletePlaceConfirm": "Jeste li sigurni da želite obrisati \"{address}\"? Ovo može utjecati na povezane restorane i adrese."
+    },
+    "drivers": {
+      "title": "Praćenje vozača",
+      "subtitle": "Pratite sve vozače uživo na mapi",
+      "onlineDrivers": "Vozači na mreži",
+      "online": "na mreži",
+      "noDriversOnline": "Trenutno nema vozača na mreži",
+      "liveUpdates": "Ažuriranja uživo",
+      "connecting": "Povezivanje...",
+      "activeOrders": "Aktivne narudžbe",
+      "orders": "narudžbi",
+      "noPhone": "Nema telefona",
+      "noLocation": "Nema podataka o lokaciji",
+      "driverMarker": "Vozač",
+      "selectedDriver": "Odabrani vozač",
+      "errorLoading": "Nije moguće učitati vozače"
     }
   },
   "language": {

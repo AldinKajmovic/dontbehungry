@@ -2,6 +2,8 @@
 import { prisma } from '../../lib/prisma'
 import { BadRequestError, NotFoundError } from '../../utils/errors'
 import { notifyNewOrder } from '../notification.service'
+import { broadcastOrderToNearbyDrivers } from './orderBroadcast.service'
+import { logger } from '../../utils/logger'
 import { CreateOrderData, CreatedOrderResponse } from './types'
 
 export async function createOrder(userId: string, data: CreateOrderData): Promise<CreatedOrderResponse> {
@@ -155,6 +157,10 @@ export async function createOrder(userId: string, data: CreateOrderData): Promis
     restaurant.name,
     completeOrder.totalAmount.toString()
   )
+
+  broadcastOrderToNearbyDrivers(completeOrder.id).catch((err) => {
+    logger.error('Failed to broadcast order to drivers', err, { orderId: completeOrder.id })
+  })
 
   return {
     id: completeOrder.id,

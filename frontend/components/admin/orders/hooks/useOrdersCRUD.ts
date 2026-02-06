@@ -341,6 +341,21 @@ export function useOrdersCRUD() {
     })
   }
 
+  // Auto-fill subtotal and tax from items
+  const updateSubtotalAndTax = (items: CreateOrderItem[]) => {
+    if (items.length === 0) {
+      setCreateFormData((prev) => ({ ...prev, subtotal: '', tax: '' }))
+      return
+    }
+    const subtotal = items.reduce((sum, item) => sum + item.menuItemPrice * item.quantity, 0)
+    const tax = subtotal * 0.2
+    setCreateFormData((prev) => ({
+      ...prev,
+      subtotal: subtotal.toFixed(2),
+      tax: tax.toFixed(2),
+    }))
+  }
+
   // Create order items handlers (local state)
   const handleCreateAddItem = () => {
     if (!createNewItemData.menuItemId || !createNewItemData.menuItemLabel) return
@@ -358,14 +373,18 @@ export function useOrdersCRUD() {
       notes: createNewItemData.notes,
     }
 
-    setCreateOrderItems((prev) => [...prev, newItem])
+    setCreateOrderItems((prev) => {
+      const updated = [...prev, newItem]
+      updateSubtotalAndTax(updated)
+      return updated
+    })
     setShowCreateAddItemForm(false)
     setCreateNewItemData({ menuItemId: '', menuItemLabel: '', quantity: '1', notes: '' })
   }
 
   const handleCreateUpdateItem = (itemId: string) => {
-    setCreateOrderItems((prev) =>
-      prev.map((item) =>
+    setCreateOrderItems((prev) => {
+      const updated = prev.map((item) =>
         item.id === itemId
           ? {
               ...item,
@@ -374,12 +393,18 @@ export function useOrdersCRUD() {
             }
           : item
       )
-    )
+      updateSubtotalAndTax(updated)
+      return updated
+    })
     setCreateEditingItemId(null)
   }
 
   const handleCreateDeleteItem = (itemId: string) => {
-    setCreateOrderItems((prev) => prev.filter((item) => item.id !== itemId))
+    setCreateOrderItems((prev) => {
+      const updated = prev.filter((item) => item.id !== itemId)
+      updateSubtotalAndTax(updated)
+      return updated
+    })
   }
 
   const startCreateEditItem = (item: CreateOrderItem) => {

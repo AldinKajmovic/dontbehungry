@@ -46,3 +46,10 @@ export {
   updateLocation,
   getDriverLocation,
 } from './location.controller'
+
+// Order assignment controllers
+export {
+  acceptOrderHandler,
+  denyOrderHandler,
+  getAvailableOrdersHandler,
+} from './orderAssignment.controller'

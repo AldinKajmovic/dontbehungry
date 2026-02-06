@@ -176,6 +176,10 @@ Payment is collected upon delivery. The payment method indicates how the custome
 
 The `Payment.status` starts as `PENDING` and is updated to `COMPLETED` when the driver confirms payment receipt.
 
+## Driver Broadcast
+
+After order creation, `broadcastOrderToNearbyDrivers(orderId)` is called as a fire-and-forget operation. This finds all online drivers within 10km of the restaurant and emits `order:available` via Socket.IO. Drivers can then accept or deny the order from their queue panel. See `backend/guides/order-assignment.md` for full details.
+
 ## Order Status Flow
 
 ```
@@ -184,7 +188,7 @@ PENDING → CONFIRMED → PREPARING → READY_FOR_PICKUP → OUT_FOR_DELIVERY �
                                                                  CANCELLED
 ```
 
-- `PENDING`: Initial status after order creation
+- `PENDING`: Initial status after order creation (driver assignment happens during this phase)
 - `CONFIRMED`: Restaurant accepts the order
 - `PREPARING`: Kitchen is preparing food
 - `READY_FOR_PICKUP`: Food is ready for driver

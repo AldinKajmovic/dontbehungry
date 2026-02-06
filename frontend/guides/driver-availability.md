@@ -222,6 +222,16 @@ function DriverAvailabilitySection() {
 }
 ```
 
+## Related: Driver Order Queue
+
+When a driver is online (has an ACTIVE shift), they automatically receive available orders via the `DriverOrderQueueOverlay` component. This is a separate floating UI rendered globally in `app/layout.tsx` that shows a badge + slide-in panel for accepting/denying orders. See `frontend/guides/order-assignment.md` for full details.
+
+The order queue only populates when the driver is online and has a `DriverLocation` record (i.e., is sharing their location).
+
+### Clean Slate on Shift Start
+
+When a driver goes online, the backend unassigns any stale orders from previous shifts (orders still in a pre-delivery state). This prevents leftover orders from blocking the driver's ability to accept new ones, since the system enforces a one-active-order limit per driver.
+
 ## Integration
 
 The component is rendered in `app/my-profile/page.tsx`:

@@ -23,8 +23,8 @@ const prisma = new PrismaClient({ adapter })
 ========================= */
 
 const SEED_CONFIG = {
-  usersPerCity: 5,
-  restaurantsPerCity: 3,
+  usersPerCity: 20,
+  restaurantsPerCity: 10,
   categoriesPerRestaurant: 12,
   menuItemsPerRestaurant: 15,
   ordersPerUser: 20,
@@ -32,16 +32,9 @@ const SEED_CONFIG = {
   driversPerCity: 8,
 }
 
-/* =========================
-   CITY CLUSTERS
-========================= */
-
-// Croatian cities with their center coordinates - users and restaurants will be placed nearby
+// Sarajevo city center coordinates
 const CITY_CLUSTERS = [
-  { name: 'Zagreb', country: 'Hrvatska', lat: 45.8150, lng: 15.9819 },
-  { name: 'Split', country: 'Hrvatska', lat: 43.5081, lng: 16.4402 },
-  { name: 'Rijeka', country: 'Hrvatska', lat: 45.3271, lng: 14.4422 },
-  { name: 'Osijek', country: 'Hrvatska', lat: 45.5550, lng: 18.6955 },
+  { name: 'Sarajevo', country: 'Bosna i Hercegovina', lat: 43.8486, lng: 18.3564 },
 ]
 
 // Generate random coordinates within ~1km of city center (to stay on roads)
@@ -55,13 +48,11 @@ function getRandomCoordsInCity(city: typeof CITY_CLUSTERS[0]): { lat: number; ln
   }
 }
 
-// Generate a realistic Croatian street address
 function generateStreetAddress(): string {
   const streets = [
-    'Ilica', 'Vlaška', 'Maksimirska', 'Radićeva', 'Savska',
-    'Dubrovačka', 'Dalmatinska', 'Kneza Mislava', 'Držićeva', 'Vukovarska',
-    'Heinzelova', 'Slavonska avenija', 'Ulica grada Vukovara', 'Trg bana Jelačića',
-    'Jurišićeva', 'Petrinjska', 'Gundulićeva', 'Teslina', 'Preradovićeva',
+    'Titova', 'Safvet-bega Bašagića', 'Mula Mustafe Bašeskije', 'Zelenih Beretki', 'Veljka Mladenca',
+    'Maršala Tita', 'Bazar', 'Hamdije Kreševljakovića', 'Muzejski trg', 'Drvenija',
+    'Obala Kulina Bana', 'Banjalučka', 'Koševska', 'Nusreta Čauševića', 'Hamza Balića',
   ]
   const streetNumber = faker.number.int({ min: 1, max: 150 })
   return `${faker.helpers.arrayElement(streets)} ${streetNumber}`
@@ -77,34 +68,18 @@ const FOOD_CATEGORIES = [
   { name: 'Sushi', description: 'Japanski sushi', iconUrl: null },
   { name: 'Meksička hrana', description: 'Meksička kuhinja', iconUrl: null },
   { name: 'Kineska hrana', description: 'Kineska kuhinja', iconUrl: null },
-  { name: 'Indijska hrana', description: 'Indijska jela', iconUrl: null },
-  { name: 'Tajlandska hrana', description: 'Tajlandska kuhinja', iconUrl: null },
-  { name: 'Korejska hrana', description: 'Korejska kuhinja', iconUrl: null },
-  { name: 'Vijetnamska hrana', description: 'Vijetnamska kuhinja', iconUrl: null },
-  { name: 'Mediteranska hrana', description: 'Mediteranska kuhinja', iconUrl: null },
-  { name: 'Grčka hrana', description: 'Grčka jela', iconUrl: null },
-  { name: 'Talijanska hrana', description: 'Talijanska kuhinja', iconUrl: null },
-  { name: 'Francuska hrana', description: 'Francuska kuhinja', iconUrl: null },
   { name: 'Roštilj', description: 'Roštiljano meso', iconUrl: null },
   { name: 'Morski plodovi', description: 'Riba i morski plodovi', iconUrl: null },
   { name: 'Salate', description: 'Zdrave salate', iconUrl: null },
-  { name: 'Veganska hrana', description: 'Biljna hrana', iconUrl: null },
   { name: 'Vegetarijanska hrana', description: 'Vegetarijanska jela', iconUrl: null },
   { name: 'Doručak', description: 'Jutarnji obroci', iconUrl: null },
-  { name: 'Kasni doručak', description: 'Brunch', iconUrl: null },
   { name: 'Deserti', description: 'Slatki deserti', iconUrl: null },
   { name: 'Pekara', description: 'Pekarski proizvodi', iconUrl: null },
   { name: 'Pića', description: 'Napitci', iconUrl: null },
   { name: 'Kafa', description: 'Kafa i espresso', iconUrl: null },
-  { name: 'Ulična hrana', description: 'Ulična jela', iconUrl: null },
-  { name: 'Brza hrana', description: 'Brzi obroci', iconUrl: null },
-  { name: 'Zdravo', description: 'Niskokalorični obroci', iconUrl: null },
   { name: 'Tjestenina', description: 'Jela od tjestenine', iconUrl: null },
-  { name: 'Ramen', description: 'Japanski ramen', iconUrl: null },
-  { name: 'Bliskoistočna hrana', description: 'Bliskoistočna kuhinja', iconUrl: null },
   { name: 'Ćevapi', description: 'Tradicionalni bosanski ćevapi', iconUrl: null },
-  { name: 'Bosanska kuhinja', description: 'Tradicionalna bosanska jela', iconUrl: null },
-  { name: 'Pite i bureci', description: 'Domaće pite i bureci', iconUrl: null },
+  { name: 'Pite', description: 'Domaće pite', iconUrl: null },
 ]
 
 const MENU_ITEMS_BY_CATEGORY: Record<string, string[]> = {
@@ -113,7 +88,7 @@ const MENU_ITEMS_BY_CATEGORY: Record<string, string[]> = {
     'Prosciutto', 'Vegetarijanska', 'BBQ Piletina', 'Šunka i gljive', 'Tonno'
   ],
   'Burgeri': [
-    'Klasični burger', 'Cheeseburger', 'Bacon burger', 'BBQ burger', 'Smash burger',
+    'Klasični burger', 'Cheeseburger', 'BBQ burger', 'Smash burger',
     'Burger sa gljivama', 'Dupli burger', 'Ljuti burger', 'Veggie burger'
   ],
   'Sushi': [
@@ -128,31 +103,9 @@ const MENU_ITEMS_BY_CATEGORY: Record<string, string[]> = {
     'Pržena riža', 'Chow Mein', 'Kung Pao piletina', 'Slatko-kisela svinjetina',
     'Mapo Tofu', 'Proljetne rolice', 'Knedle'
   ],
-  'Indijska hrana': [
-    'Butter Chicken', 'Chicken Tikka Masala', 'Biryani', 'Dal Tadka',
-    'Saag Paneer', 'Rogan Josh', 'Naan'
-  ],
-  'Tajlandska hrana': [
-    'Pad Thai', 'Pad See Ew', 'Zeleni curry', 'Crveni curry',
-    'Massaman curry', 'Tom Yum juha'
-  ],
-  'Korejska hrana': [
-    'Bibimbap', 'Bulgogi', 'Kimchi pržena riža',
-    'Korejska pržena piletina', 'Japchae'
-  ],
-  'Vijetnamska hrana': [
-    'Pho Bo', 'Pho Ga', 'Banh Mi', 'Proljetne rolice', 'Bun Cha'
-  ],
-  'Mediteranska hrana': [
-    'Gyros', 'Falafel', 'Hummus tanjir', 'Shawarma', 'Grilovani Halloumi'
-  ],
   'Tjestenina': [
     'Špageti Bolognese', 'Carbonara', 'Alfredo',
     'Pesto tjestenina', 'Lazanje', 'Ravioli'
-  ],
-  'Ramen': [
-    'Tonkotsu Ramen', 'Shoyu Ramen', 'Miso Ramen',
-    'Ljuti Ramen', 'Pileći Ramen'
   ],
   'Salate': [
     'Caesar salata', 'Grčka salata', 'Šopska salata',
@@ -178,17 +131,9 @@ const MENU_ITEMS_BY_CATEGORY: Record<string, string[]> = {
     'Ćevapi', 'Pljeskavica', 'Ražnjići', 'Kobasice',
     'Piletina sa roštilja', 'Miješano meso'
   ],
-  'Ćevapi': [
-    'Ćevapi 5 kom', 'Ćevapi 10 kom', 'Ćevapi u lepinji',
-    'Ćevapi u somunu', 'Ćevapi sa kajmakom'
-  ],
-  'Bosanska kuhinja': [
-    'Bosanski lonac', 'Begova čorba', 'Dolma', 'Sarma',
-    'Japrak', 'Klepe', 'Bamija'
-  ],
-  'Pite i bureci': [
-    'Burek sa mesom', 'Sirnica', 'Zeljanica', 'Krompiruša',
-    'Burek sa sirom', 'Pita sa jabukama'
+  'Pite': [
+    'Burek', 'Sirnica', 'Zeljanica', 'Krompiruša',
+    'Tikvenica', 'Učkur pita'
   ],
 }
 

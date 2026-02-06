@@ -1,1 +1,1 @@
-export { initializeSocket, getIO, emitToUser, isUserConnected } from './socket'
+export { initializeSocket, getIO, emitToUser, isUserConnected, emitToAdmins } from './socket'

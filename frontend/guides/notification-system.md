@@ -4,6 +4,8 @@
 
 The frontend notification system provides real-time notification updates using Socket.IO and a dropdown UI for viewing and managing notifications.
 
+**Note:** The driver order queue (`order:available`, `order:accepted`, `order:removed` events) uses the same Socket.IO connection but is handled by a separate system — see `frontend/guides/order-assignment.md`.
+
 ## Architecture
 
 ### Providers

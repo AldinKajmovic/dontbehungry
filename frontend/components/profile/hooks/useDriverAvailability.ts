@@ -72,6 +72,11 @@ export function useDriverAvailability() {
       setIsOnline(result.isOnline)
       setCurrentShift(result.currentShift)
 
+      // Notify other hooks (e.g. order queue) about availability change
+      window.dispatchEvent(
+        new CustomEvent('driver:availability-changed', { detail: { isOnline: result.isOnline } })
+      )
+
       if (result.currentShift) {
         setWorkedMinutes(result.currentShift.workedMinutes)
       } else {
@@ -143,7 +148,9 @@ export function useDriverAvailability() {
         }
       },
       (err) => {
-        logger.error('Geolocation error', err)
+        logger.error('Geolocation error', new Error(err.message), {
+          code: err.code,
+        })
         setLocationError(t('profile.availability.locationError'))
       },
       {

@@ -163,8 +163,9 @@ Get monthly hours summary.
 When a driver goes **online**:
 1. Check if user is a delivery driver
 2. Verify no active shift exists
-3. Create new shift with `ACTIVE` status
-4. Return status with `workedMinutes: 0` (no orders yet)
+3. **Unassign stale orders**: Any orders still assigned to this driver in a pre-delivery state (not DELIVERED or CANCELLED) are unassigned (`driverId` set to `null`). This ensures a clean slate — leftover orders from a previous shift don't block the driver from accepting new ones.
+4. Create new shift with `ACTIVE` status
+5. Return status with `workedMinutes: 0` (no orders yet)
 
 When a driver goes **offline**:
 1. Find active shift

@@ -294,3 +294,41 @@ export interface LocationUpdateEvent {
   }
   timestamp: string
 }
+
+// Driver Order Queue Types
+
+export interface AvailableOrderEvent {
+  orderId: string
+  restaurantName: string
+  restaurantAddress: string
+  deliveryAddress: string
+  totalAmount: string
+  itemCount: number
+  createdAt: string
+  estimatedDistance: number | null
+}
+
+export interface AcceptOrderResponse {
+  success: boolean
+  message: string
+}
+
+export interface OrderAcceptedEvent {
+  orderId: string
+  driverName: string
+}
+
+export interface OrderRemovedEvent {
+  orderId: string
+  reason: string
+}
+
+export interface AvailableOrdersResponse {
+  orders: AvailableOrderEvent[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}

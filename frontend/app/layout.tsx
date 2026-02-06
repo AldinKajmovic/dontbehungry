@@ -9,6 +9,7 @@ import { NotificationProvider } from '@/providers/NotificationProvider'
 import { LanguageProvider } from '@/providers/LanguageProvider'
 import { ToastProvider } from '@/providers/ToastProvider'
 import { ToastContainer } from '@/components/ui'
+import DriverOrderQueueOverlay from '@/components/driver/DriverOrderQueueOverlay'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -34,6 +35,7 @@ export default function RootLayout({
                     <CartProvider>
                       {children}
                       <ToastContainer />
+                      <DriverOrderQueueOverlay />
                     </CartProvider>
                   </ToastProvider>
                 </NotificationProvider>

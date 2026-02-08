@@ -6,8 +6,9 @@ import { Pagination } from '@/components/admin/Pagination'
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal'
 import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
-import { Modal, Input, Button, Alert } from '@/components/ui'
+import { Modal, Input, Button, Alert, ImageUpload, CROP_CONFIGS } from '@/components/ui'
 import { adminService, AdminCategory, PaginationInfo, SortParams } from '@/services/admin'
+import { profileService } from '@/services/profile'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useToast } from '@/hooks/useToast'
 
@@ -36,6 +37,29 @@ export default function CategoriesPage() {
   })
   const [formError, setFormError] = useState('')
   const [formLoading, setFormLoading] = useState(false)
+  const [imageUploading, setImageUploading] = useState(false)
+
+  const handleIconUpload = async (file: File): Promise<string | null> => {
+    setImageUploading(true)
+    try {
+      const { url } = await profileService.uploadImage(file, 'category-icon')
+      setFormData(prev => ({ ...prev, iconUrl: url }))
+      toast.success(t('upload.success'))
+      return url
+    } catch {
+      toast.error(t('upload.failed'))
+      return null
+    } finally {
+      setImageUploading(false)
+    }
+  }
+
+  const handleIconRemove = () => {
+    if (formData.iconUrl && formData.iconUrl.startsWith('https://storage.googleapis.com/')) {
+      profileService.deleteImage(formData.iconUrl).catch(() => {})
+    }
+    setFormData(prev => ({ ...prev, iconUrl: '' }))
+  }
 
   const loadCategories = useCallback(async () => {
     try {
@@ -318,14 +342,17 @@ export default function CategoriesPage() {
             hint={`(${t('common.optional')})`}
           />
 
-          <Input
+          <ImageUpload
+            currentUrl={formData.iconUrl || null}
+            onUpload={handleIconUpload}
+            onRemove={handleIconRemove}
+            uploading={imageUploading}
             label={t('admin.categoriesPage.iconUrl')}
-            type="url"
-            id="iconUrl"
-            value={formData.iconUrl}
-            onChange={(e) => setFormData({ ...formData, iconUrl: e.target.value })}
-            placeholder="https://..."
             hint={`(${t('common.optional')})`}
+            width="w-20"
+            height="h-20"
+            browserFolder="categories"
+            cropConfig={CROP_CONFIGS['category-icon']}
           />
 
           <div className="flex gap-3 pt-4">
@@ -365,14 +392,17 @@ export default function CategoriesPage() {
             hint={`(${t('common.optional')})`}
           />
 
-          <Input
+          <ImageUpload
+            currentUrl={formData.iconUrl || null}
+            onUpload={handleIconUpload}
+            onRemove={handleIconRemove}
+            uploading={imageUploading}
             label={t('admin.categoriesPage.iconUrl')}
-            type="url"
-            id="edit-iconUrl"
-            value={formData.iconUrl}
-            onChange={(e) => setFormData({ ...formData, iconUrl: e.target.value })}
-            placeholder="https://..."
             hint={`(${t('common.optional')})`}
+            width="w-20"
+            height="h-20"
+            browserFolder="categories"
+            cropConfig={CROP_CONFIGS['category-icon']}
           />
 
           <div className="flex gap-3 pt-4">

@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma'
 import { NotFoundError } from '../../utils/errors'
+import { deleteFromGCS, extractGCSPath, isGCSUrl } from '../../lib/gcs'
 import { PaginatedResponse } from '../../types'
 import { PaginationParams, RestaurantFilters, CreateRestaurantData, UpdateRestaurantData } from '../../validators/admin'
 
@@ -81,6 +82,14 @@ export async function getRestaurantById(id: string) {
       categories: {
         include: { category: true },
       },
+      galleryImages: {
+        orderBy: { sortOrder: 'asc' },
+        select: { id: true, imageUrl: true, sortOrder: true },
+      },
+      openingHours: {
+        orderBy: { dayOfWeek: 'asc' },
+        select: { id: true, dayOfWeek: true, openTime: true, closeTime: true, isClosed: true },
+      },
     },
   })
 
@@ -112,6 +121,30 @@ export async function createRestaurant(data: CreateRestaurantData) {
       placeId: data.placeId,
       minOrderAmount: data.minOrderAmount || null,
       deliveryFee: data.deliveryFee || null,
+      logoUrl: data.logoUrl || null,
+      coverUrl: data.coverUrl || null,
+      ...(data.openingHours?.length && {
+        openingHours: {
+          createMany: {
+            data: data.openingHours.map((h) => ({
+              dayOfWeek: h.dayOfWeek,
+              openTime: h.openTime,
+              closeTime: h.closeTime,
+              isClosed: h.isClosed,
+            })),
+          },
+        },
+      }),
+      ...(data.galleryImages?.length && {
+        galleryImages: {
+          createMany: {
+            data: data.galleryImages.map((img) => ({
+              imageUrl: img.imageUrl,
+              sortOrder: img.sortOrder,
+            })),
+          },
+        },
+      }),
     },
     include: {
       owner: {
@@ -125,7 +158,7 @@ export async function createRestaurant(data: CreateRestaurantData) {
 }
 
 export async function updateRestaurant(id: string, data: UpdateRestaurantData) {
-  await getRestaurantById(id)
+  const existing = await getRestaurantById(id)
 
   if (data.ownerId) {
     const owner = await prisma.user.findUnique({ where: { id: data.ownerId } })
@@ -141,24 +174,76 @@ export async function updateRestaurant(id: string, data: UpdateRestaurantData) {
     }
   }
 
-  const restaurant = await prisma.restaurant.update({
-    where: { id },
-    data: {
-      ...(data.name && { name: data.name }),
-      ...(data.description !== undefined && { description: data.description || null }),
-      ...(data.phone !== undefined && { phone: data.phone || null }),
-      ...(data.email !== undefined && { email: data.email || null }),
-      ...(data.ownerId && { ownerId: data.ownerId }),
-      ...(data.placeId && { placeId: data.placeId }),
-      ...(data.minOrderAmount !== undefined && { minOrderAmount: data.minOrderAmount || null }),
-      ...(data.deliveryFee !== undefined && { deliveryFee: data.deliveryFee || null }),
-    },
-    include: {
-      owner: {
-        select: { id: true, email: true, firstName: true, lastName: true },
+  // Clean up old images from GCS when replaced
+  if (data.logoUrl !== undefined && existing.logoUrl && isGCSUrl(existing.logoUrl) && data.logoUrl !== existing.logoUrl) {
+    const oldPath = extractGCSPath(existing.logoUrl)
+    if (oldPath) deleteFromGCS(oldPath)
+  }
+  if (data.coverUrl !== undefined && existing.coverUrl && isGCSUrl(existing.coverUrl) && data.coverUrl !== existing.coverUrl) {
+    const oldPath = extractGCSPath(existing.coverUrl)
+    if (oldPath) deleteFromGCS(oldPath)
+  }
+
+  const restaurant = await prisma.$transaction(async (tx) => {
+    // Replace opening hours if provided
+    if (data.openingHours !== undefined) {
+      await tx.openingHours.deleteMany({ where: { restaurantId: id } })
+      if (data.openingHours.length > 0) {
+        await tx.openingHours.createMany({
+          data: data.openingHours.map((h) => ({
+            restaurantId: id,
+            dayOfWeek: h.dayOfWeek,
+            openTime: h.openTime,
+            closeTime: h.closeTime,
+            isClosed: h.isClosed,
+          })),
+        })
+      }
+    }
+
+    // Replace gallery images if provided
+    if (data.galleryImages !== undefined) {
+      const existingImages = await tx.restaurantImage.findMany({ where: { restaurantId: id } })
+      const newUrls = new Set(data.galleryImages.map((img) => img.imageUrl))
+      for (const img of existingImages) {
+        if (!newUrls.has(img.imageUrl) && isGCSUrl(img.imageUrl)) {
+          const oldPath = extractGCSPath(img.imageUrl)
+          if (oldPath) deleteFromGCS(oldPath)
+        }
+      }
+      await tx.restaurantImage.deleteMany({ where: { restaurantId: id } })
+      if (data.galleryImages.length > 0) {
+        await tx.restaurantImage.createMany({
+          data: data.galleryImages.map((img) => ({
+            restaurantId: id,
+            imageUrl: img.imageUrl,
+            sortOrder: img.sortOrder,
+          })),
+        })
+      }
+    }
+
+    return tx.restaurant.update({
+      where: { id },
+      data: {
+        ...(data.name && { name: data.name }),
+        ...(data.description !== undefined && { description: data.description || null }),
+        ...(data.phone !== undefined && { phone: data.phone || null }),
+        ...(data.email !== undefined && { email: data.email || null }),
+        ...(data.ownerId && { ownerId: data.ownerId }),
+        ...(data.placeId && { placeId: data.placeId }),
+        ...(data.minOrderAmount !== undefined && { minOrderAmount: data.minOrderAmount || null }),
+        ...(data.deliveryFee !== undefined && { deliveryFee: data.deliveryFee || null }),
+        ...(data.logoUrl !== undefined && { logoUrl: data.logoUrl || null }),
+        ...(data.coverUrl !== undefined && { coverUrl: data.coverUrl || null }),
       },
-      place: true,
-    },
+      include: {
+        owner: {
+          select: { id: true, email: true, firstName: true, lastName: true },
+        },
+        place: true,
+      },
+    })
   })
 
   return restaurant

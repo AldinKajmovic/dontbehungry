@@ -725,3 +725,19 @@ export async function getOnlineDrivers(
     next(error)
   }
 }
+
+// ==================== IMAGES ====================
+
+export async function browseImages(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const folder = req.query.folder as string | undefined
+    const images = await adminService.browseImages(folder)
+    res.json({ images, total: images.length })
+  } catch (error) {
+    next(error)
+  }
+}

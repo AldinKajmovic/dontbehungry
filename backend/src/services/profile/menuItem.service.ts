@@ -1,6 +1,7 @@
 // Menu item CRUD: getMyMenuItems, createMyMenuItem, updateMyMenuItem, deleteMyMenuItem, getCategories
 import { prisma } from '../../lib/prisma'
 import { NotFoundError } from '../../utils/errors'
+import { deleteFromGCS, extractGCSPath, isGCSUrl } from '../../lib/gcs'
 import { verifyRestaurantOwnership } from './restaurant.service'
 import {
   MyMenuItemResponse,
@@ -103,7 +104,13 @@ export async function updateMyMenuItem(userId: string, restaurantId: string, ite
   if (data.name !== undefined) updateData.name = data.name.trim()
   if (data.description !== undefined) updateData.description = data.description?.trim() || null
   if (data.price !== undefined) updateData.price = data.price
-  if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl?.trim() || null
+  if (data.imageUrl !== undefined) {
+    if (existingItem.imageUrl && isGCSUrl(existingItem.imageUrl) && data.imageUrl !== existingItem.imageUrl) {
+      const oldPath = extractGCSPath(existingItem.imageUrl)
+      if (oldPath) deleteFromGCS(oldPath)
+    }
+    updateData.imageUrl = data.imageUrl?.trim() || null
+  }
   if (data.categoryId !== undefined) updateData.categoryId = data.categoryId || null
   if (data.isAvailable !== undefined) updateData.isAvailable = data.isAvailable
   if (data.preparationTime !== undefined) updateData.preparationTime = data.preparationTime

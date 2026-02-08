@@ -18,6 +18,25 @@ export interface RestaurantPlace {
   country?: string
 }
 
+export interface OpeningHours {
+  id: string
+  dayOfWeek: number
+  openTime: string
+  closeTime: string
+  isClosed: boolean
+}
+
+export interface GalleryImage {
+  id: string
+  imageUrl: string
+  sortOrder: number
+}
+
+export interface ReviewStats {
+  averageRating: number
+  totalReviews: number
+}
+
 export interface PublicRestaurant {
   id: string
   name: string
@@ -29,7 +48,12 @@ export interface PublicRestaurant {
   minOrderAmount: string | number | null
   categories: RestaurantCategory[]
   place: RestaurantPlace
-  distance?: number 
+  distance?: number
+  phone?: string | null
+  email?: string | null
+  openingHours?: OpeningHours[]
+  galleryImages?: GalleryImage[]
+  reviewStats?: ReviewStats
 }
 
 export interface MenuItem {

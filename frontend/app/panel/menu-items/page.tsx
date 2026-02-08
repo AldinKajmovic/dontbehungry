@@ -1,236 +1,31 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
 import { DataTable } from '@/components/admin/DataTable'
 import { Pagination } from '@/components/admin/Pagination'
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal'
 import { RangeFilter } from '@/components/admin/RangeFilter'
 import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
-import { Modal, Input, Button, Alert, Select, SearchableSelect } from '@/components/ui'
-import { adminService, AdminMenuItem, PaginationInfo, MenuItemFilters, SortParams } from '@/services/admin'
-import { useLanguage } from '@/hooks/useLanguage'
-import { useToast } from '@/hooks/useToast'
+import { Modal, Input, Button, Alert, SearchableSelect, ImageUpload, CROP_CONFIGS } from '@/components/ui'
+import { AdminMenuItem } from '@/services/admin'
+import { useAdminMenuItems } from '@/hooks/admin'
 
 export default function MenuItemsPage() {
-  const { t } = useLanguage()
-  const { toast } = useToast()
-
-  const AVAILABILITY_OPTIONS = [
-    { value: '', label: t('admin.menuItemsPage.allItems') },
-    { value: 'true', label: t('admin.menuItemsPage.available') },
-    { value: 'false', label: t('admin.menuItemsPage.unavailable') },
-  ]
-  const [menuItems, setMenuItems] = useState<AdminMenuItem[]>([])
-  const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
-  const [search, setSearch] = useState('')
-  const [filters, setFilters] = useState<MenuItemFilters>({})
-  const [sort, setSort] = useState<SortParams>({})
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  // Modal states
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [showEmailReportModal, setShowEmailReportModal] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<AdminMenuItem | null>(null)
-
-  // Form states
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    imageUrl: '',
-    restaurantId: '',
-    categoryId: '',
-    isAvailable: true,
-    preparationTime: '',
-  })
-  const [formError, setFormError] = useState('')
-  const [formLoading, setFormLoading] = useState(false)
-
-  const loadMenuItems = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      setError(null)
-      const result = await adminService.getMenuItems(
-        pagination.page,
-        pagination.limit,
-        search || undefined,
-        Object.keys(filters).length > 0 ? filters : undefined,
-        sort.sortBy ? sort : undefined
-      )
-      setMenuItems(result.items)
-      setPagination(result.pagination)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load menu items')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [pagination.page, pagination.limit, search, filters, sort])
-
-  useEffect(() => {
-    loadMenuItems()
-  }, [loadMenuItems])
-
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => {
-      const next = { ...prev, [key]: value || undefined }
-      Object.keys(next).forEach((k) => {
-        if (!next[k as keyof MenuItemFilters]) delete next[k as keyof MenuItemFilters]
-      })
-      return next
-    })
-    setPagination((prev) => ({ ...prev, page: 1 }))
-  }
-
-  const handleClearFilters = () => {
-    setFilters({})
-    setPagination((prev) => ({ ...prev, page: 1 }))
-  }
-
-  const handleSort = (sortBy: string, sortOrder: 'asc' | 'desc') => {
-    setSort({ sortBy, sortOrder })
-    setPagination((prev) => ({ ...prev, page: 1 }))
-  }
-
-  const hasActiveFilters = Object.keys(filters).length > 0
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    setPagination((prev) => ({ ...prev, page: 1 }))
-    loadMenuItems()
-  }
-
-  const handlePageChange = (page: number) => {
-    setPagination((prev) => ({ ...prev, page }))
-  }
-
-  const handleLimitChange = (limit: number) => {
-    setPagination((prev) => ({ ...prev, page: 1, limit }))
-  }
-
-  const openCreateModal = () => {
-    setFormData({
-      name: '',
-      description: '',
-      price: '',
-      imageUrl: '',
-      restaurantId: '',
-      categoryId: '',
-      isAvailable: true,
-      preparationTime: '',
-    })
-    setFormError('')
-    setShowCreateModal(true)
-  }
-
-  const openEditModal = (item: AdminMenuItem) => {
-    setSelectedItem(item)
-    setFormData({
-      name: item.name,
-      description: item.description || '',
-      price: item.price,
-      imageUrl: item.imageUrl || '',
-      restaurantId: item.restaurant.id,
-      categoryId: item.category?.id || '',
-      isAvailable: item.isAvailable,
-      preparationTime: item.preparationTime?.toString() || '',
-    })
-    setFormError('')
-    setShowEditModal(true)
-  }
-
-  const openDeleteModal = (item: AdminMenuItem) => {
-    setSelectedItem(item)
-    setShowDeleteModal(true)
-  }
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!formData.restaurantId) {
-      setFormError(t('admin.menuItemsPage.selectRestaurant'))
-      return
-    }
-    try {
-      setFormLoading(true)
-      setFormError('')
-      const newItem = await adminService.createMenuItem({
-        name: formData.name,
-        description: formData.description || undefined,
-        price: parseFloat(formData.price),
-        imageUrl: formData.imageUrl || undefined,
-        restaurantId: formData.restaurantId,
-        categoryId: formData.categoryId || undefined,
-        isAvailable: formData.isAvailable,
-        preparationTime: formData.preparationTime ? parseInt(formData.preparationTime) : undefined,
-      })
-      // Add new item to local state
-      setMenuItems((prev) => [newItem, ...prev])
-      setShowCreateModal(false)
-      toast.success(t('toast.menuItemSaved'))
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Failed to create menu item')
-      toast.error(t('toast.error'))
-    } finally {
-      setFormLoading(false)
-    }
-  }
-
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedItem) return
-    try {
-      setFormLoading(true)
-      setFormError('')
-      const updatedItem = await adminService.updateMenuItem(selectedItem.id, {
-        name: formData.name,
-        description: formData.description || null,
-        price: parseFloat(formData.price),
-        imageUrl: formData.imageUrl || null,
-        restaurantId: formData.restaurantId || undefined,
-        categoryId: formData.categoryId || null,
-        isAvailable: formData.isAvailable,
-        preparationTime: formData.preparationTime ? parseInt(formData.preparationTime) : null,
-      })
-      // Update local state with response data
-      setMenuItems((prev) => prev.map((item) => (item.id === updatedItem.id ? updatedItem : item)))
-      setShowEditModal(false)
-      toast.success(t('toast.menuItemSaved'))
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Failed to update menu item')
-      toast.error(t('toast.error'))
-    } finally {
-      setFormLoading(false)
-    }
-  }
-
-  const handleDelete = async () => {
-    if (!selectedItem) return
-    try {
-      setFormLoading(true)
-      await adminService.deleteMenuItem(selectedItem.id)
-      // Remove from local state
-      setMenuItems((prev) => prev.filter((item) => item.id !== selectedItem.id))
-      setShowDeleteModal(false)
-      toast.success(t('toast.menuItemDeleted'))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete menu item')
-      toast.error(t('toast.error'))
-    } finally {
-      setFormLoading(false)
-    }
-  }
-
-  // Dropdown loaders for SearchableSelect
-  const loadRestaurantOptions = useCallback((searchTerm: string) => {
-    return adminService.getRestaurantsForSelect(searchTerm || undefined)
-  }, [])
-
-  const loadCategoryOptions = useCallback((searchTerm: string) => {
-    return adminService.getCategoriesForSelect(searchTerm || undefined)
-  }, [])
+  const {
+    menuItems, pagination, search, setSearch, filters, sort, isLoading, error,
+    showCreateModal, setShowCreateModal, showEditModal, setShowEditModal,
+    showDeleteModal, setShowDeleteModal, showEmailReportModal, setShowEmailReportModal,
+    selectedItem,
+    formData, setFormData, formError, formLoading, imageUploading,
+    handleSearch, handlePageChange, handleLimitChange, handleSort,
+    handleFilterChange, handleClearFilters, hasActiveFilters,
+    openCreateModal, openEditModal, openDeleteModal,
+    handleCreate, handleUpdate, handleDelete,
+    handleImageUpload, handleImageRemove,
+    loadRestaurantOptions, loadCategoryOptions,
+    AVAILABILITY_OPTIONS,
+    t,
+  } = useAdminMenuItems()
 
   const columns = [
     {
@@ -513,14 +308,17 @@ export default function MenuItemsPage() {
             />
           </div>
 
-          <Input
+          <ImageUpload
+            currentUrl={formData.imageUrl || null}
+            onUpload={handleImageUpload}
+            onRemove={handleImageRemove}
+            uploading={imageUploading}
             label={t('admin.menuItemsPage.imageUrl')}
-            type="url"
-            id="imageUrl"
-            value={formData.imageUrl}
-            onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-            placeholder="https://..."
             hint={`(${t('common.optional')})`}
+            width="w-24"
+            height="h-24"
+            browserFolder="menu-items"
+            cropConfig={CROP_CONFIGS['menu-item']}
           />
 
           <label className="flex items-center gap-3 cursor-pointer">
@@ -618,14 +416,17 @@ export default function MenuItemsPage() {
             />
           </div>
 
-          <Input
+          <ImageUpload
+            currentUrl={formData.imageUrl || null}
+            onUpload={handleImageUpload}
+            onRemove={handleImageRemove}
+            uploading={imageUploading}
             label={t('admin.menuItemsPage.imageUrl')}
-            type="url"
-            id="edit-imageUrl"
-            value={formData.imageUrl}
-            onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-            placeholder="https://..."
             hint={`(${t('common.optional')})`}
+            width="w-24"
+            height="h-24"
+            browserFolder="menu-items"
+            cropConfig={CROP_CONFIGS['menu-item']}
           />
 
           <label className="flex items-center gap-3 cursor-pointer">

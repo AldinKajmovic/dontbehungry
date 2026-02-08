@@ -1,6 +1,6 @@
 'use client'
 
-import { Input, Button, Alert, Modal } from '@/components/ui'
+import { Input, Button, Alert, Modal, ImageUpload, CROP_CONFIGS } from '@/components/ui'
 import { MyMenuItem, Category } from '@/services/profile'
 
 interface MenuItemFormState {
@@ -22,6 +22,9 @@ interface MenuItemFormModalProps {
   formLoading: boolean
   error: string
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
+  onImageUpload: (file: File) => Promise<string | null>
+  onImageRemove: () => void
+  imageUploading?: boolean
   handleSubmit: (e: React.FormEvent) => void
 }
 
@@ -40,6 +43,9 @@ export function MenuItemFormModal({
   formLoading,
   error,
   handleChange,
+  onImageUpload,
+  onImageRemove,
+  imageUploading,
   handleSubmit,
 }: MenuItemFormModalProps) {
   return (
@@ -139,15 +145,16 @@ export function MenuItemFormModal({
           </div>
         </div>
 
-        <Input
-          label="Image URL"
-          type="url"
-          id="menuItemImageUrl"
-          name="imageUrl"
-          value={form.imageUrl}
-          onChange={handleChange}
-          placeholder="https://example.com/image.jpg"
+        <ImageUpload
+          currentUrl={form.imageUrl || null}
+          onUpload={onImageUpload}
+          onRemove={onImageRemove}
+          uploading={imageUploading}
+          label="Image"
           hint="(optional)"
+          width="w-24"
+          height="h-24"
+          cropConfig={CROP_CONFIGS['menu-item']}
         />
 
         <div className="flex gap-3 pt-2">

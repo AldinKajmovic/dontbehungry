@@ -84,6 +84,9 @@ router.get('/payments', adminController.getPayments)
 router.get('/payments/:id', adminController.getPaymentById)
 router.patch('/payments/:id', adminController.updatePayment)
 
+// Images
+router.get('/images/browse', adminController.browseImages)
+
 // Drivers
 router.get('/drivers/online', adminController.getOnlineDrivers)
 

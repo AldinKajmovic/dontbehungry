@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useToast } from '@/hooks/useToast'
+import { useLanguage } from '@/hooks/useLanguage'
 import { profileService, MyMenuItem, Category } from '@/services/profile'
 
 interface MenuItemFormState {
@@ -24,9 +26,12 @@ const INITIAL_FORM: MenuItemFormState = {
 }
 
 export function useMenuItems(restaurantId: string | null) {
+  const { toast } = useToast()
+  const { t } = useLanguage()
   const [menuItems, setMenuItems] = useState<MyMenuItem[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(false)
+  const [imageUploading, setImageUploading] = useState(false)
   const [showListModal, setShowListModal] = useState(false)
   const [showFormModal, setShowFormModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -121,6 +126,30 @@ export function useMenuItems(restaurantId: string | null) {
   const closeDeleteModal = useCallback(() => {
     setShowDeleteModal(false)
     setDeletingItem(null)
+  }, [])
+
+  const onImageUpload = useCallback(async (file: File): Promise<string | null> => {
+    setImageUploading(true)
+    try {
+      const { url } = await profileService.uploadImage(file, 'menu-item')
+      setForm((prev) => ({ ...prev, imageUrl: url }))
+      toast.success(t('upload.success'))
+      return url
+    } catch {
+      toast.error(t('upload.failed'))
+      return null
+    } finally {
+      setImageUploading(false)
+    }
+  }, [toast, t])
+
+  const onImageRemove = useCallback(() => {
+    setForm((prev) => {
+      if (prev.imageUrl && prev.imageUrl.startsWith('https://storage.googleapis.com/')) {
+        profileService.deleteImage(prev.imageUrl).catch(() => {})
+      }
+      return { ...prev, imageUrl: '' }
+    })
   }, [])
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
@@ -222,6 +251,9 @@ export function useMenuItems(restaurantId: string | null) {
     setPerPage,
     setSearch,
     handleFormChange,
+    onImageUpload,
+    onImageRemove,
+    imageUploading,
     openListModal,
     closeListModal,
     openAddModal,

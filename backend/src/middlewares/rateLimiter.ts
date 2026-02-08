@@ -60,11 +60,22 @@ export const adminLimiter = rateLimit({
 })
 
 export const socketTokenLimiter = rateLimit({
-  windowMs: 60 * 1000, 
-  max: 10, 
+  windowMs: 60 * 1000,
+  max: 10,
   message: {
     error: 'Too many requests',
     details: 'Too many socket token requests. Please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+export const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: {
+    error: 'Too many requests',
+    details: 'Too many upload attempts. Please try again later.',
   },
   standardHeaders: true,
   legacyHeaders: false,

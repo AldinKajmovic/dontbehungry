@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma'
 import { NotFoundError, ConflictError } from '../../utils/errors'
+import { deleteFromGCS, extractGCSPath, isGCSUrl } from '../../lib/gcs'
 import { PaginatedResponse } from '../../types'
 import { PaginationParams, CreateCategoryData, UpdateCategoryData } from '../../validators/admin'
 
@@ -70,7 +71,13 @@ export async function createCategory(data: CreateCategoryData) {
 }
 
 export async function updateCategory(id: string, data: UpdateCategoryData) {
-  await getCategoryById(id)
+  const existing = await getCategoryById(id)
+
+  // Clean up old icon from GCS when replaced
+  if (data.iconUrl !== undefined && existing.iconUrl && isGCSUrl(existing.iconUrl) && data.iconUrl !== existing.iconUrl) {
+    const oldPath = extractGCSPath(existing.iconUrl)
+    if (oldPath) deleteFromGCS(oldPath)
+  }
 
   if (data.name) {
     const existing = await prisma.category.findFirst({

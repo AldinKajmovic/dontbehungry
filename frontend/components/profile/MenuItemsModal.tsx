@@ -51,6 +51,9 @@ export function MenuItemsModal({
     setPerPage,
     setSearch,
     handleFormChange,
+    onImageUpload,
+    onImageRemove,
+    imageUploading,
     openListModal,
     closeListModal,
     openAddModal,
@@ -291,6 +294,9 @@ export function MenuItemsModal({
         formLoading={formLoading}
         error={error}
         handleChange={handleFormChange}
+        onImageUpload={onImageUpload}
+        onImageRemove={onImageRemove}
+        imageUploading={imageUploading}
         handleSubmit={handleSubmit}
       />
 

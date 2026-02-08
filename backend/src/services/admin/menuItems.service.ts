@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma'
 import { NotFoundError } from '../../utils/errors'
+import { deleteFromGCS, extractGCSPath, isGCSUrl } from '../../lib/gcs'
 import { PaginatedResponse } from '../../types'
 import { PaginationParams, MenuItemFilters, CreateMenuItemData, UpdateMenuItemData } from '../../validators/admin'
 
@@ -117,7 +118,13 @@ export async function createMenuItem(data: CreateMenuItemData) {
 }
 
 export async function updateMenuItem(id: string, data: UpdateMenuItemData) {
-  await getMenuItemById(id)
+  const existing = await getMenuItemById(id)
+
+  // Clean up old image from GCS when replaced
+  if (data.imageUrl !== undefined && existing.imageUrl && isGCSUrl(existing.imageUrl) && data.imageUrl !== existing.imageUrl) {
+    const oldPath = extractGCSPath(existing.imageUrl)
+    if (oldPath) deleteFromGCS(oldPath)
+  }
 
   if (data.restaurantId) {
     const restaurant = await prisma.restaurant.findUnique({ where: { id: data.restaurantId } })

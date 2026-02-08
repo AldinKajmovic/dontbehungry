@@ -425,7 +425,29 @@
     "differentRestaurantWarning": "Your cart contains items from another restaurant. Would you like to clear your cart and start a new order from",
     "keepCurrentCart": "Keep current cart",
     "startNewOrderButton": "Start new order",
-    "min": "min"
+    "min": "min",
+    "menu": "Menu",
+    "about": "About"
+  },
+  "openingHours": {
+    "title": "Opening Hours",
+    "setOpeningHours": "Set Opening Hours",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "closed": "Closed",
+    "openNow": "Open now",
+    "closedNow": "Closed now"
+  },
+  "about": {
+    "contactInfo": "Contact Information",
+    "gallery": "Gallery",
+    "noReviewsYet": "No reviews yet",
+    "fromReviews": "from {count} reviews"
   },
   "address": {
     "addNew": "Add New Address",
@@ -671,7 +693,16 @@
     },
     "errors": {
       "selectOwnerAndPlace": "Please select both an owner and a place",
-      "restaurantFieldsRequired": "Restaurant name, address, city, and country are required"
+      "restaurantFieldsRequired": "Restaurant name, address, city, and country are required",
+      "selectOwner": "Please select an owner",
+      "selectPlace": "Please select a place or create a new one",
+      "placeAddressRequired": "Please provide address, city, and country for the new place",
+      "failedToLoad": "Failed to load {entity}",
+      "failedToCreate": "Failed to create {entity}",
+      "failedToUpdate": "Failed to update {entity}",
+      "failedToDelete": "Failed to delete {entity}",
+      "userCreatedRestaurantFailed": "User created but restaurant creation failed. Please create restaurant separately.",
+      "invalidPrice": "Please enter a valid positive number"
     },
     "reports": {
       "report": "Report",
@@ -835,6 +866,19 @@
       "createPlace": "Create Place",
       "deletePlaceConfirm": "Are you sure you want to delete \"{address}\"? This may affect associated restaurants and addresses."
     },
+    "imageBrowser": {
+      "title": "Browse Existing Images",
+      "allFolders": "All Folders",
+      "restaurants": "Restaurants",
+      "menuItems": "Menu Items",
+      "categories": "Categories",
+      "avatars": "Avatars",
+      "searchPlaceholder": "Search by filename...",
+      "empty": "No images found",
+      "count": "{count} image(s)",
+      "folder": "Folder",
+      "select": "Select"
+    },
     "drivers": {
       "title": "Driver Monitoring",
       "subtitle": "Track all online drivers in real-time",
@@ -867,6 +911,30 @@
       "items": "items",
       "distance": "Distance"
     }
+  },
+  "upload": {
+    "uploadPhoto": "Upload Photo",
+    "removePhoto": "Remove Photo",
+    "changePhoto": "Change Photo",
+    "addImage": "Add Image",
+    "uploading": "Uploading...",
+    "success": "Image uploaded successfully",
+    "failed": "Failed to upload image",
+    "removed": "Image removed",
+    "removeFailed": "Failed to remove image",
+    "dragDrop": "Click or drag to upload",
+    "maxSize": "Max file size: 5MB",
+    "allowedTypes": "Allowed: JPEG, PNG, WebP, GIF",
+    "tooLarge": "File is too large. Maximum size is 5MB.",
+    "invalidType": "Invalid file type. Please upload an image.",
+    "galleryHint": "First image = Logo, Second image = Cover",
+    "browseExisting": "Browse existing"
+  },
+  "crop": {
+    "title": "Crop Image",
+    "instruction": "Drag to reposition, use the slider to zoom",
+    "zoom": "Zoom",
+    "confirm": "Apply Crop"
   },
   "language": {
     "select": "Select language",

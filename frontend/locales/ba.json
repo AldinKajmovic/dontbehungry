@@ -424,7 +424,29 @@
     "differentRestaurantWarning": "Vaša korpa sadrži stavke iz drugog restorana. Želite li isprazniti korpu i započeti novu narudžbu iz",
     "keepCurrentCart": "Zadrži trenutnu korpu",
     "startNewOrderButton": "Započni novu narudžbu",
-    "min": "min"
+    "min": "min",
+    "menu": "Meni",
+    "about": "O restoranu"
+  },
+  "openingHours": {
+    "title": "Radno vrijeme",
+    "setOpeningHours": "Postavi radno vrijeme",
+    "monday": "Ponedjeljak",
+    "tuesday": "Utorak",
+    "wednesday": "Srijeda",
+    "thursday": "Četvrtak",
+    "friday": "Petak",
+    "saturday": "Subota",
+    "sunday": "Nedjelja",
+    "closed": "Zatvoreno",
+    "openNow": "Otvoreno",
+    "closedNow": "Zatvoreno"
+  },
+  "about": {
+    "contactInfo": "Kontakt informacije",
+    "gallery": "Galerija",
+    "noReviewsYet": "Još nema recenzija",
+    "fromReviews": "iz {count} recenzija"
   },
   "address": {
     "addNew": "Dodaj novu adresu",
@@ -670,7 +692,16 @@
     },
     "errors": {
       "selectOwnerAndPlace": "Molimo odaberite vlasnika i mjesto",
-      "restaurantFieldsRequired": "Naziv restorana, adresa, grad i država su obavezni"
+      "restaurantFieldsRequired": "Naziv restorana, adresa, grad i država su obavezni",
+      "selectOwner": "Molimo odaberite vlasnika",
+      "selectPlace": "Molimo odaberite mjesto ili kreirajte novo",
+      "placeAddressRequired": "Molimo unesite adresu, grad i državu za novo mjesto",
+      "failedToLoad": "Greška pri učitavanju {entity}",
+      "failedToCreate": "Greška pri kreiranju {entity}",
+      "failedToUpdate": "Greška pri ažuriranju {entity}",
+      "failedToDelete": "Greška pri brisanju {entity}",
+      "userCreatedRestaurantFailed": "Korisnik kreiran ali kreiranje restorana nije uspjelo. Molimo kreirajte restoran odvojeno.",
+      "invalidPrice": "Molimo unesite validan pozitivan broj"
     },
     "reports": {
       "report": "Izvještaj",
@@ -833,6 +864,19 @@
       "createPlace": "Kreiraj mjesto",
       "deletePlaceConfirm": "Jeste li sigurni da želite obrisati \"{address}\"? Ovo može utjecati na povezane restorane i adrese."
     },
+    "imageBrowser": {
+      "title": "Pregledaj postojeće slike",
+      "allFolders": "Svi folderi",
+      "restaurants": "Restorani",
+      "menuItems": "Stavke menija",
+      "categories": "Kategorije",
+      "avatars": "Avatari",
+      "searchPlaceholder": "Pretraži po imenu datoteke...",
+      "empty": "Nema pronađenih slika",
+      "count": "{count} slika",
+      "folder": "Folder",
+      "select": "Odaberi"
+    },
     "drivers": {
       "title": "Praćenje vozača",
       "subtitle": "Pratite sve vozače uživo na mapi",
@@ -865,6 +909,30 @@
       "items": "stavki",
       "distance": "Udaljenost"
     }
+  },
+  "upload": {
+    "uploadPhoto": "Postavi sliku",
+    "removePhoto": "Ukloni sliku",
+    "changePhoto": "Promijeni sliku",
+    "addImage": "Dodaj sliku",
+    "uploading": "Postavljanje...",
+    "success": "Slika uspješno postavljena",
+    "failed": "Postavljanje slike nije uspjelo",
+    "removed": "Slika uklonjena",
+    "removeFailed": "Uklanjanje slike nije uspjelo",
+    "dragDrop": "Kliknite ili prevucite za postavljanje",
+    "maxSize": "Maksimalna veličina: 5MB",
+    "allowedTypes": "Dozvoljeno: JPEG, PNG, WebP, GIF",
+    "tooLarge": "Datoteka je prevelika. Maksimalna veličina je 5MB.",
+    "invalidType": "Nevažeći tip datoteke. Molimo postavite sliku.",
+    "galleryHint": "Prva slika = Logo, Druga slika = Naslovnica",
+    "browseExisting": "Pregledaj postojeće"
+  },
+  "crop": {
+    "title": "Izreži sliku",
+    "instruction": "Povucite za pozicioniranje, koristite klizač za zumiranje",
+    "zoom": "Zum",
+    "confirm": "Primijeni izrez"
   },
   "language": {
     "select": "Odaberi jezik",

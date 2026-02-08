@@ -374,6 +374,80 @@ const placeOptions = await adminService.getPlacesForSelect(search)
 
 ## Hooks
 
+### Admin Page Hooks (`frontend/hooks/admin/`)
+
+Each admin page has a dedicated hook that encapsulates all state management, API calls, and form logic. These hooks follow a consistent pattern and are exported via a barrel file at `hooks/admin/index.ts`.
+
+#### `useAdminRestaurants`
+```typescript
+import { useAdminRestaurants } from '@/hooks/admin'
+
+const {
+  restaurants, pagination, search, setSearch, filters, sort, isLoading, error,
+  showCreateModal, setShowCreateModal, showEditModal, setShowEditModal,
+  showDeleteModal, setShowDeleteModal, showEmailReportModal, setShowEmailReportModal,
+  showImageBrowser, setShowImageBrowser, selectedRestaurant,
+  formData, setFormData, formError, formLoading, imageUploading, prefillLoading,
+  imageInputRef, cropSrc, setCropSrc, currentCropConfig, setCurrentCropConfig,
+  handleSearch, handlePageChange, handleLimitChange, handleSort,
+  handleFilterChange, handleClearFilters, hasActiveFilters,
+  openCreateModal, openEditModal, openDeleteModal,
+  handleCreate, handleUpdate, handleDelete,
+  handleImageFileChange, handleCropConfirm, handleCropCancel,
+  loadOwnerOptions, loadPlaceOptions,
+  t,
+} = useAdminRestaurants()
+```
+
+#### `useAdminUsers`
+```typescript
+import { useAdminUsers } from '@/hooks/admin'
+
+const {
+  users, pagination, search, setSearch, filters, sort, isLoading, error,
+  showCreateModal, setShowCreateModal, showEditModal, setShowEditModal,
+  showDeleteModal, setShowDeleteModal, showEmailReportModal, setShowEmailReportModal,
+  selectedUser,
+  formData, setFormData, formError, formLoading, imageUploading,
+  handleSearch, handlePageChange, handleLimitChange, handleSort,
+  handleFilterChange, handleClearFilters,
+  openCreateModal, openEditModal, openDeleteModal,
+  handleCreate, handleUpdate, handleDelete,
+  handleAvatarUpload, handleAvatarRemove,
+  ROLE_OPTIONS, FILTER_CONFIG,
+  t,
+} = useAdminUsers()
+```
+
+#### `useAdminMenuItems`
+```typescript
+import { useAdminMenuItems } from '@/hooks/admin'
+
+const {
+  menuItems, pagination, search, setSearch, filters, sort, isLoading, error,
+  showCreateModal, setShowCreateModal, showEditModal, setShowEditModal,
+  showDeleteModal, setShowDeleteModal, showEmailReportModal, setShowEmailReportModal,
+  selectedItem,
+  formData, setFormData, formError, formLoading, imageUploading,
+  handleSearch, handlePageChange, handleLimitChange, handleSort,
+  handleFilterChange, handleClearFilters, hasActiveFilters,
+  openCreateModal, openEditModal, openDeleteModal,
+  handleCreate, handleUpdate, handleDelete,
+  handleImageUpload, handleImageRemove,
+  loadRestaurantOptions, loadCategoryOptions,
+  AVAILABILITY_OPTIONS,
+  t,
+} = useAdminMenuItems()
+```
+
+**Common pattern across all admin hooks:**
+- Data loading via `useCallback` + `useEffect`
+- Pagination, search, filter, and sort state management
+- Modal state (create/edit/delete/email report)
+- Form data with validation
+- CRUD handlers with toast notifications
+- Translation function `t` from `useLanguage`
+
 ### `useAdminAuth` (`frontend/hooks/useAdminAuth.ts`)
 
 Hook for admin authentication:
@@ -448,7 +522,12 @@ frontend/
 │       ├── Select.tsx
 │       └── SearchableSelect.tsx
 ├── hooks/
-│   └── useAdminAuth.ts
+│   ├── useAdminAuth.ts
+│   └── admin/
+│       ├── index.ts                # Barrel export
+│       ├── useAdminRestaurants.ts
+│       ├── useAdminUsers.ts
+│       └── useAdminMenuItems.ts
 └── services/
     └── admin/
         ├── types.ts
@@ -468,4 +547,4 @@ The admin panel uses existing Tailwind CSS classes and follows the design patter
 
 ---
 
-*Last updated: February 2026 - Added User Address management with AddressAutocomplete, Restaurant place creation with map*
+*Last updated: February 2026 - Extracted admin page hooks (useAdminRestaurants, useAdminUsers, useAdminMenuItems) into hooks/admin/ with barrel export*

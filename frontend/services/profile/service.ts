@@ -14,6 +14,7 @@ import {
   CreateMyMenuItemData,
   UpdateMyMenuItemData,
   Category,
+  ImageUploadType,
   OrderHistoryFilters,
   OrderHistoryResponse,
   RestaurantOrdersResponse,
@@ -257,6 +258,25 @@ class ProfileService {
       `${BASE_PATH}/orders/${orderId}/deny`
     )
     return response.data
+  }
+
+  async uploadImage(file: File, type: ImageUploadType, entityId?: string): Promise<{ url: string }> {
+    const formData = new FormData()
+    formData.append('image', file)
+
+    const params = new URLSearchParams({ type })
+    if (entityId) params.append('entityId', entityId)
+
+    const response = await api.post<{ url: string }>(
+      `/api/upload?${params.toString()}`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    )
+    return response.data
+  }
+
+  async deleteImage(url: string): Promise<void> {
+    await api.delete('/api/upload', { data: { url } })
   }
 }
 

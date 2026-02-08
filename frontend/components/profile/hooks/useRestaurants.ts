@@ -1,10 +1,27 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { useLanguage } from '@/hooks/useLanguage'
-import { profileService, MyRestaurant } from '@/services/profile'
+import { profileService, MyRestaurant, OpeningHoursData, GalleryImageData } from '@/services/profile'
+import { CROP_CONFIGS, CropConfig } from '@/components/ui/cropUtils'
+
+interface OpeningHoursEntry {
+  dayOfWeek: number
+  openTime: string
+  closeTime: string
+  isClosed: boolean
+}
+
+function defaultOpeningHours(): OpeningHoursEntry[] {
+  return Array.from({ length: 7 }, (_, i) => ({
+    dayOfWeek: i,
+    openTime: '09:00',
+    closeTime: '22:00',
+    isClosed: false,
+  }))
+}
 
 interface RestaurantFormState {
   name: string
@@ -20,6 +37,7 @@ interface RestaurantFormState {
   images: string[]
   latitude?: number
   longitude?: number
+  openingHours: OpeningHoursEntry[]
 }
 
 const INITIAL_FORM: RestaurantFormState = {
@@ -36,6 +54,7 @@ const INITIAL_FORM: RestaurantFormState = {
   images: [],
   latitude: undefined,
   longitude: undefined,
+  openingHours: defaultOpeningHours(),
 }
 
 export function useRestaurants() {
@@ -54,9 +73,21 @@ export function useRestaurants() {
   const [form, setForm] = useState<RestaurantFormState>(INITIAL_FORM)
   const [formLoading, setFormLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [imageUploading, setImageUploading] = useState(false)
+  const imageInputRef = useRef<HTMLInputElement>(null)
+  const [cropSrc, setCropSrc] = useState<string | null>(null)
+  const [cropConfig, setCropConfig] = useState<CropConfig>(CROP_CONFIGS['restaurant-logo'])
   const [error, setError] = useState('')
 
   const isRestaurantOwner = user?.role === 'RESTAURANT_OWNER'
+
+  // Revoke crop object URL on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (cropSrc) URL.revokeObjectURL(cropSrc)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Load restaurants for owners
   const loadRestaurants = useCallback(async () => {
@@ -87,11 +118,64 @@ export function useRestaurants() {
   }, [])
 
   const removeImage = useCallback((index: number) => {
-    setForm((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }))
+    setForm((prev) => {
+      const removedUrl = prev.images[index]
+      if (removedUrl && removedUrl.startsWith('https://storage.googleapis.com/')) {
+        profileService.deleteImage(removedUrl).catch(() => {})
+      }
+      return {
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index),
+      }
+    })
   }, [])
+
+  const onAddImage = useCallback(() => {
+    imageInputRef.current?.click()
+  }, [])
+
+  const handleImageFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+
+    const imageCount = form.images.length
+    const config = imageCount === 0
+      ? CROP_CONFIGS['restaurant-logo']
+      : imageCount === 1
+        ? CROP_CONFIGS['restaurant-cover']
+        : CROP_CONFIGS['restaurant-gallery']
+    setCropConfig(config)
+    setCropSrc(URL.createObjectURL(file))
+  }, [form.images.length])
+
+  const handleCropConfirm = useCallback(async (croppedFile: File) => {
+    if (cropSrc) URL.revokeObjectURL(cropSrc)
+    setCropSrc(null)
+
+    setImageUploading(true)
+    try {
+      const imageCount = form.images.length
+      const type = imageCount === 0
+        ? 'restaurant-logo' as const
+        : imageCount === 1
+          ? 'restaurant-cover' as const
+          : 'restaurant-gallery' as const
+      const entityId = editingRestaurant?.id
+      const { url } = await profileService.uploadImage(croppedFile, type, entityId)
+      setForm((prev) => ({ ...prev, images: [...prev.images, url] }))
+      toast.success(t('upload.success'))
+    } catch {
+      toast.error(t('upload.failed'))
+    } finally {
+      setImageUploading(false)
+    }
+  }, [cropSrc, form.images.length, editingRestaurant, toast, t])
+
+  const handleCropCancel = useCallback(() => {
+    if (cropSrc) URL.revokeObjectURL(cropSrc)
+    setCropSrc(null)
+  }, [cropSrc])
 
   const handleAddressSelect = useCallback((addr: {
     address: string
@@ -125,6 +209,22 @@ export function useRestaurants() {
     const images: string[] = []
     if (restaurant.logoUrl) images.push(restaurant.logoUrl)
     if (restaurant.coverUrl) images.push(restaurant.coverUrl)
+    // Add gallery images after logo and cover
+    if (restaurant.galleryImages?.length) {
+      for (const img of restaurant.galleryImages) {
+        images.push(img.imageUrl)
+      }
+    }
+
+    // Populate opening hours from restaurant data, or use defaults
+    const openingHours = restaurant.openingHours?.length
+      ? defaultOpeningHours().map((def) => {
+          const existing = restaurant.openingHours.find((h) => h.dayOfWeek === def.dayOfWeek)
+          return existing
+            ? { dayOfWeek: existing.dayOfWeek, openTime: existing.openTime, closeTime: existing.closeTime, isClosed: existing.isClosed }
+            : def
+        })
+      : defaultOpeningHours()
 
     setForm({
       name: restaurant.name,
@@ -138,6 +238,7 @@ export function useRestaurants() {
       minOrderAmount: restaurant.minOrderAmount || '',
       deliveryFee: restaurant.deliveryFee || '',
       images,
+      openingHours,
     })
     setError('')
     setShowFormModal(true)
@@ -169,10 +270,20 @@ export function useRestaurants() {
     setDeletingRestaurant(null)
   }, [])
 
+  const setOpeningHours = useCallback((openingHours: OpeningHoursEntry[]) => {
+    setForm((prev) => ({ ...prev, openingHours }))
+  }, [])
+
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setFormLoading(true)
     setError('')
+
+    // Build gallery images from images[2+]
+    const galleryImages: GalleryImageData[] = form.images.slice(2).map((url, i) => ({
+      imageUrl: url,
+      sortOrder: i,
+    }))
 
     try {
       if (editingRestaurant) {
@@ -185,6 +296,8 @@ export function useRestaurants() {
           deliveryFee: form.deliveryFee ? parseFloat(form.deliveryFee) : null,
           logoUrl: form.images[0] || null,
           coverUrl: form.images[1] || null,
+          openingHours: form.openingHours,
+          galleryImages,
         })
         setRestaurants((prev) => prev.map((r) => (r.id === restaurant.id ? restaurant : r)))
         toast.success(t('toast.restaurantUpdated'))
@@ -205,6 +318,8 @@ export function useRestaurants() {
           postalCode: form.postalCode || null,
           minOrderAmount: form.minOrderAmount ? parseFloat(form.minOrderAmount) : null,
           deliveryFee: form.deliveryFee ? parseFloat(form.deliveryFee) : null,
+          openingHours: form.openingHours,
+          galleryImages,
         })
         setRestaurants((prev) => [...prev, restaurant])
         toast.success(t('toast.restaurantCreated'))
@@ -250,6 +365,14 @@ export function useRestaurants() {
     handleAddressSelect,
     setImages,
     removeImage,
+    onAddImage,
+    handleImageFileChange,
+    handleCropConfirm,
+    handleCropCancel,
+    cropSrc,
+    cropConfig,
+    imageInputRef,
+    imageUploading,
     openAddModal,
     openEditModal,
     closeFormModal,
@@ -259,5 +382,6 @@ export function useRestaurants() {
     closeDeleteModal,
     handleSubmit,
     handleDelete,
+    setOpeningHours,
   }
 }

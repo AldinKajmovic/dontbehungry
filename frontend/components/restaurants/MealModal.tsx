@@ -8,6 +8,7 @@ import { useLanguage } from '@/hooks/useLanguage'
 import { useMealModal } from './hooks'
 import { MenuItemCard } from './MenuItemCard'
 import { DifferentRestaurantModal } from './DifferentRestaurantModal'
+import { AboutSection } from './AboutSection'
 
 interface MealModalProps {
   restaurant: PublicRestaurant | null
@@ -33,6 +34,9 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
     handleAddToCart,
     handleConfirmNewRestaurant,
     handleCancelNewRestaurant,
+    restaurantDetail,
+    activeTab,
+    setActiveTab,
   } = useMealModal(restaurant, isOpen)
 
   useEffect(() => {
@@ -151,25 +155,50 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
             </div>
           </div>
 
-          {/* Category Tabs */}
-          {menuCategories.length > 0 && (
-            <div className="border-b border-gray-200 overflow-x-auto">
+          {/* Menu / About Tabs */}
+          <div className="border-b border-gray-200">
+            <div className="flex px-4">
+              <button
+                onClick={() => setActiveTab('menu')}
+                className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${
+                  activeTab === 'menu'
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {t('mealModal.menu')}
+              </button>
+              <button
+                onClick={() => setActiveTab('about')}
+                className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${
+                  activeTab === 'about'
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {t('mealModal.about')}
+              </button>
+            </div>
+          </div>
+
+          {/* Category Sub-tabs (only for menu) */}
+          {activeTab === 'menu' && menuCategories.length > 0 && (
+            <div className="border-b border-gray-100 overflow-x-auto">
               <div className="flex px-4 gap-1 min-w-max">
                 {menuCategories.map((cat) => (
                   <button
                     key={cat.categoryId}
                     onClick={() => setSelectedCategory(cat.categoryId)}
                     className={`
-                      px-4 py-3 text-sm font-medium whitespace-nowrap
-                      border-b-2 -mb-px
+                      px-3 py-2 text-xs font-medium whitespace-nowrap rounded-full
                       ${selectedCategory === cat.categoryId
-                        ? 'border-primary-500 text-primary-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'bg-primary-100 text-primary-700'
+                        : 'text-gray-500 hover:bg-gray-100'
                       }
                     `}
                   >
                     {cat.categoryName}
-                    <span className="ml-1 text-xs text-gray-400">({cat.items.length})</span>
+                    <span className="ml-1 text-gray-400">({cat.items.length})</span>
                   </button>
                 ))}
               </div>
@@ -178,7 +207,15 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
 
           {/* Content */}
           <div className="p-4 max-h-[50vh] overflow-y-auto">
-            {isLoading ? (
+            {activeTab === 'about' ? (
+              restaurantDetail ? (
+                <AboutSection restaurant={restaurantDetail} />
+              ) : (
+                <div className="flex justify-center py-8">
+                  <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              )
+            ) : isLoading ? (
               <div className="flex justify-center py-8">
                 <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
               </div>

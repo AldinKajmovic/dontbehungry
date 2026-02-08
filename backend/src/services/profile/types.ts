@@ -9,6 +9,32 @@ export interface UpdateProfileResult {
   verificationEmailFailed?: boolean
 }
 
+export interface OpeningHoursInput {
+  dayOfWeek: number
+  openTime: string
+  closeTime: string
+  isClosed: boolean
+}
+
+export interface GalleryImageInput {
+  imageUrl: string
+  sortOrder: number
+}
+
+export interface OpeningHoursResponse {
+  id: string
+  dayOfWeek: number
+  openTime: string
+  closeTime: string
+  isClosed: boolean
+}
+
+export interface GalleryImageResponse {
+  id: string
+  imageUrl: string
+  sortOrder: number
+}
+
 export interface MyRestaurantResponse {
   id: string
   name: string
@@ -26,6 +52,8 @@ export interface MyRestaurantResponse {
     city: string
     country: string
   }
+  openingHours: OpeningHoursResponse[]
+  galleryImages: GalleryImageResponse[]
 }
 
 export interface CreateMyRestaurantData {
@@ -39,6 +67,8 @@ export interface CreateMyRestaurantData {
   postalCode?: string | null
   minOrderAmount?: number | null
   deliveryFee?: number | null
+  openingHours?: OpeningHoursInput[]
+  galleryImages?: GalleryImageInput[]
 }
 
 export interface UpdateMyRestaurantData {
@@ -50,6 +80,8 @@ export interface UpdateMyRestaurantData {
   deliveryFee?: number | null
   logoUrl?: string | null
   coverUrl?: string | null
+  openingHours?: OpeningHoursInput[]
+  galleryImages?: GalleryImageInput[]
 }
 
 export interface MyMenuItemResponse {

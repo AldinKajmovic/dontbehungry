@@ -1,8 +1,15 @@
 'use client'
 
 import { useLanguage } from '@/hooks/useLanguage'
-import { Input, Button, Alert, Modal, AddressAutocomplete } from '@/components/ui'
+import { Input, Button, Alert, Modal, AddressAutocomplete, OpeningHoursForm } from '@/components/ui'
 import { MyRestaurant } from '@/services/profile'
+
+interface OpeningHoursEntry {
+  dayOfWeek: number
+  openTime: string
+  closeTime: string
+  isClosed: boolean
+}
 
 interface RestaurantFormState {
   name: string
@@ -16,6 +23,7 @@ interface RestaurantFormState {
   minOrderAmount: string
   deliveryFee: string
   images: string[]
+  openingHours: OpeningHoursEntry[]
 }
 
 interface RestaurantFormModalProps {
@@ -36,7 +44,10 @@ interface RestaurantFormModalProps {
     longitude: number
   }) => void
   removeImage: (index: number) => void
+  onAddImage?: () => void
+  imageUploading?: boolean
   handleSubmit: (e: React.FormEvent) => void
+  onOpeningHoursChange?: (hours: OpeningHoursEntry[]) => void
 }
 
 const RestaurantIcon = (
@@ -55,7 +66,10 @@ export function RestaurantFormModal({
   handleChange,
   handleAddressSelect,
   removeImage,
+  onAddImage,
+  imageUploading,
   handleSubmit,
+  onOpeningHoursChange,
 }: RestaurantFormModalProps) {
   const { t } = useLanguage()
 
@@ -146,17 +160,33 @@ export function RestaurantFormModal({
             {form.images.length < 6 && (
               <button
                 type="button"
-                className="group flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer"
+                onClick={onAddImage}
+                disabled={imageUploading}
+                className="group flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer disabled:opacity-50"
               >
-                <svg className="w-8 h-8 text-gray-400 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                <span className="text-xs text-gray-500 group-hover:text-primary-600 mt-1">{form.images.length} / 6</span>
+                {imageUploading ? (
+                  <div className="w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <svg className="w-8 h-8 text-gray-400 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span className="text-xs text-gray-500 group-hover:text-primary-600 mt-1">{form.images.length} / 6</span>
+                  </>
+                )}
               </button>
             )}
           </div>
-          <p className="text-xs text-gray-400 mt-2">Click to add images (up to 6)</p>
+          <p className="text-xs text-gray-400 mt-2">{t('upload.galleryHint')}</p>
         </div>
+
+        {/* Opening Hours */}
+        {onOpeningHoursChange && (
+          <OpeningHoursForm
+            value={form.openingHours}
+            onChange={onOpeningHoursChange}
+          />
+        )}
 
         {!editingRestaurant && (
           <>

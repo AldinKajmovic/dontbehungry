@@ -48,4 +48,10 @@ export const config = {
   admin: {
     whitelistedIPs: process.env.ADMIN_WHITELISTED_IPS?.split(',').map(ip => ip.trim()).filter(Boolean) || [],
   },
+  // Google Cloud Storage bucket configuration for storing user-uploaded images
+  gcs: {
+    bucketName: process.env.GCS_BUCKET_NAME || '',
+    projectId: process.env.GCS_PROJECT_ID || '',
+    credentials: process.env.GCS_CREDENTIALS || '',
+  },
 } as const

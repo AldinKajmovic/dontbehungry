@@ -105,7 +105,15 @@ Modal form for creating or editing restaurants:
   - Each image has a delete button (trash icon) on hover
   - Plus button to add new images (placeholder for future upload)
   - Counter shows current/max images (e.g., "3/6")
-  - First image used as logo, second as cover
+  - First image used as logo, second as cover, remaining as gallery images
+
+- **Opening Hours** (`OpeningHoursForm` component):
+  - 7 rows for Monday through Sunday
+  - Each row has day label, "Closed" checkbox, open time and close time inputs
+  - Time inputs are disabled when "Closed" is checked
+  - Default: all days 09:00-22:00, none closed
+  - Sent as `openingHours` array in create/update payloads
+  - On update: server uses delete-all + recreate pattern
 
 **Menu Items Management**
 
@@ -255,7 +263,7 @@ const [menuItemsPage, setMenuItemsPage] = useState(1)
 const [menuItemsPerPage, setMenuItemsPerPage] = useState(5)
 const [menuItemsSearch, setMenuItemsSearch] = useState('')
 
-// Restaurant form state (includes gallery)
+// Restaurant form state (includes gallery + opening hours)
 const [restaurantForm, setRestaurantForm] = useState({
   name: '',
   description: '',
@@ -267,7 +275,8 @@ const [restaurantForm, setRestaurantForm] = useState({
   postalCode: '',
   minOrderAmount: '',
   deliveryFee: '',
-  images: [] as string[],  // Gallery images array
+  images: [] as string[],  // Gallery images array (0=logo, 1=cover, 2-5=gallery)
+  openingHours: defaultOpeningHours(),  // 7 days, Mon-Sun
 })
 
 // Order history state (for customers)

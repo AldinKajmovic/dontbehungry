@@ -178,7 +178,16 @@ export async function getPublicRestaurantById(id: string) {
       place: {
         select: { city: true, address: true, country: true },
       },
-      openingHours: true,
+      openingHours: {
+        orderBy: { dayOfWeek: 'asc' },
+      },
+      galleryImages: {
+        select: { id: true, imageUrl: true, sortOrder: true },
+        orderBy: { sortOrder: 'asc' },
+      },
+      reviews: {
+        select: { rating: true },
+      },
     },
   })
 
@@ -186,7 +195,17 @@ export async function getPublicRestaurantById(id: string) {
     throw new NotFoundError('Restaurant not found', `No restaurant found with ID: ${id}`)
   }
 
-  return restaurant
+  // Calculate average rating and total reviews for the restaurant
+  const { reviews, ...rest } = restaurant
+  const totalReviews = reviews.length
+  const averageRating = totalReviews > 0
+    ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews) * 10) / 10
+    : 0
+
+  return {
+    ...rest,
+    reviewStats: { averageRating, totalReviews },
+  }
 }
 
 export async function getPublicCategories() {

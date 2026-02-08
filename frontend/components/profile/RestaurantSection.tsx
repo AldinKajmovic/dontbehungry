@@ -1,7 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/hooks/useLanguage'
-import { Button, Section } from '@/components/ui'
+import { Button, Section, CropModal } from '@/components/ui'
 import { useRestaurants } from './hooks'
 import { RestaurantFormModal } from './RestaurantFormModal'
 import { RestaurantViewModal } from './RestaurantViewModal'
@@ -26,6 +26,14 @@ export function RestaurantSection() {
     handleChange,
     handleAddressSelect,
     removeImage,
+    onAddImage,
+    handleImageFileChange,
+    handleCropConfirm,
+    handleCropCancel,
+    cropSrc,
+    cropConfig,
+    imageInputRef,
+    imageUploading,
     openAddModal,
     openEditModal,
     closeFormModal,
@@ -35,6 +43,7 @@ export function RestaurantSection() {
     closeDeleteModal,
     handleSubmit,
     handleDelete,
+    setOpeningHours,
   } = useRestaurants()
 
   if (!isRestaurantOwner) return null
@@ -168,8 +177,29 @@ export function RestaurantSection() {
         handleChange={handleChange}
         handleAddressSelect={handleAddressSelect}
         removeImage={removeImage}
+        onAddImage={onAddImage}
+        imageUploading={imageUploading}
         handleSubmit={handleSubmit}
+        onOpeningHoursChange={setOpeningHours}
       />
+
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageFileChange}
+        className="hidden"
+      />
+
+      {cropSrc && (
+        <CropModal
+          isOpen={!!cropSrc}
+          imageSrc={cropSrc}
+          cropConfig={cropConfig}
+          onConfirm={handleCropConfirm}
+          onCancel={handleCropCancel}
+        />
+      )}
 
       <RestaurantViewModal
         isOpen={showViewModal}

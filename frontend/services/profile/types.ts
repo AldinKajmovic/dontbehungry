@@ -26,6 +26,19 @@ export interface UpdateAvatarData {
   avatarUrl: string | null
 }
 
+export interface OpeningHoursData {
+  dayOfWeek: number
+  openTime: string
+  closeTime: string
+  isClosed: boolean
+}
+
+export interface GalleryImageData {
+  id?: string
+  imageUrl: string
+  sortOrder: number
+}
+
 // Restaurant owner types
 export interface MyRestaurant {
   id: string
@@ -44,6 +57,8 @@ export interface MyRestaurant {
     city: string
     country: string
   }
+  openingHours: OpeningHoursData[]
+  galleryImages: GalleryImageData[]
 }
 
 export interface CreateMyRestaurantData {
@@ -57,6 +72,8 @@ export interface CreateMyRestaurantData {
   postalCode?: string | null
   minOrderAmount?: number | null
   deliveryFee?: number | null
+  openingHours?: OpeningHoursData[]
+  galleryImages?: GalleryImageData[]
 }
 
 export interface UpdateMyRestaurantData {
@@ -68,6 +85,8 @@ export interface UpdateMyRestaurantData {
   deliveryFee?: number | null
   logoUrl?: string | null
   coverUrl?: string | null
+  openingHours?: OpeningHoursData[]
+  galleryImages?: GalleryImageData[]
 }
 
 // Menu item types for restaurant owners
@@ -106,6 +125,8 @@ export interface Category {
   id: string
   name: string
 }
+
+export type ImageUploadType = 'avatar' | 'restaurant-logo' | 'restaurant-cover' | 'restaurant-gallery' | 'menu-item' | 'category-icon'
 
 // Order History Types
 

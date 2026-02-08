@@ -133,6 +133,8 @@ export interface AdminRestaurant {
   rating: string
   minOrderAmount: string | null
   deliveryFee: string | null
+  galleryImages?: { id?: string; imageUrl: string; sortOrder: number }[]
+  openingHours?: OpeningHoursInput[]
   owner: {
     id: string
     email: string
@@ -140,6 +142,18 @@ export interface AdminRestaurant {
     lastName: string
   }
   place: AdminPlace
+}
+
+export interface OpeningHoursInput {
+  dayOfWeek: number
+  openTime: string
+  closeTime: string
+  isClosed: boolean
+}
+
+export interface GalleryImageInput {
+  imageUrl: string
+  sortOrder: number
 }
 
 export interface CreateRestaurantInput {
@@ -153,6 +167,8 @@ export interface CreateRestaurantInput {
   deliveryFee?: number
   logoUrl?: string | null
   coverUrl?: string | null
+  openingHours?: OpeningHoursInput[]
+  galleryImages?: GalleryImageInput[]
 }
 
 export interface UpdateRestaurantInput {
@@ -166,6 +182,8 @@ export interface UpdateRestaurantInput {
   deliveryFee?: number | null
   logoUrl?: string | null
   coverUrl?: string | null
+  openingHours?: OpeningHoursInput[]
+  galleryImages?: GalleryImageInput[]
 }
 
 // Category types
@@ -395,4 +413,18 @@ export interface AdminDriverLocationEvent {
     heading: number | null
   }
   timestamp: string
+}
+
+export interface GCSImage {
+  name: string
+  url: string
+  size: number
+  contentType: string
+  created: string
+  folder: string
+}
+
+export interface BrowseImagesResponse {
+  images: GCSImage[]
+  total: number
 }

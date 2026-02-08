@@ -265,9 +265,24 @@ Content-Type: application/json
   "minOrderAmount": 15.00,
   "deliveryFee": 3.50,
   "logoUrl": "https://example.com/logo.jpg",     // optional
-  "coverUrl": "https://example.com/cover.jpg"    // optional
+  "coverUrl": "https://example.com/cover.jpg",   // optional
+  "openingHours": [                               // optional
+    { "dayOfWeek": 0, "openTime": "09:00", "closeTime": "22:00", "isClosed": false },
+    { "dayOfWeek": 6, "openTime": "00:00", "closeTime": "00:00", "isClosed": true }
+  ],
+  "galleryImages": [                              // optional, max 6
+    { "imageUrl": "https://example.com/interior.jpg", "sortOrder": 0 }
+  ]
 }
 ```
+
+**Opening Hours Validation:**
+- Max 7 entries (one per day), `dayOfWeek` 0 (Monday) to 6 (Sunday)
+- `openTime` and `closeTime` must be in `HH:mm` format
+- No duplicate `dayOfWeek` values
+
+**Gallery Images Validation:**
+- Max 6 images, each with a valid `imageUrl` and integer `sortOrder`
 
 #### Update Restaurant
 
@@ -279,7 +294,9 @@ Content-Type: application/json
   "name": "Updated Name",
   "description": "Updated description",
   "logoUrl": "https://example.com/new-logo.jpg",
-  "coverUrl": "https://example.com/new-cover.jpg"
+  "coverUrl": "https://example.com/new-cover.jpg",
+  "openingHours": [...],      // replaces all existing hours (delete-all + recreate)
+  "galleryImages": [...]      // replaces all existing gallery images (old GCS files cleaned up)
 }
 ```
 
@@ -575,6 +592,17 @@ Content-Type: application/json
 | 404 | Not Found - Resource doesn't exist |
 | 409 | Conflict - Duplicate entry |
 | 429 | Too Many Requests - Rate limit exceeded |
+
+## Image Upload
+
+Admin entity updates that include image fields (`avatarUrl`, `logoUrl`, `coverUrl`, `imageUrl`, `iconUrl`) will automatically clean up old GCS images when replaced. Use the shared upload endpoint to get image URLs:
+
+```
+POST /api/upload?type=avatar|restaurant-logo|restaurant-cover|menu-item|category-icon[&entityId=xxx]
+DELETE /api/upload  (body: { url: string })
+```
+
+See [image-upload.md](./image-upload.md) for full details.
 
 ## Files
 

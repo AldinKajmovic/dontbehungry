@@ -150,6 +150,7 @@ model Restaurant {
   orders       Order[]
   reviews      Review[]
   openingHours OpeningHours[]
+  galleryImages RestaurantImage[]
 
   @@index([ownerId])
   @@index([placeId])
@@ -195,6 +196,18 @@ model OpeningHours {
   restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@unique([restaurantId, dayOfWeek])
+  @@index([restaurantId])
+}
+
+model RestaurantImage {
+  id           String @id @default(uuid())
+  restaurantId String
+  imageUrl     String
+  sortOrder    Int    @default(0)
+
+  // Relations
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
   @@index([restaurantId])
 }
 

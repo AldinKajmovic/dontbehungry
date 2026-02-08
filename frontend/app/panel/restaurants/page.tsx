@@ -1,321 +1,35 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
 import { DataTable } from '@/components/admin/DataTable'
 import { Pagination } from '@/components/admin/Pagination'
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal'
 import { RangeFilter } from '@/components/admin/RangeFilter'
 import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
-import { Modal, Input, Button, Alert, SearchableSelect, AddressAutocomplete } from '@/components/ui'
-import { adminService, AdminRestaurant, PaginationInfo, RestaurantFilters, SortParams } from '@/services/admin'
-import { useLanguage } from '@/hooks/useLanguage'
-import { useToast } from '@/hooks/useToast'
+import { Modal, Input, Button, Alert, SearchableSelect, AddressAutocomplete, OpeningHoursForm } from '@/components/ui'
+import { ImageBrowserModal } from '@/components/admin/ImageBrowserModal'
+import { AdminRestaurant } from '@/services/admin'
+import { profileService } from '@/services/profile'
+import { CropModal } from '@/components/ui/CropModal'
+import { CROP_CONFIGS } from '@/components/ui/cropUtils'
+import { useAdminRestaurants } from '@/hooks/admin'
 
 export default function RestaurantsPage() {
-  const { t } = useLanguage()
-  const { toast } = useToast()
-  const [restaurants, setRestaurants] = useState<AdminRestaurant[]>([])
-  const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
-  const [search, setSearch] = useState('')
-  const [filters, setFilters] = useState<RestaurantFilters>({})
-  const [sort, setSort] = useState<SortParams>({})
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  // Modal states
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [showEmailReportModal, setShowEmailReportModal] = useState(false)
-  const [selectedRestaurant, setSelectedRestaurant] = useState<AdminRestaurant | null>(null)
-
-  // Form states
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    phone: '',
-    email: '',
-    ownerId: '',
-    placeId: '',
-    minOrderAmount: '',
-    deliveryFee: '',
-    images: [] as string[],
-    // New place fields (for creating inline)
-    createNewPlace: false,
-    newPlaceAddress: '',
-    newPlaceCity: '',
-    newPlaceCountry: '',
-    newPlacePostalCode: '',
-    newPlaceLatitude: undefined as number | undefined,
-    newPlaceLongitude: undefined as number | undefined,
-  })
-  const [formError, setFormError] = useState('')
-  const [formLoading, setFormLoading] = useState(false)
-
-  const loadRestaurants = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      setError(null)
-      const result = await adminService.getRestaurants(
-        pagination.page,
-        pagination.limit,
-        search || undefined,
-        Object.keys(filters).length > 0 ? filters : undefined,
-        sort.sortBy ? sort : undefined
-      )
-      setRestaurants(result.items)
-      setPagination(result.pagination)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load restaurants')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [pagination.page, pagination.limit, search, filters, sort])
-
-  useEffect(() => {
-    loadRestaurants()
-  }, [loadRestaurants])
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    setPagination((prev) => ({ ...prev, page: 1 }))
-    loadRestaurants()
-  }
-
-  const handlePageChange = (page: number) => {
-    setPagination((prev) => ({ ...prev, page }))
-  }
-
-  const handleLimitChange = (limit: number) => {
-    setPagination((prev) => ({ ...prev, page: 1, limit }))
-  }
-
-  const handleSort = (sortBy: string, sortOrder: 'asc' | 'desc') => {
-    setSort({ sortBy, sortOrder })
-    setPagination((prev) => ({ ...prev, page: 1 }))
-  }
-
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => {
-      const next = { ...prev, [key]: value || undefined }
-      Object.keys(next).forEach((k) => {
-        if (!next[k as keyof RestaurantFilters]) delete next[k as keyof RestaurantFilters]
-      })
-      return next
-    })
-    setPagination((prev) => ({ ...prev, page: 1 }))
-  }
-
-  const handleClearFilters = () => {
-    setFilters({})
-    setPagination((prev) => ({ ...prev, page: 1 }))
-  }
-
-  const hasActiveFilters = Object.keys(filters).length > 0
-
-  const openCreateModal = () => {
-    setFormData({
-      name: '',
-      description: '',
-      phone: '',
-      email: '',
-      ownerId: '',
-      placeId: '',
-      minOrderAmount: '',
-      deliveryFee: '',
-      images: [],
-      createNewPlace: false,
-      newPlaceAddress: '',
-      newPlaceCity: '',
-      newPlaceCountry: '',
-      newPlacePostalCode: '',
-      newPlaceLatitude: undefined,
-      newPlaceLongitude: undefined,
-    })
-    setFormError('')
-    setShowCreateModal(true)
-  }
-
-  const openEditModal = (restaurant: AdminRestaurant) => {
-    setSelectedRestaurant(restaurant)
-    // Build images array from logo and cover
-    const images: string[] = []
-    if (restaurant.logoUrl) images.push(restaurant.logoUrl)
-    if (restaurant.coverUrl) images.push(restaurant.coverUrl)
-
-    setFormData({
-      name: restaurant.name,
-      description: restaurant.description || '',
-      phone: restaurant.phone || '',
-      email: restaurant.email || '',
-      ownerId: restaurant.owner.id,
-      placeId: restaurant.place.id,
-      minOrderAmount: restaurant.minOrderAmount || '',
-      deliveryFee: restaurant.deliveryFee || '',
-      images,
-      createNewPlace: false,
-      newPlaceAddress: '',
-      newPlaceCity: '',
-      newPlaceCountry: '',
-      newPlacePostalCode: '',
-      newPlaceLatitude: undefined,
-      newPlaceLongitude: undefined,
-    })
-    setFormError('')
-    setShowEditModal(true)
-  }
-
-  const openDeleteModal = (restaurant: AdminRestaurant) => {
-    setSelectedRestaurant(restaurant)
-    setShowDeleteModal(true)
-  }
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    // Validate: need owner and either existing place or new place address
-    if (!formData.ownerId) {
-      setFormError('Please select an owner')
-      return
-    }
-
-    if (!formData.createNewPlace && !formData.placeId) {
-      setFormError('Please select a place or create a new one')
-      return
-    }
-
-    if (formData.createNewPlace && (!formData.newPlaceAddress || !formData.newPlaceCity || !formData.newPlaceCountry)) {
-      setFormError('Please provide address, city, and country for the new place')
-      return
-    }
-
-    try {
-      setFormLoading(true)
-      setFormError('')
-
-      let placeId = formData.placeId
-
-      // If creating a new place, create it first
-      if (formData.createNewPlace) {
-        const newPlace = await adminService.createPlace({
-          address: formData.newPlaceAddress,
-          city: formData.newPlaceCity,
-          country: formData.newPlaceCountry,
-          postalCode: formData.newPlacePostalCode || undefined,
-          latitude: formData.newPlaceLatitude,
-          longitude: formData.newPlaceLongitude,
-        })
-        placeId = newPlace.id
-      }
-
-      const newRestaurant = await adminService.createRestaurant({
-        name: formData.name,
-        description: formData.description || undefined,
-        phone: formData.phone || undefined,
-        email: formData.email || undefined,
-        ownerId: formData.ownerId,
-        placeId,
-        minOrderAmount: formData.minOrderAmount ? parseFloat(formData.minOrderAmount) : undefined,
-        deliveryFee: formData.deliveryFee ? parseFloat(formData.deliveryFee) : undefined,
-        logoUrl: formData.images[0] || null,
-        coverUrl: formData.images[1] || null,
-      })
-      setRestaurants((prev) => [newRestaurant, ...prev])
-      setShowCreateModal(false)
-      toast.success(t('toast.restaurantCreated'))
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Failed to create restaurant')
-      toast.error(t('toast.error'))
-    } finally {
-      setFormLoading(false)
-    }
-  }
-
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedRestaurant) return
-    if (!formData.ownerId) {
-      setFormError('Please select an owner')
-      return
-    }
-
-    if (!formData.createNewPlace && !formData.placeId) {
-      setFormError('Please select a place or create a new one')
-      return
-    }
-
-    if (formData.createNewPlace && (!formData.newPlaceAddress || !formData.newPlaceCity || !formData.newPlaceCountry)) {
-      setFormError('Please provide address, city, and country for the new place')
-      return
-    }
-
-    try {
-      setFormLoading(true)
-      setFormError('')
-
-      let placeId = formData.placeId
-
-      // If creating a new place, create it first
-      if (formData.createNewPlace) {
-        const newPlace = await adminService.createPlace({
-          address: formData.newPlaceAddress,
-          city: formData.newPlaceCity,
-          country: formData.newPlaceCountry,
-          postalCode: formData.newPlacePostalCode || undefined,
-          latitude: formData.newPlaceLatitude,
-          longitude: formData.newPlaceLongitude,
-        })
-        placeId = newPlace.id
-      }
-
-      const updatedRestaurant = await adminService.updateRestaurant(selectedRestaurant.id, {
-        name: formData.name,
-        description: formData.description || null,
-        phone: formData.phone || null,
-        email: formData.email || null,
-        ownerId: formData.ownerId,
-        placeId,
-        minOrderAmount: formData.minOrderAmount ? parseFloat(formData.minOrderAmount) : null,
-        deliveryFee: formData.deliveryFee ? parseFloat(formData.deliveryFee) : null,
-        logoUrl: formData.images[0] || null,
-        coverUrl: formData.images[1] || null,
-      })
-      setRestaurants((prev) => prev.map((r) => (r.id === updatedRestaurant.id ? updatedRestaurant : r)))
-      setShowEditModal(false)
-      toast.success(t('toast.restaurantUpdated'))
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Failed to update restaurant')
-      toast.error(t('toast.error'))
-    } finally {
-      setFormLoading(false)
-    }
-  }
-
-  const handleDelete = async () => {
-    if (!selectedRestaurant) return
-    try {
-      setFormLoading(true)
-      await adminService.deleteRestaurant(selectedRestaurant.id)
-      setRestaurants((prev) => prev.filter((r) => r.id !== selectedRestaurant.id))
-      setShowDeleteModal(false)
-      toast.success(t('toast.restaurantDeleted'))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete restaurant')
-      toast.error(t('toast.error'))
-    } finally {
-      setFormLoading(false)
-    }
-  }
-
-  // Dropdown loaders for SearchableSelect
-  const loadOwnerOptions = useCallback((searchTerm: string) => {
-    return adminService.getUsersForSelect(searchTerm || undefined)
-  }, [])
-
-  const loadPlaceOptions = useCallback((searchTerm: string) => {
-    return adminService.getPlacesForSelect(searchTerm || undefined)
-  }, [])
+  const {
+    restaurants, pagination, search, setSearch, filters, sort, isLoading, error,
+    showCreateModal, setShowCreateModal, showEditModal, setShowEditModal,
+    showDeleteModal, setShowDeleteModal, showEmailReportModal, setShowEmailReportModal,
+    showImageBrowser, setShowImageBrowser, selectedRestaurant,
+    formData, setFormData, formError, formLoading, imageUploading, prefillLoading,
+    imageInputRef, cropSrc, setCropSrc, currentCropConfig, setCurrentCropConfig,
+    handleSearch, handlePageChange, handleLimitChange, handleSort,
+    handleFilterChange, handleClearFilters, hasActiveFilters,
+    openCreateModal, openEditModal, openDeleteModal,
+    handleCreate, handleUpdate, handleDelete,
+    handleImageFileChange, handleCropConfirm, handleCropCancel,
+    loadOwnerOptions, loadPlaceOptions,
+    t,
+  } = useAdminRestaurants()
 
   const columns = [
     {
@@ -672,10 +386,15 @@ export default function RestaurantsPage() {
                     />
                     <button
                       type="button"
-                      onClick={() => setFormData((prev) => ({
-                        ...prev,
-                        images: prev.images.filter((_, i) => i !== index)
-                      }))}
+                      onClick={() => {
+                        if (imgUrl.startsWith('https://storage.googleapis.com/')) {
+                          profileService.deleteImage(imgUrl).catch(() => {})
+                        }
+                        setFormData((prev) => ({
+                          ...prev,
+                          images: prev.images.filter((_, i) => i !== index)
+                        }))
+                      }}
                       className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                     >
                       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -690,19 +409,39 @@ export default function RestaurantsPage() {
                 <button
                   type="button"
                   className="group flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer"
-                  onClick={() => {
-                    // Visual only for now - file upload to be implemented
-                  }}
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={imageUploading}
                 >
-                  <svg className="w-8 h-8 text-gray-400 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
+                  {imageUploading ? (
+                    <svg className="w-8 h-8 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-8 h-8 text-gray-400 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  )}
                   <span className="text-xs text-gray-500 group-hover:text-primary-600 mt-1">{formData.images.length} / 6</span>
                 </button>
               )}
             </div>
-            <p className="text-xs text-gray-400 mt-2">{t('admin.modals.clickToAddImages')}</p>
+            <div className="flex items-center gap-3 mt-2">
+              <p className="text-xs text-gray-400">{t('admin.modals.clickToAddImages')}</p>
+              <button
+                type="button"
+                onClick={() => setShowImageBrowser(true)}
+                className="text-xs text-primary-600 hover:text-primary-700 underline"
+              >
+                {t('upload.browseExisting')}
+              </button>
+            </div>
           </div>
+
+          <OpeningHoursForm
+            value={formData.openingHours}
+            onChange={(hours) => setFormData((prev) => ({ ...prev, openingHours: hours }))}
+          />
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowCreateModal(false)}>
@@ -871,10 +610,15 @@ export default function RestaurantsPage() {
                     />
                     <button
                       type="button"
-                      onClick={() => setFormData((prev) => ({
-                        ...prev,
-                        images: prev.images.filter((_, i) => i !== index)
-                      }))}
+                      onClick={() => {
+                        if (imgUrl.startsWith('https://storage.googleapis.com/')) {
+                          profileService.deleteImage(imgUrl).catch(() => {})
+                        }
+                        setFormData((prev) => ({
+                          ...prev,
+                          images: prev.images.filter((_, i) => i !== index)
+                        }))
+                      }}
                       className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                     >
                       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -889,25 +633,45 @@ export default function RestaurantsPage() {
                 <button
                   type="button"
                   className="group flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer"
-                  onClick={() => {
-                    // Visual only for now - file upload to be implemented
-                  }}
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={imageUploading}
                 >
-                  <svg className="w-8 h-8 text-gray-400 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
+                  {imageUploading ? (
+                    <svg className="w-8 h-8 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-8 h-8 text-gray-400 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  )}
                   <span className="text-xs text-gray-500 group-hover:text-primary-600 mt-1">{formData.images.length} / 6</span>
                 </button>
               )}
             </div>
-            <p className="text-xs text-gray-400 mt-2">{t('admin.modals.clickToAddImages')}</p>
+            <div className="flex items-center gap-3 mt-2">
+              <p className="text-xs text-gray-400">{t('admin.modals.clickToAddImages')}</p>
+              <button
+                type="button"
+                onClick={() => setShowImageBrowser(true)}
+                className="text-xs text-primary-600 hover:text-primary-700 underline"
+              >
+                {t('upload.browseExisting')}
+              </button>
+            </div>
           </div>
+
+          <OpeningHoursForm
+            value={formData.openingHours}
+            onChange={(hours) => setFormData((prev) => ({ ...prev, openingHours: hours }))}
+          />
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowEditModal(false)}>
               {t('common.cancel')}
             </Button>
-            <Button type="submit" className="flex-1" isLoading={formLoading}>
+            <Button type="submit" className="flex-1" isLoading={formLoading || prefillLoading} disabled={prefillLoading}>
               {t('admin.buttons.saveChanges')}
             </Button>
           </div>
@@ -930,6 +694,36 @@ export default function RestaurantsPage() {
         onClose={() => setShowEmailReportModal(false)}
         reportType="restaurants"
         filters={filters}
+      />
+
+      <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageFileChange} className="hidden" />
+
+      {cropSrc && (
+        <CropModal
+          isOpen={!!cropSrc}
+          imageSrc={cropSrc}
+          cropConfig={currentCropConfig}
+          onConfirm={handleCropConfirm}
+          onCancel={handleCropCancel}
+        />
+      )}
+
+      {/* Image Browser Modal */}
+      <ImageBrowserModal
+        isOpen={showImageBrowser}
+        onClose={() => setShowImageBrowser(false)}
+        onSelect={(url) => {
+          setShowImageBrowser(false)
+          const imageCount = formData.images.length
+          const config = imageCount === 0
+            ? CROP_CONFIGS['restaurant-logo']
+            : imageCount === 1
+              ? CROP_CONFIGS['restaurant-cover']
+              : CROP_CONFIGS['restaurant-gallery']
+          setCurrentCropConfig(config)
+          setCropSrc(url)
+        }}
+        defaultFolder="restaurants"
       />
     </div>
   )

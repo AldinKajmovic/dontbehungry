@@ -41,6 +41,7 @@ import {
   UpdatePaymentInput,
   SortParams,
   OnlineDriversResponse,
+  BrowseImagesResponse,
 } from './types'
 
 // API paths
@@ -235,6 +236,13 @@ class AdminService {
   // ============ Online Drivers ============
   async getOnlineDrivers(): Promise<OnlineDriversResponse> {
     const response = await api.get<OnlineDriversResponse>('/api/admin/drivers/online')
+    return response.data
+  }
+
+  // ============ Image Browser ============
+  async browseImages(folder?: string): Promise<BrowseImagesResponse> {
+    const params = folder ? { folder } : {}
+    const response = await api.get<BrowseImagesResponse>('/api/admin/images/browse', { params })
     return response.data
   }
 }

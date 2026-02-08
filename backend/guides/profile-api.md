@@ -107,7 +107,7 @@ Changes the user's password. Only available for users with local authentication 
 
 ### Update Avatar
 
-Updates the user's avatar URL.
+Updates the user's avatar URL. When replaced, old GCS images are automatically cleaned up.
 
 **Endpoint:** `PATCH /api/profile/avatar`
 
@@ -123,6 +123,8 @@ Updates the user's avatar URL.
 **Validation Rules:**
 - `avatarUrl`: Must be a valid URL with `http://` or `https://` protocol
 - Other protocols (`javascript:`, `data:`, etc.) are rejected for security
+
+> **Image Upload**: Use `POST /api/upload?type=avatar` to upload an avatar image first, then pass the returned URL here. See [image-upload.md](./image-upload.md) for details.
 
 **Response:**
 ```json
@@ -198,7 +200,13 @@ Returns all restaurants owned by the authenticated user.
         "address": "123 Main Street",
         "city": "New York",
         "country": "USA"
-      }
+      },
+      "openingHours": [
+        { "dayOfWeek": 0, "openTime": "09:00", "closeTime": "22:00", "isClosed": false }
+      ],
+      "galleryImages": [
+        { "id": "uuid", "imageUrl": "https://example.com/gallery1.jpg", "sortOrder": 0 }
+      ]
     }
   ]
 }
@@ -226,7 +234,23 @@ Creates a new restaurant for the authenticated user.
   "country": "string (required)",
   "postalCode": "string (optional)",
   "minOrderAmount": "number (optional)",
-  "deliveryFee": "number (optional)"
+  "deliveryFee": "number (optional)",
+  "logoUrl": "string (optional)",
+  "coverUrl": "string (optional)",
+  "openingHours": [
+    {
+      "dayOfWeek": 0,
+      "openTime": "09:00",
+      "closeTime": "22:00",
+      "isClosed": false
+    }
+  ],
+  "galleryImages": [
+    {
+      "imageUrl": "https://example.com/gallery1.jpg",
+      "sortOrder": 0
+    }
+  ]
 }
 ```
 
@@ -237,6 +261,8 @@ Creates a new restaurant for the authenticated user.
 - `country`: Required, non-empty
 - `minOrderAmount`: Must be a positive number if provided
 - `deliveryFee`: Must be a positive number if provided
+- `openingHours`: Max 7 entries, `dayOfWeek` 0-6, `openTime`/`closeTime` in HH:mm format, no duplicate days
+- `galleryImages`: Max 6 images, each must have a valid `imageUrl`
 
 **Response:**
 ```json
@@ -258,7 +284,13 @@ Creates a new restaurant for the authenticated user.
       "address": "123 Main Street",
       "city": "New York",
       "country": "USA"
-    }
+    },
+    "openingHours": [
+      { "dayOfWeek": 0, "openTime": "09:00", "closeTime": "22:00", "isClosed": false }
+    ],
+    "galleryImages": [
+      { "id": "uuid", "imageUrl": "https://example.com/gallery1.jpg", "sortOrder": 0 }
+    ]
   }
 }
 ```
@@ -266,6 +298,7 @@ Creates a new restaurant for the authenticated user.
 **Side Effects:**
 - Creates a new Place record with the provided address
 - Creates a new Restaurant linked to the user and place
+- Creates OpeningHours and RestaurantImage records if provided
 
 ---
 
@@ -285,11 +318,31 @@ Updates an existing restaurant owned by the authenticated user.
   "phone": "string | null (optional)",
   "email": "string | null (optional)",
   "minOrderAmount": "number | null (optional)",
-  "deliveryFee": "number | null (optional)"
+  "deliveryFee": "number | null (optional)",
+  "logoUrl": "string | null (optional)",
+  "coverUrl": "string | null (optional)",
+  "openingHours": [
+    {
+      "dayOfWeek": 0,
+      "openTime": "09:00",
+      "closeTime": "22:00",
+      "isClosed": false
+    }
+  ],
+  "galleryImages": [
+    {
+      "imageUrl": "https://example.com/gallery1.jpg",
+      "sortOrder": 0
+    }
+  ]
 }
 ```
 
 **Note:** Location (place) cannot be updated through this endpoint. Contact admin if location change is needed.
+
+**Opening Hours & Gallery Update Behavior:**
+- When `openingHours` is provided, all existing opening hours are deleted and replaced with the new set (delete-all + recreate pattern)
+- When `galleryImages` is provided, all existing gallery images are deleted and replaced; removed GCS images are cleaned up automatically
 
 **Response:**
 ```json

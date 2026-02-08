@@ -19,12 +19,16 @@ export function useMealModal(restaurant: PublicRestaurant | null, isOpen: boolea
   const [showDifferentRestaurantModal, setShowDifferentRestaurantModal] = useState(false)
   const [pendingItem, setPendingItem] = useState<MenuItem | null>(null)
   const [addedItems, setAddedItems] = useState<Set<string>>(new Set())
+  const [restaurantDetail, setRestaurantDetail] = useState<PublicRestaurant | null>(null)
+  const [activeTab, setActiveTab] = useState<'menu' | 'about'>('menu')
 
   useEffect(() => {
     if (isOpen && restaurant) {
       loadMenuItems()
+      loadRestaurantDetail()
       setItemQuantities({})
       setAddedItems(new Set())
+      setActiveTab('menu')
     }
   }, [isOpen, restaurant])
 
@@ -41,6 +45,16 @@ export function useMealModal(restaurant: PublicRestaurant | null, isOpen: boolea
       logger.error('Failed to load menu items', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const loadRestaurantDetail = async () => {
+    if (!restaurant) return
+    try {
+      const detail = await publicService.getRestaurantById(restaurant.id)
+      setRestaurantDetail(detail)
+    } catch (error) {
+      logger.error('Failed to load restaurant details', error)
     }
   }
 
@@ -124,5 +138,8 @@ export function useMealModal(restaurant: PublicRestaurant | null, isOpen: boolea
     handleAddToCart,
     handleConfirmNewRestaurant,
     handleCancelNewRestaurant,
+    restaurantDetail,
+    activeTab,
+    setActiveTab,
   }
 }

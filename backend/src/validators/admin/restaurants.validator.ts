@@ -60,6 +60,18 @@ export function validateRestaurantFilters(query: {
   return filters
 }
 
+export interface OpeningHoursInput {
+  dayOfWeek: number
+  openTime: string
+  closeTime: string
+  isClosed: boolean
+}
+
+export interface GalleryImageInput {
+  imageUrl: string
+  sortOrder: number
+}
+
 export interface CreateRestaurantData {
   name: string
   description?: string
@@ -69,6 +81,49 @@ export interface CreateRestaurantData {
   placeId: string
   minOrderAmount?: number
   deliveryFee?: number
+  logoUrl?: string | null
+  coverUrl?: string | null
+  openingHours?: OpeningHoursInput[]
+  galleryImages?: GalleryImageInput[]
+}
+
+const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/
+
+function validateOpeningHours(hours?: OpeningHoursInput[]): void {
+  if (!hours) return
+  if (hours.length > 7) {
+    throw new BadRequestError('Too many opening hours entries', 'Maximum 7 entries allowed (one per day)')
+  }
+  const seen = new Set<number>()
+  for (const entry of hours) {
+    if (entry.dayOfWeek < 0 || entry.dayOfWeek > 6 || !Number.isInteger(entry.dayOfWeek)) {
+      throw new BadRequestError('Invalid day of week', 'dayOfWeek must be an integer between 0 and 6')
+    }
+    if (seen.has(entry.dayOfWeek)) {
+      throw new BadRequestError('Duplicate day', `Duplicate entry for day ${entry.dayOfWeek}`)
+    }
+    seen.add(entry.dayOfWeek)
+    if (!entry.isClosed) {
+      if (!TIME_REGEX.test(entry.openTime)) {
+        throw new BadRequestError('Invalid open time', 'openTime must be in HH:mm format')
+      }
+      if (!TIME_REGEX.test(entry.closeTime)) {
+        throw new BadRequestError('Invalid close time', 'closeTime must be in HH:mm format')
+      }
+    }
+  }
+}
+
+function validateGalleryImages(images?: GalleryImageInput[]): void {
+  if (!images) return
+  if (images.length > 6) {
+    throw new BadRequestError('Too many gallery images', 'Maximum 6 gallery images allowed')
+  }
+  for (const img of images) {
+    if (!img.imageUrl || typeof img.imageUrl !== 'string') {
+      throw new BadRequestError('Invalid gallery image', 'Each gallery image must have a valid imageUrl')
+    }
+  }
 }
 
 export function validateCreateRestaurant(data: CreateRestaurantData): void {
@@ -87,6 +142,9 @@ export function validateCreateRestaurant(data: CreateRestaurantData): void {
   if (email && !EMAIL_REGEX.test(email)) {
     throw new BadRequestError('Invalid email', 'Please provide a valid restaurant email address')
   }
+
+  validateOpeningHours(data.openingHours)
+  validateGalleryImages(data.galleryImages)
 }
 
 export interface UpdateRestaurantData {
@@ -98,6 +156,10 @@ export interface UpdateRestaurantData {
   placeId?: string
   minOrderAmount?: number
   deliveryFee?: number
+  logoUrl?: string | null
+  coverUrl?: string | null
+  openingHours?: OpeningHoursInput[]
+  galleryImages?: GalleryImageInput[]
 }
 
 export function validateUpdateRestaurant(data: UpdateRestaurantData): void {
@@ -112,4 +174,7 @@ export function validateUpdateRestaurant(data: UpdateRestaurantData): void {
   if (email && !EMAIL_REGEX.test(email)) {
     throw new BadRequestError('Invalid email', 'Please provide a valid restaurant email address')
   }
+
+  validateOpeningHours(data.openingHours)
+  validateGalleryImages(data.galleryImages)
 }

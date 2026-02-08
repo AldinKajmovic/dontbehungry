@@ -8,6 +8,7 @@ import { createVerificationToken } from '../verification.service'
 import { sendVerificationEmail } from '../email.service'
 import { revokeAllUserTokens } from '../token.service'
 import { logger } from '../../utils/logger'
+import { deleteFromGCS, extractGCSPath, isGCSUrl } from '../../lib/gcs'
 import { UpdateProfileResult, UserResponse } from './types'
 
 export async function updateProfile(userId: string, data: UpdateProfile): Promise<UpdateProfileResult> {
@@ -121,6 +122,12 @@ export async function updateAvatar(userId: string, avatarUrl: string | null): Pr
 
   if (!user) {
     throw new NotFoundError('User not found', 'User does not exist')
+  }
+
+  // Delete old avatar from GCS if it exists
+  if (user.avatarUrl && isGCSUrl(user.avatarUrl)) {
+    const oldPath = extractGCSPath(user.avatarUrl)
+    if (oldPath) deleteFromGCS(oldPath)
   }
 
   const updatedUser = await prisma.user.update({

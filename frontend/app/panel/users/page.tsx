@@ -1,398 +1,30 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
 import { DataTable } from '@/components/admin/DataTable'
 import { Pagination } from '@/components/admin/Pagination'
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal'
 import { FilterBar } from '@/components/admin/FilterBar'
 import { ReportButton } from '@/components/admin/ReportButton'
 import { EmailReportModal } from '@/components/admin/EmailReportModal'
-import { Modal, Input, Button, Alert, Select, AddressAutocomplete } from '@/components/ui'
-import { adminService, AdminUser, PaginationInfo, UserFilters, SortParams } from '@/services/admin'
-import { useLanguage } from '@/hooks/useLanguage'
-import { useToast } from '@/hooks/useToast'
+import { Modal, Input, Button, Alert, Select, AddressAutocomplete, ImageUpload, CROP_CONFIGS } from '@/components/ui'
+import { AdminUser } from '@/services/admin'
+import { useAdminUsers } from '@/hooks/admin'
 
 export default function UsersPage() {
-  const { t } = useLanguage()
-  const { toast } = useToast()
-
-  const ROLE_OPTIONS = [
-    { value: 'CUSTOMER', label: t('admin.roles.CUSTOMER') },
-    { value: 'RESTAURANT_OWNER', label: t('admin.roles.RESTAURANT_OWNER') },
-    { value: 'DELIVERY_DRIVER', label: t('admin.roles.DELIVERY_DRIVER') },
-    { value: 'ADMIN', label: t('admin.roles.ADMIN') },
-  ]
-
-  const FILTER_CONFIG = [
-    {
-      key: 'role',
-      label: t('admin.roles.label'),
-      options: [
-        { value: 'CUSTOMER', label: t('admin.roles.CUSTOMER') },
-        { value: 'RESTAURANT_OWNER', label: t('admin.roles.RESTAURANT_OWNER') },
-        { value: 'DELIVERY_DRIVER', label: t('admin.roles.DELIVERY_DRIVER') },
-        { value: 'ADMIN', label: t('admin.roles.ADMIN') },
-        { value: 'SUPER_ADMIN', label: t('admin.roles.SUPER_ADMIN') },
-      ],
-      placeholder: t('admin.roles.allRoles'),
-    },
-    {
-      key: 'emailVerified',
-      label: t('admin.status.label'),
-      options: [
-        { value: 'true', label: t('admin.status.verified') },
-        { value: 'false', label: t('admin.status.pending') },
-      ],
-      placeholder: t('admin.status.allStatuses'),
-    },
-  ]
-  const [users, setUsers] = useState<AdminUser[]>([])
-  const [pagination, setPagination] = useState<PaginationInfo>({ page: 1, limit: 10, total: 0, totalPages: 0 })
-  const [search, setSearch] = useState('')
-  const [filters, setFilters] = useState<UserFilters>({})
-  const [sort, setSort] = useState<SortParams>({})
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  // Modal states
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [showEmailReportModal, setShowEmailReportModal] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null)
-
-  // Form states
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    phone: '',
-    role: 'CUSTOMER',
-    // User address fields
-    userAddressId: '' as string, // Track existing address for updates
-    userAddress: '',
-    userCity: '',
-    userCountry: '',
-    userPostalCode: '',
-    userLatitude: undefined as number | undefined,
-    userLongitude: undefined as number | undefined,
-    // Restaurant fields (only used when role is RESTAURANT_OWNER)
-    restaurantName: '',
-    restaurantDescription: '',
-    restaurantPhone: '',
-    restaurantEmail: '',
-    restaurantAddress: '',
-    restaurantCity: '',
-    restaurantCountry: '',
-    restaurantPostalCode: '',
-    restaurantLatitude: undefined as number | undefined,
-    restaurantLongitude: undefined as number | undefined,
-  })
-  const [formError, setFormError] = useState('')
-  const [formLoading, setFormLoading] = useState(false)
-
-  const loadUsers = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      setError(null)
-      const result = await adminService.getUsers(
-        pagination.page,
-        pagination.limit,
-        search || undefined,
-        Object.keys(filters).length > 0 ? filters : undefined,
-        sort.sortBy ? sort : undefined
-      )
-      setUsers(result.items)
-      setPagination(result.pagination)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load users')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [pagination.page, pagination.limit, search, filters, sort])
-
-  useEffect(() => {
-    loadUsers()
-  }, [loadUsers])
-
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => {
-      const next = { ...prev, [key]: value || undefined }
-      Object.keys(next).forEach((k) => {
-        if (!next[k as keyof UserFilters]) delete next[k as keyof UserFilters]
-      })
-      return next
-    })
-    setPagination((prev) => ({ ...prev, page: 1 }))
-  }
-
-  const handleClearFilters = () => {
-    setFilters({})
-    setPagination((prev) => ({ ...prev, page: 1 }))
-  }
-
-  const handleSort = (sortBy: string, sortOrder: 'asc' | 'desc') => {
-    setSort({ sortBy, sortOrder })
-    setPagination((prev) => ({ ...prev, page: 1 }))
-  }
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    setPagination((prev) => ({ ...prev, page: 1 }))
-    loadUsers()
-  }
-
-  const handlePageChange = (page: number) => {
-    setPagination((prev) => ({ ...prev, page }))
-  }
-
-  const handleLimitChange = (limit: number) => {
-    setPagination((prev) => ({ ...prev, page: 1, limit }))
-  }
-
-  const openCreateModal = () => {
-    setFormData({
-      email: '',
-      password: '',
-      firstName: '',
-      lastName: '',
-      phone: '',
-      role: 'CUSTOMER',
-      userAddressId: '',
-      userAddress: '',
-      userCity: '',
-      userCountry: '',
-      userPostalCode: '',
-      userLatitude: undefined,
-      userLongitude: undefined,
-      restaurantName: '',
-      restaurantDescription: '',
-      restaurantPhone: '',
-      restaurantEmail: '',
-      restaurantAddress: '',
-      restaurantCity: '',
-      restaurantCountry: '',
-      restaurantPostalCode: '',
-      restaurantLatitude: undefined,
-      restaurantLongitude: undefined,
-    })
-    setFormError('')
-    setShowCreateModal(true)
-  }
-
-  const openEditModal = async (user: AdminUser) => {
-    setSelectedUser(user)
-    setFormError('')
-
-    // Fetch user's addresses
-    let defaultAddress = {
-      userAddressId: '',
-      userAddress: '',
-      userCity: '',
-      userCountry: '',
-      userPostalCode: '',
-      userLatitude: undefined as number | undefined,
-      userLongitude: undefined as number | undefined,
-    }
-
-    try {
-      const addresses = await adminService.getUserAddresses(user.id)
-      const defaultAddr = addresses.find(a => a.isDefault) || addresses[0]
-      if (defaultAddr) {
-        defaultAddress = {
-          userAddressId: defaultAddr.id,
-          userAddress: defaultAddr.address,
-          userCity: defaultAddr.city,
-          userCountry: defaultAddr.country,
-          userPostalCode: defaultAddr.postalCode || '',
-          userLatitude: defaultAddr.latitude || undefined,
-          userLongitude: defaultAddr.longitude || undefined,
-        }
-      }
-    } catch {
-      // Ignore errors loading addresses
-    }
-
-    setFormData({
-      email: user.email,
-      password: '',
-      firstName: user.firstName,
-      lastName: user.lastName,
-      phone: user.phone || '',
-      role: user.role,
-      ...defaultAddress,
-      restaurantName: '',
-      restaurantDescription: '',
-      restaurantPhone: '',
-      restaurantEmail: '',
-      restaurantAddress: '',
-      restaurantCity: '',
-      restaurantCountry: '',
-      restaurantPostalCode: '',
-      restaurantLatitude: undefined,
-      restaurantLongitude: undefined,
-    })
-    setShowEditModal(true)
-  }
-
-  const openDeleteModal = (user: AdminUser) => {
-    setSelectedUser(user)
-    setShowDeleteModal(true)
-  }
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      setFormLoading(true)
-      setFormError('')
-
-      // Validate restaurant fields if role is RESTAURANT_OWNER
-      if (formData.role === 'RESTAURANT_OWNER') {
-        if (!formData.restaurantName || !formData.restaurantAddress || !formData.restaurantCity || !formData.restaurantCountry) {
-          setFormError('Restaurant name, address, city, and country are required')
-          setFormLoading(false)
-          return
-        }
-      }
-
-      // Create user first
-      const newUser = await adminService.createUser({
-        email: formData.email,
-        password: formData.password,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
-        role: formData.role,
-      })
-
-      // Add user address if provided
-      if (formData.userAddress && formData.userCity && formData.userCountry) {
-        try {
-          await adminService.addUserAddress(newUser.id, {
-            address: formData.userAddress,
-            city: formData.userCity,
-            country: formData.userCountry,
-            postalCode: formData.userPostalCode || undefined,
-            latitude: formData.userLatitude,
-            longitude: formData.userLongitude,
-            isDefault: true,
-          })
-        } catch {
-          // Address creation failed but user was created
-        }
-      }
-
-      // If role is RESTAURANT_OWNER, create place and restaurant
-      if (formData.role === 'RESTAURANT_OWNER') {
-        try {
-          // Create place first
-          const newPlace = await adminService.createPlace({
-            address: formData.restaurantAddress,
-            city: formData.restaurantCity,
-            country: formData.restaurantCountry,
-            postalCode: formData.restaurantPostalCode || undefined,
-            latitude: formData.restaurantLatitude,
-            longitude: formData.restaurantLongitude,
-          })
-
-          // Create restaurant with user as owner
-          await adminService.createRestaurant({
-            name: formData.restaurantName,
-            description: formData.restaurantDescription || undefined,
-            phone: formData.restaurantPhone || undefined,
-            email: formData.restaurantEmail || undefined,
-            ownerId: newUser.id,
-            placeId: newPlace.id,
-          })
-        } catch {
-          // Restaurant creation failed but user was created
-          setFormError('User created but restaurant creation failed. Please create restaurant separately.')
-        }
-      }
-
-      setUsers((prev) => [newUser, ...prev])
-      setShowCreateModal(false)
-      toast.success(t('toast.userCreated'))
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Failed to create user')
-      toast.error(t('toast.error'))
-    } finally {
-      setFormLoading(false)
-    }
-  }
-
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedUser) return
-    try {
-      setFormLoading(true)
-      setFormError('')
-      const updateData: Partial<AdminUser> = {
-        email: formData.email,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone || null,
-        role: formData.role,
-      }
-      const updatedUser = await adminService.updateUser(selectedUser.id, updateData)
-
-      // Update or add user address if provided
-      if (formData.userAddress && formData.userCity && formData.userCountry) {
-        try {
-          if (formData.userAddressId) {
-            // Update existing address
-            await adminService.updateUserAddress(selectedUser.id, formData.userAddressId, {
-              address: formData.userAddress,
-              city: formData.userCity,
-              country: formData.userCountry,
-              postalCode: formData.userPostalCode || undefined,
-              latitude: formData.userLatitude,
-              longitude: formData.userLongitude,
-            })
-          } else {
-            // Add new default address
-            await adminService.addUserAddress(selectedUser.id, {
-              address: formData.userAddress,
-              city: formData.userCity,
-              country: formData.userCountry,
-              postalCode: formData.userPostalCode || undefined,
-              latitude: formData.userLatitude,
-              longitude: formData.userLongitude,
-              isDefault: true,
-            })
-          }
-        } catch {
-          // Address update failed but user was updated
-        }
-      }
-
-      setUsers((prev) => prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)))
-      setShowEditModal(false)
-      toast.success(t('toast.userUpdated'))
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Failed to update user')
-      toast.error(t('toast.error'))
-    } finally {
-      setFormLoading(false)
-    }
-  }
-
-  const handleDelete = async () => {
-    if (!selectedUser) return
-    try {
-      setFormLoading(true)
-      await adminService.deleteUser(selectedUser.id)
-      setUsers((prev) => prev.filter((u) => u.id !== selectedUser.id))
-      setShowDeleteModal(false)
-      toast.success(t('toast.userDeleted'))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete user')
-      toast.error(t('toast.error'))
-    } finally {
-      setFormLoading(false)
-    }
-  }
+  const {
+    users, pagination, search, setSearch, filters, sort, isLoading, error,
+    showCreateModal, setShowCreateModal, showEditModal, setShowEditModal,
+    showDeleteModal, setShowDeleteModal, showEmailReportModal, setShowEmailReportModal,
+    selectedUser,
+    formData, setFormData, formError, formLoading, imageUploading,
+    handleSearch, handlePageChange, handleLimitChange, handleSort,
+    handleFilterChange, handleClearFilters,
+    openCreateModal, openEditModal, openDeleteModal,
+    handleCreate, handleUpdate, handleDelete,
+    handleAvatarUpload, handleAvatarRemove,
+    ROLE_OPTIONS, FILTER_CONFIG,
+    t,
+  } = useAdminUsers()
 
   const columns = [
     {
@@ -618,6 +250,20 @@ export default function UsersPage() {
             options={ROLE_OPTIONS}
           />
 
+          <ImageUpload
+            currentUrl={formData.avatarUrl || null}
+            onUpload={handleAvatarUpload}
+            onRemove={handleAvatarRemove}
+            uploading={imageUploading}
+            shape="circle"
+            label={t('profile.profilePicture')}
+            hint={`(${t('common.optional')})`}
+            width="w-20"
+            height="h-20"
+            browserFolder="avatars"
+            cropConfig={CROP_CONFIGS.avatar}
+          />
+
           {/* User Address Section */}
           <div className="border-t border-gray-200 pt-4 mt-4 space-y-4">
             <p className="text-sm font-medium text-gray-700">{t('admin.modals.userAddress')} <span className="text-gray-400 font-normal">({t('common.optional')})</span></p>
@@ -778,6 +424,20 @@ export default function UsersPage() {
             value={formData.role}
             onChange={(e) => setFormData({ ...formData, role: e.target.value })}
             options={ROLE_OPTIONS}
+          />
+
+          <ImageUpload
+            currentUrl={formData.avatarUrl || null}
+            onUpload={handleAvatarUpload}
+            onRemove={handleAvatarRemove}
+            uploading={imageUploading}
+            shape="circle"
+            label={t('profile.profilePicture')}
+            hint={`(${t('common.optional')})`}
+            width="w-20"
+            height="h-20"
+            browserFolder="avatars"
+            cropConfig={CROP_CONFIGS.avatar}
           />
 
           {/* User Address Section */}

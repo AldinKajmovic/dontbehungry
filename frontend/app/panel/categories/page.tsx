@@ -194,13 +194,13 @@ export default function CategoriesPage() {
           {category.iconUrl ? (
             <img src={category.iconUrl} alt={category.name} className="w-10 h-10 rounded-lg object-cover" />
           ) : (
-            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
             </div>
           )}
-          <span className="font-medium text-gray-900">{category.name}</span>
+          <span className="font-medium text-gray-900 dark:text-white">{category.name}</span>
         </div>
       ),
     },
@@ -209,7 +209,7 @@ export default function CategoriesPage() {
       header: t('admin.categoriesPage.description'),
       sortable: true,
       render: (category: AdminCategory) => (
-        <span className="text-gray-500 truncate max-w-xs block">
+        <span className="text-gray-500 dark:text-neutral-400 truncate max-w-xs block">
           {category.description || '-'}
         </span>
       ),
@@ -218,7 +218,7 @@ export default function CategoriesPage() {
       key: 'iconUrl',
       header: t('admin.categoriesPage.iconUrl'),
       render: (category: AdminCategory) => (
-        <span className="text-gray-500 truncate max-w-xs block text-sm">
+        <span className="text-gray-500 dark:text-neutral-400 truncate max-w-xs block text-sm">
           {category.iconUrl || '-'}
         </span>
       ),
@@ -230,8 +230,8 @@ export default function CategoriesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.categoriesPage.title')}</h1>
-          <p className="text-gray-500 mt-1">{t('admin.categoriesPage.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.categoriesPage.title')}</h1>
+          <p className="text-gray-500 dark:text-neutral-400 mt-1">{t('admin.categoriesPage.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -284,7 +284,7 @@ export default function CategoriesPage() {
           <>
             <button
               onClick={() => openEditModal(category)}
-              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 rounded-lg transition-colors"
               title={t('common.edit')}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -293,7 +293,7 @@ export default function CategoriesPage() {
             </button>
             <button
               onClick={() => openDeleteModal(category)}
-              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
               title={t('common.delete')}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

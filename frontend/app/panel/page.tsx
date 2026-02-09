@@ -67,8 +67,8 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.dashboard')}</h1>
-          <p className="text-gray-500 mt-1">{t('admin.welcomeMessage')}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.dashboard')}</h1>
+          <p className="text-gray-500 dark:text-neutral-400 mt-1">{t('admin.welcomeMessage')}</p>
         </div>
         <button
           onClick={() => setShowReportModal(true)}
@@ -83,7 +83,7 @@ export default function AdminDashboard() {
 
       {/* Error state */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600">
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-xl text-red-600 dark:text-red-400">
           {error}
         </div>
       )}
@@ -92,13 +92,13 @@ export default function AdminDashboard() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 animate-pulse">
+            <div key={i} className="bg-white dark:bg-neutral-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-neutral-800 animate-pulse">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-20 mb-2" />
-                  <div className="h-8 bg-gray-200 rounded w-24" />
+                  <div className="h-4 bg-gray-200 dark:bg-neutral-700 rounded w-20 mb-2" />
+                  <div className="h-8 bg-gray-200 dark:bg-neutral-700 rounded w-24" />
                 </div>
-                <div className="w-12 h-12 bg-gray-200 rounded-lg" />
+                <div className="w-12 h-12 bg-gray-200 dark:bg-neutral-700 rounded-lg" />
               </div>
             </div>
           ))}
@@ -130,55 +130,55 @@ export default function AdminDashboard() {
 
       {/* Quick Actions */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.quickActions')}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('admin.quickActions')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <a
             href="/panel/users"
-            className="p-4 bg-white rounded-xl border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all group"
+            className="p-4 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-sm transition-all group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center text-primary-600 group-hover:bg-primary-200 transition-colors">
+              <div className="w-10 h-10 bg-primary-100 dark:bg-primary-950/50 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400 group-hover:bg-primary-200 dark:group-hover:bg-primary-900/50 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-gray-900">{t('admin.actions.addNewUser')}</p>
-                <p className="text-sm text-gray-500">{t('admin.actions.createUserAccount')}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{t('admin.actions.addNewUser')}</p>
+                <p className="text-sm text-gray-500 dark:text-neutral-400">{t('admin.actions.createUserAccount')}</p>
               </div>
             </div>
           </a>
 
           <a
             href="/panel/restaurants"
-            className="p-4 bg-white rounded-xl border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all group"
+            className="p-4 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-sm transition-all group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center text-primary-600 group-hover:bg-primary-200 transition-colors">
+              <div className="w-10 h-10 bg-primary-100 dark:bg-primary-950/50 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400 group-hover:bg-primary-200 dark:group-hover:bg-primary-900/50 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-gray-900">{t('admin.actions.addRestaurant')}</p>
-                <p className="text-sm text-gray-500">{t('admin.actions.registerRestaurant')}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{t('admin.actions.addRestaurant')}</p>
+                <p className="text-sm text-gray-500 dark:text-neutral-400">{t('admin.actions.registerRestaurant')}</p>
               </div>
             </div>
           </a>
 
           <a
             href="/panel/orders"
-            className="p-4 bg-white rounded-xl border border-gray-100 hover:border-primary-200 hover:shadow-sm transition-all group"
+            className="p-4 bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-sm transition-all group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center text-primary-600 group-hover:bg-primary-200 transition-colors">
+              <div className="w-10 h-10 bg-primary-100 dark:bg-primary-950/50 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400 group-hover:bg-primary-200 dark:group-hover:bg-primary-900/50 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-gray-900">{t('admin.actions.viewOrders')}</p>
-                <p className="text-sm text-gray-500">{t('admin.actions.manageOrders')}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{t('admin.actions.viewOrders')}</p>
+                <p className="text-sm text-gray-500 dark:text-neutral-400">{t('admin.actions.manageOrders')}</p>
               </div>
             </div>
           </a>

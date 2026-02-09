@@ -15,7 +15,7 @@ export function AdminSection() {
 
   return (
     <Section title={t('profile.administration')}>
-      <p className="text-sm text-gray-600 mb-4">
+      <p className="text-sm text-gray-600 dark:text-neutral-400 mb-4">
         {t('admin.welcomeMessage')}
       </p>
       <Link href="/panel">

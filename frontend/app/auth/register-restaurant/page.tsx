@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { CountryCode } from 'libphonenumber-js'
-import { Input, Button, PhoneInput, Alert, PasswordStrength, AuthLayout, LanguageToggle, AddressAutocomplete } from '@/components/ui'
+import { Input, Button, PhoneInput, Alert, PasswordStrength, AuthLayout, LanguageToggle, ThemeToggle, AddressAutocomplete } from '@/components/ui'
 import { registerRestaurantSchema, extractZodErrors, formatPhoneE164, RegisterRestaurantForm } from '@/services/validation'
 import { useFormValidation } from '@/hooks/useFormValidation'
 import { useAuth } from '@/hooks/useAuth'
@@ -114,20 +114,19 @@ export default function RegisterRestaurantPage() {
       title={t('auth.registerRestaurant.title')}
       subtitle={t('auth.registerRestaurant.subtitle')}
       icon={icon}
-      iconGradient="secondary"
-      backgroundGradient="green"
+      iconGradient="primary"
       footerText={t('auth.registerRestaurant.hasAccount')}
       footerLinkText={t('common.signIn')}
       footerLinkHref="/auth/login"
-      headerRight={<LanguageToggle />}
+      headerRight={<div className="flex items-center gap-2"><ThemeToggle /><LanguageToggle /></div>}
     >
       {/* Progress indicator */}
       <div className="flex items-center justify-center gap-2 mb-6">
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 1 ? 'bg-secondary-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 1 ? 'bg-primary-500 text-white' : 'bg-gray-200 dark:bg-neutral-700 text-gray-500 dark:text-neutral-400'}`}>
           1
         </div>
-        <div className={`w-16 h-1 rounded ${step >= 2 ? 'bg-secondary-500' : 'bg-gray-200'}`} />
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 2 ? 'bg-secondary-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+        <div className={`w-16 h-1 rounded ${step >= 2 ? 'bg-primary-500' : 'bg-gray-200 dark:bg-neutral-700'}`} />
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 2 ? 'bg-primary-500 text-white' : 'bg-gray-200 dark:bg-neutral-700 text-gray-500 dark:text-neutral-400'}`}>
           2
         </div>
       </div>
@@ -137,7 +136,7 @@ export default function RegisterRestaurantPage() {
 
         {step === 1 && (
           <>
-            <p className="text-sm text-gray-600 font-medium mb-4">{t('auth.registerRestaurant.ownerInfo')}</p>
+            <p className="text-sm text-gray-600 dark:text-neutral-400 font-medium mb-4">{t('auth.registerRestaurant.ownerInfo')}</p>
 
             <div className="grid grid-cols-2 gap-3">
               <Input
@@ -229,7 +228,7 @@ export default function RegisterRestaurantPage() {
 
         {step === 2 && (
           <>
-            <p className="text-sm text-gray-600 font-medium mb-4">{t('auth.registerRestaurant.restaurantInfo')}</p>
+            <p className="text-sm text-gray-600 dark:text-neutral-400 font-medium mb-4">{t('auth.registerRestaurant.restaurantInfo')}</p>
 
             <Input
               label={t('auth.registerRestaurant.restaurantName')}
@@ -243,8 +242,8 @@ export default function RegisterRestaurantPage() {
             />
 
             <div>
-              <label htmlFor="restaurantDescription" className="block text-sm font-medium text-gray-700 mb-2">
-                {t('auth.registerRestaurant.description')} <span className="text-gray-400">({t('common.optional')})</span>
+              <label htmlFor="restaurantDescription" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+                {t('auth.registerRestaurant.description')} <span className="text-gray-400 dark:text-neutral-500">({t('common.optional')})</span>
               </label>
               <textarea
                 id="restaurantDescription"
@@ -285,7 +284,7 @@ export default function RegisterRestaurantPage() {
               placeholder="contact@restaurant.com"
             />
 
-            <p className="text-sm text-gray-600 font-medium mt-6 mb-4">{t('auth.registerRestaurant.deliverySettings')}</p>
+            <p className="text-sm text-gray-600 dark:text-neutral-400 font-medium mt-6 mb-4">{t('auth.registerRestaurant.deliverySettings')}</p>
 
             <div className="grid grid-cols-2 gap-3">
               <Input
@@ -318,7 +317,7 @@ export default function RegisterRestaurantPage() {
               />
             </div>
 
-            <p className="text-sm text-gray-600 font-medium mt-6 mb-4">{t('auth.registerRestaurant.restaurantAddress')}</p>
+            <p className="text-sm text-gray-600 dark:text-neutral-400 font-medium mt-6 mb-4">{t('auth.registerRestaurant.restaurantAddress')}</p>
 
             <AddressAutocomplete
               label={t('address.streetAddress')}
@@ -345,8 +344,8 @@ export default function RegisterRestaurantPage() {
         )}
       </form>
 
-      <div className="mt-6 pt-6 border-t border-gray-200">
-        <p className="text-center text-sm text-gray-500">
+      <div className="mt-6 pt-6 border-t border-gray-200 dark:border-neutral-700">
+        <p className="text-center text-sm text-gray-500 dark:text-neutral-400">
           {t('auth.registerRestaurant.wantToOrder')}{' '}
           <Link href="/auth/register" className="link">
             {t('auth.registerRestaurant.registerAsCustomer')}

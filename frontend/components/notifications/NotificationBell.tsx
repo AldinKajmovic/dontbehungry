@@ -21,7 +21,7 @@ export function NotificationBell() {
     <div className="relative" ref={containerRef}>
       <button
         onClick={toggleDropdown}
-        className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+        className="relative p-2 text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-full transition-colors"
         aria-label="Notifications"
       >
         {/* Bell icon */}

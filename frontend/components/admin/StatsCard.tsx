@@ -15,11 +15,11 @@ interface StatsCardProps {
 
 export function StatsCard({ title, value, icon, trend, className = '' }: StatsCardProps) {
   return (
-    <div className={`bg-white rounded-xl p-6 shadow-sm border border-gray-100 ${className}`}>
+    <div className={`bg-white dark:bg-neutral-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-neutral-800 ${className}`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+          <p className="text-sm font-medium text-gray-500 dark:text-neutral-400">{title}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
           {trend && (
             <div className="flex items-center mt-2">
               <span
@@ -29,11 +29,11 @@ export function StatsCard({ title, value, icon, trend, className = '' }: StatsCa
               >
                 {trend.isPositive ? '+' : '-'}{Math.abs(trend.value)}%
               </span>
-              <span className="text-sm text-gray-400 ml-1">vs last month</span>
+              <span className="text-sm text-gray-400 dark:text-neutral-500 ml-1">vs last month</span>
             </div>
           )}
         </div>
-        <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center text-primary-600">
+        <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400">
           {icon}
         </div>
       </div>

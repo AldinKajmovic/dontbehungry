@@ -86,8 +86,8 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.orders')}</h1>
-          <p className="text-gray-500 mt-1">{t('admin.manageCustomerOrders')}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.orders')}</h1>
+          <p className="text-gray-500 dark:text-neutral-400 mt-1">{t('admin.manageCustomerOrders')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton

@@ -129,20 +129,20 @@ export function SearchableSelect({
   return (
     <div className="w-full" ref={containerRef}>
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor={id} className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
-          {hint && <span className="text-gray-400 font-normal"> {hint}</span>}
+          {hint && <span className="text-gray-400 dark:text-neutral-500 font-normal"> {hint}</span>}
         </label>
       )}
 
       <div className="relative">
-        <div className={`input-field flex items-center gap-2 cursor-pointer ${error ? 'border-red-300 focus-within:border-red-500 focus-within:ring-red-500/20' : ''} ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}>
+        <div className={`input-field flex items-center gap-2 cursor-pointer ${error ? 'border-red-300 focus-within:border-red-500 focus-within:ring-red-500/20' : ''} ${disabled ? 'bg-gray-100 dark:bg-neutral-800 cursor-not-allowed' : ''}`}>
           <input
             ref={inputRef}
             id={id}
             type="text"
-            className="flex-1 min-w-0 bg-transparent outline-none text-gray-900 placeholder-gray-400 truncate"
+            className="flex-1 min-w-0 bg-transparent outline-none text-gray-900 dark:text-neutral-100 placeholder-gray-400 dark:placeholder-neutral-500 truncate"
             placeholder={selectedLabel || placeholder}
             value={isOpen ? search : selectedLabel}
             onChange={(e) => setSearch(e.target.value)}
@@ -155,16 +155,16 @@ export function SearchableSelect({
             <button
               type="button"
               onClick={handleClear}
-              className="p-1 hover:bg-gray-100 rounded-full"
+              className="p-1 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-full"
             >
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           )}
 
           <svg
-            className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            className={`w-5 h-5 text-gray-400 dark:text-neutral-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -174,14 +174,14 @@ export function SearchableSelect({
         </div>
 
         {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          <div className="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center py-4">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600"></div>
-                <span className="ml-2 text-sm text-gray-500">Loading...</span>
+                <span className="ml-2 text-sm text-gray-500 dark:text-neutral-400">Loading...</span>
               </div>
             ) : options.length === 0 ? (
-              <div className="py-4 px-3 text-center text-gray-500 text-sm">
+              <div className="py-4 px-3 text-center text-gray-500 dark:text-neutral-400 text-sm">
                 {emptyMessage}
               </div>
             ) : (
@@ -190,8 +190,8 @@ export function SearchableSelect({
                   <li
                     key={option.value}
                     onClick={() => handleSelect(option)}
-                    className={`px-3 py-2 cursor-pointer hover:bg-primary-50 transition-colors ${
-                      option.value === value ? 'bg-primary-50 text-primary-700' : 'text-gray-700'
+                    className={`px-3 py-2 cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-950/30 transition-colors ${
+                      option.value === value ? 'bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400' : 'text-gray-700 dark:text-neutral-300'
                     }`}
                   >
                     {option.label}

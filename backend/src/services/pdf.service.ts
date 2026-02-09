@@ -1,7 +1,10 @@
 import PDFDocument from 'pdfkit'
+import path from 'path'
+
+const LOGO_PATH = path.join(__dirname, '..', 'assets', 'logo.png')
 
 const COLORS = {
-  primary: '#00A082',
+  primary: '#d9432a',
   headerBg: '#f8f9fa',
   text: '#333333',
   textLight: '#666666',
@@ -10,10 +13,8 @@ const COLORS = {
   rowOdd: '#ffffff',
 }
 
-const FONTS = {
-  regular: 'Helvetica',
-  bold: 'Helvetica-Bold',
-}
+const FONT_REGULAR = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+const FONT_BOLD = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
 
 interface TableColumn {
   header: string
@@ -62,12 +63,24 @@ function generateHeader(
   doc: PDFKit.PDFDocument,
   options: ReportOptions
 ): void {
-  doc.font(FONTS.bold)
-    .fontSize(12)
+  const startY = doc.page.margins.top
+
+  // Logo
+  try {
+    doc.image(LOGO_PATH, doc.page.margins.left, startY, { width: 200, height: 200 })
+  } catch {
+    // If logo fails, skip it
+  }
+
+  // Brand name + report title (positioned to the right of the logo)
+  const textX = doc.page.margins.left + 210
+
+  doc.font(FONT_BOLD)
+    .fontSize(14)
     .fillColor(COLORS.primary)
-    .text('DontBeHungry', doc.page.margins.left, doc.page.margins.top, { continued: true })
+    .text('Najedise', textX, startY + 70, { continued: true })
     .fillColor(COLORS.text)
-    .text(` - ${options.title}`)
+    .text(` — ${options.title}`)
 
   let infoLine = `Generated: ${formatDate(new Date())}`
   if (options.filters && Object.keys(options.filters).length > 0) {
@@ -80,13 +93,13 @@ function generateHeader(
     }
   }
 
-  doc.font(FONTS.regular)
+  doc.font(FONT_REGULAR)
     .fontSize(8)
     .fillColor(COLORS.textLight)
-    .text(infoLine)
+    .text(infoLine, textX)
 
-  // Small gap before table
-  doc.y += 8
+  // Move below the logo
+  doc.y = startY + 210
 }
 
 function generateTable(
@@ -119,7 +132,7 @@ function generateTable(
     .fill(COLORS.primary)
 
   // Draw header text
-  doc.font(FONTS.bold)
+  doc.font(FONT_BOLD)
     .fontSize(8)
     .fillColor('#ffffff')
 
@@ -145,7 +158,7 @@ function generateTable(
       doc.rect(doc.page.margins.left, currentY, pageWidth, headerHeight)
         .fill(COLORS.primary)
 
-      doc.font(FONTS.bold)
+      doc.font(FONT_BOLD)
         .fontSize(12)
         .fillColor('#ffffff')
 
@@ -165,7 +178,7 @@ function generateTable(
     doc.rect(doc.page.margins.left, currentY, pageWidth, rowHeight)
       .fill(bgColor)
 
-    doc.font(FONTS.regular)
+    doc.font(FONT_REGULAR)
       .fontSize(10)
       .fillColor(COLORS.text)
 
@@ -232,7 +245,7 @@ export function createOrdersReport(
   }))
 
   generateTable(doc, columns, transformedData)
-  
+
   return doc
 }
 
@@ -270,7 +283,7 @@ export function createRestaurantsReport(
   }))
 
   generateTable(doc, columns, transformedData)
-  
+
   return doc
 }
 
@@ -304,7 +317,7 @@ export function createUsersReport(
   }))
 
   generateTable(doc, columns, transformedData)
-  
+
   return doc
 }
 
@@ -336,7 +349,7 @@ export function createReviewsReport(
   }))
 
   generateTable(doc, columns, transformedData)
-  
+
   return doc
 }
 
@@ -360,7 +373,7 @@ export function createCategoriesReport(
   }))
 
   generateTable(doc, columns, transformedData)
-  
+
   return doc
 }
 
@@ -396,7 +409,7 @@ export function createMenuItemsReport(
   }))
 
   generateTable(doc, columns, transformedData)
-  
+
   return doc
 }
 
@@ -428,7 +441,7 @@ export function createPlacesReport(
   }))
 
   generateTable(doc, columns, transformedData)
-  
+
   return doc
 }
 
@@ -458,7 +471,7 @@ export function createCombinedReport(
       doc.y += 15 // Add spacing between sections
     }
 
-    doc.font(FONTS.bold)
+    doc.font(FONT_BOLD)
       .fontSize(12)
       .fillColor(COLORS.primary)
       .text(section.title, doc.page.margins.left, doc.y)
@@ -577,7 +590,7 @@ export function createCombinedReport(
       const endY = generateTable(doc, columns, transformedData)
       doc.y = endY // Update doc.y for next section
     } else {
-      doc.font(FONTS.regular)
+      doc.font(FONT_REGULAR)
         .fontSize(10)
         .fillColor(COLORS.textLight)
         .text('No data available for this section.')
@@ -585,7 +598,7 @@ export function createCombinedReport(
     }
   })
 
-  
+
   return doc
 }
 

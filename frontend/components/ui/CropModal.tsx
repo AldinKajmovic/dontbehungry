@@ -46,11 +46,11 @@ export function CropModal({ isOpen, imageSrc, cropConfig, onConfirm, onCancel }:
       <div className="absolute inset-0 bg-black/60" onClick={onCancel} />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden">
+      <div className="relative bg-white dark:bg-neutral-900 rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden">
         {/* Header */}
         <div className="px-6 pt-5 pb-3">
-          <h3 className="text-lg font-semibold text-gray-900">{t('crop.title')}</h3>
-          <p className="text-sm text-gray-500 mt-1">{t('crop.instruction')}</p>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('crop.title')}</h3>
+          <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1">{t('crop.instruction')}</p>
         </div>
 
         {/* Cropper area */}
@@ -69,7 +69,7 @@ export function CropModal({ isOpen, imageSrc, cropConfig, onConfirm, onCancel }:
 
         {/* Zoom slider */}
         <div className="px-6 py-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
             {t('crop.zoom')}
           </label>
           <input

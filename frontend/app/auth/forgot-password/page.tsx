@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AuthLayout, Input, Button, Alert, StatusMessage, LanguageToggle } from '@/components/ui'
+import { AuthLayout, Input, Button, Alert, StatusMessage, LanguageToggle, ThemeToggle } from '@/components/ui'
 import { authService } from '@/services/auth'
 
 const EmailIcon = (
@@ -44,8 +44,7 @@ export default function ForgotPasswordPage() {
         title="Check Your Email"
         subtitle="We've sent you a password reset link"
         icon={icon}
-        backgroundGradient="orange"
-        headerRight={<LanguageToggle />}
+        headerRight={<div className="flex items-center gap-2"><ThemeToggle /><LanguageToggle /></div>}
       >
         <StatusMessage
           status="success"
@@ -55,8 +54,8 @@ export default function ForgotPasswordPage() {
           <p className="mb-2">
             If an account with that email exists, we&apos;ve sent a password reset link to:
           </p>
-          <p className="font-medium text-gray-900 mb-4">{email}</p>
-          <p className="text-sm text-gray-500">
+          <p className="font-medium text-gray-900 dark:text-white mb-4">{email}</p>
+          <p className="text-sm text-gray-500 dark:text-neutral-400">
             The link will expire in 1 hour. Check your spam folder if you don&apos;t see it.
           </p>
         </StatusMessage>
@@ -69,11 +68,10 @@ export default function ForgotPasswordPage() {
       title="Forgot Password?"
       subtitle="Enter your email to reset your password"
       icon={icon}
-      backgroundGradient="orange"
       footerText="Remember your password?"
       footerLinkText="Sign in"
       footerLinkHref="/auth/login"
-      headerRight={<LanguageToggle />}
+      headerRight={<div className="flex items-center gap-2"><ThemeToggle /><LanguageToggle /></div>}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <Alert type="error">{error}</Alert>}

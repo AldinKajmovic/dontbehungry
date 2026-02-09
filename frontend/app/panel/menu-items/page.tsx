@@ -37,15 +37,15 @@ export default function MenuItemsPage() {
           {item.imageUrl ? (
             <img src={item.imageUrl} alt={item.name} className="w-12 h-12 rounded-lg object-cover" />
           ) : (
-            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-gray-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
           )}
           <div>
-            <p className="font-medium text-gray-900">{item.name}</p>
-            <p className="text-xs text-gray-500">{item.restaurant.name}</p>
+            <p className="font-medium text-gray-900 dark:text-white">{item.name}</p>
+            <p className="text-xs text-gray-500 dark:text-neutral-400">{item.restaurant.name}</p>
           </div>
         </div>
       ),
@@ -62,7 +62,7 @@ export default function MenuItemsPage() {
       key: 'category',
       header: t('admin.menuItemsPage.category'),
       render: (item: AdminMenuItem) => (
-        <span className="text-gray-500">{item.category?.name || '-'}</span>
+        <span className="text-gray-500 dark:text-neutral-400">{item.category?.name || '-'}</span>
       ),
     },
     {
@@ -71,7 +71,7 @@ export default function MenuItemsPage() {
       sortable: true,
       render: (item: AdminMenuItem) => (
         <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-          item.isAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+          item.isAvailable ? 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400' : 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400'
         }`}>
           {item.isAvailable ? t('admin.menuItemsPage.available') : t('admin.menuItemsPage.unavailable')}
         </span>
@@ -82,7 +82,7 @@ export default function MenuItemsPage() {
       header: t('admin.menuItemsPage.prepTime'),
       sortable: true,
       render: (item: AdminMenuItem) => (
-        <span className="text-gray-500">{item.preparationTime ? `${item.preparationTime} min` : '-'}</span>
+        <span className="text-gray-500 dark:text-neutral-400">{item.preparationTime ? `${item.preparationTime} min` : '-'}</span>
       ),
     },
   ]
@@ -92,8 +92,8 @@ export default function MenuItemsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.menuItemsPage.title')}</h1>
-          <p className="text-gray-500 mt-1">{t('admin.menuItemsPage.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.menuItemsPage.title')}</h1>
+          <p className="text-gray-500 dark:text-neutral-400 mt-1">{t('admin.menuItemsPage.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -131,7 +131,7 @@ export default function MenuItemsPage() {
       </form>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
+      <div className="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 mb-6">
         <div className="flex flex-wrap items-end gap-4">
           <div className="min-w-[200px]">
             <SearchableSelect
@@ -145,11 +145,11 @@ export default function MenuItemsPage() {
             />
           </div>
           <div className="min-w-[150px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.menuItemsPage.availability')}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2">{t('admin.menuItemsPage.availability')}</label>
             <select
               value={filters.isAvailable || ''}
               onChange={(e) => handleFilterChange('isAvailable', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
+              className="w-full px-3 py-2 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-neutral-100"
             >
               {AVAILABILITY_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -180,7 +180,7 @@ export default function MenuItemsPage() {
           {hasActiveFilters && (
             <button
               onClick={handleClearFilters}
-              className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="px-3 py-2 text-sm text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
             >
               {t('admin.clearFilters')}
             </button>
@@ -204,7 +204,7 @@ export default function MenuItemsPage() {
           <>
             <button
               onClick={() => openEditModal(item)}
-              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 rounded-lg transition-colors"
               title={t('common.edit')}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -213,7 +213,7 @@ export default function MenuItemsPage() {
             </button>
             <button
               onClick={() => openDeleteModal(item)}
-              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
               title={t('common.delete')}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,9 +326,9 @@ export default function MenuItemsPage() {
               type="checkbox"
               checked={formData.isAvailable}
               onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
-              className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+              className="w-5 h-5 text-primary-600 border-gray-300 dark:border-neutral-600 rounded focus:ring-primary-500"
             />
-            <span className="text-sm font-medium text-gray-700">{t('admin.menuItemsPage.available')}</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">{t('admin.menuItemsPage.available')}</span>
           </label>
 
           <div className="flex gap-3 pt-4">
@@ -434,9 +434,9 @@ export default function MenuItemsPage() {
               type="checkbox"
               checked={formData.isAvailable}
               onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
-              className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+              className="w-5 h-5 text-primary-600 border-gray-300 dark:border-neutral-600 rounded focus:ring-primary-500"
             />
-            <span className="text-sm font-medium text-gray-700">{t('admin.menuItemsPage.available')}</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">{t('admin.menuItemsPage.available')}</span>
           </label>
 
           <div className="flex gap-3 pt-4">

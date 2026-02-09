@@ -75,8 +75,8 @@ export function AddressModal({
         />
 
         <div>
-          <label htmlFor="cart-notes" className="block text-sm font-medium text-gray-700 mb-2">
-            {t('address.deliveryNotes')} <span className="text-gray-400 font-normal">({t('common.optional')})</span>
+          <label htmlFor="cart-notes" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+            {t('address.deliveryNotes')} <span className="text-gray-400 dark:text-neutral-500 font-normal">({t('common.optional')})</span>
           </label>
           <textarea
             id="cart-notes"
@@ -85,7 +85,7 @@ export function AddressModal({
             onChange={onChange}
             placeholder={t('address.deliveryNotesPlaceholder')}
             rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 resize-none"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-600 dark:bg-neutral-800 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 resize-none"
           />
         </div>
 

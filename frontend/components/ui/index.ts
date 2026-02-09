@@ -25,3 +25,4 @@ export { CropModal } from './CropModal';
 export { CROP_CONFIGS } from './cropUtils';
 export type { CropConfig, CropArea } from './cropUtils';
 export { OpeningHoursForm } from './OpeningHoursForm';
+export { ThemeToggle } from './ThemeToggle';

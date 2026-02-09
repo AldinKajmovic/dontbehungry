@@ -62,23 +62,23 @@ export function CartSummary({
 
       {/* Loading indicator for delivery */}
       {isLoadingDelivery && (
-        <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
-          <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center gap-2 text-gray-500 dark:text-neutral-400 text-sm mb-2">
+          <div className="w-4 h-4 border-2 border-gray-400 dark:border-neutral-500 border-t-transparent rounded-full animate-spin" />
           <span>{t('cart.calculatingDelivery')}</span>
         </div>
       )}
 
       {/* Summary */}
       <div className="space-y-1 text-sm">
-        <div className="flex justify-between text-gray-600">
+        <div className="flex justify-between text-gray-600 dark:text-neutral-400">
           <span>{t('cart.subtotal')} ({itemCount} {t('common.items')})</span>
           <span>${formatPrice(subtotal)}</span>
         </div>
-        <div className="flex justify-between text-gray-600">
+        <div className="flex justify-between text-gray-600 dark:text-neutral-400">
           <span>{t('cart.tax')} (20%)</span>
           <span>${formatPrice(tax)}</span>
         </div>
-        <div className="flex justify-between text-gray-600">
+        <div className="flex justify-between text-gray-600 dark:text-neutral-400">
           <span>
             {t('cart.deliveryFee')}
             {deliveryInfo?.weatherSurcharge ? ` (+$${formatPrice(deliveryInfo.weatherSurcharge)} ${t('cart.weather')})` : ''}
@@ -91,7 +91,7 @@ export function CartSummary({
             <span>${formatPrice(minOrderFee)}</span>
           </div>
         )}
-        <div className="flex justify-between font-semibold text-gray-900 text-base pt-2 border-t">
+        <div className="flex justify-between font-semibold text-gray-900 dark:text-white text-base pt-2 border-t dark:border-neutral-700">
           <span>{t('cart.total')}</span>
           <span>${formatPrice(total)}</span>
         </div>

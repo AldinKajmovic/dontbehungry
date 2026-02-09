@@ -93,7 +93,7 @@ export function MenuItemsModal({
           <button
             type="button"
             onClick={handleClose}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-300 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -104,7 +104,7 @@ export function MenuItemsModal({
           {/* Search and Add */}
           <div className="flex gap-3 items-center">
             <div className="flex-1 relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -115,7 +115,7 @@ export function MenuItemsModal({
                   setSearch(e.target.value)
                   setPage(1)
                 }}
-                className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full pl-9 pr-4 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-800 dark:text-white"
               />
             </div>
             <Button
@@ -133,7 +133,7 @@ export function MenuItemsModal({
             </Button>
           </div>
 
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-neutral-400">
             {menuItems.length} item{menuItems.length !== 1 ? 's' : ''} in menu
             {search && ` (${filteredItems.length} matching)`}
           </p>
@@ -144,12 +144,12 @@ export function MenuItemsModal({
             </div>
           ) : menuItems.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-gray-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <p className="text-gray-500 mb-4">No menu items yet</p>
+              <p className="text-gray-500 dark:text-neutral-400 mb-4">No menu items yet</p>
               <Button
                 type="button"
                 variant="secondary"
@@ -161,7 +161,7 @@ export function MenuItemsModal({
             </div>
           ) : filteredItems.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500">No items match your search</p>
+              <p className="text-gray-500 dark:text-neutral-400">No items match your search</p>
             </div>
           ) : (
             <>
@@ -169,9 +169,9 @@ export function MenuItemsModal({
                 {paginatedItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-start gap-4 p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors"
+                    className="flex items-start gap-4 p-4 rounded-xl border border-gray-200 dark:border-neutral-700 hover:bg-primary-900 hover:border-primary-900 transition-colors group"
                   >
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <div className="w-16 h-16 bg-gray-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {item.imageUrl ? (
                         <img
                           src={item.imageUrl}
@@ -179,7 +179,7 @@ export function MenuItemsModal({
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-8 h-8 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       )}
@@ -187,19 +187,19 @@ export function MenuItemsModal({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="font-medium text-gray-900">{item.name}</p>
+                          <p className="font-medium text-gray-900 dark:text-white group-hover:text-white">{item.name}</p>
                           {item.description && (
-                            <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{item.description}</p>
+                            <p className="text-sm text-gray-500 dark:text-neutral-400 group-hover:text-white/70 mt-0.5 line-clamp-2">{item.description}</p>
                           )}
                           <div className="flex items-center gap-3 mt-2">
-                            <span className="text-sm font-semibold text-primary-600">${item.price}</span>
+                            <span className="text-sm font-semibold text-primary-600 dark:text-primary-400 group-hover:text-white">${item.price}</span>
                             {item.category && (
-                              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
+                              <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 group-hover:bg-transparent group-hover:text-white/70 rounded-full">
                                 {item.category.name}
                               </span>
                             )}
                             {!item.isAvailable && (
-                              <span className="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded-full">
+                              <span className="text-xs px-2 py-0.5 bg-red-100 text-red-600 group-hover:bg-transparent group-hover:text-white/70 rounded-full">
                                 Unavailable
                               </span>
                             )}
@@ -209,7 +209,7 @@ export function MenuItemsModal({
                           <button
                             type="button"
                             onClick={() => openEditModal(item)}
-                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-700 group-hover:text-white/70 group-hover:hover:text-white group-hover:hover:bg-white/10 rounded-lg transition-colors"
                             title="Edit"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,7 +219,7 @@ export function MenuItemsModal({
                           <button
                             type="button"
                             onClick={() => openDeleteModal(item)}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 text-gray-400 dark:text-neutral-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 group-hover:text-white/70 group-hover:hover:text-white group-hover:hover:bg-white/10 rounded-lg transition-colors"
                             title="Delete"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -234,9 +234,9 @@ export function MenuItemsModal({
               </div>
 
               {/* Pagination */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-4">
+              <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-neutral-800 mt-4">
                 <div className="flex items-center gap-3">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-neutral-400">
                     {(page - 1) * perPage + 1} - {Math.min(page * perPage, filteredItems.length)} of {filteredItems.length}
                   </p>
                   <select
@@ -245,7 +245,7 @@ export function MenuItemsModal({
                       setPerPage(Number(e.target.value))
                       setPage(1)
                     }}
-                    className="text-sm border border-gray-300 rounded-md py-1 px-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="text-sm border border-gray-300 dark:border-neutral-700 rounded-md py-1 px-2 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-neutral-800 dark:text-white"
                   >
                     <option value={5}>5 / page</option>
                     <option value={10}>10 / page</option>
@@ -258,20 +258,20 @@ export function MenuItemsModal({
                       type="button"
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page === 1}
-                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
-                    <span className="text-sm text-gray-700 px-2">
+                    <span className="text-sm text-gray-700 dark:text-neutral-300 px-2">
                       {page} / {totalPages}
                     </span>
                     <button
                       type="button"
                       onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                       disabled={page >= totalPages}
-                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -312,8 +312,8 @@ export function MenuItemsModal({
           { label: deleteLoading ? 'Deleting...' : 'Delete', onClick: handleDelete, variant: 'danger', loading: deleteLoading },
         ]}
       >
-        <p className="text-sm text-gray-600">
-          Are you sure you want to delete <span className="font-medium text-gray-900">{deletingItem?.name}</span>? This action cannot be undone.
+        <p className="text-sm text-gray-600 dark:text-neutral-400">
+          Are you sure you want to delete <span className="font-medium text-gray-900 dark:text-white">{deletingItem?.name}</span>? This action cannot be undone.
         </p>
       </Modal>
     </>

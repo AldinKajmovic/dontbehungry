@@ -33,8 +33,8 @@ export default function UsersPage() {
       sortable: true,
       render: (user: AdminUser) => (
         <div>
-          <p className="font-medium text-gray-900">{user.email}</p>
-          <p className="text-xs text-gray-500">{user.firstName} {user.lastName}</p>
+          <p className="font-medium text-gray-900 dark:text-white">{user.email}</p>
+          <p className="text-xs text-gray-500 dark:text-neutral-400">{user.firstName} {user.lastName}</p>
         </div>
       ),
     },
@@ -55,15 +55,7 @@ export default function UsersPage() {
       header: t('admin.columns.role'),
       sortable: true,
       render: (user: AdminUser) => (
-        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-          user.role === 'ADMIN' || user.role === 'SUPER_ADMIN'
-            ? 'bg-purple-100 text-purple-700'
-            : user.role === 'RESTAURANT_OWNER'
-            ? 'bg-blue-100 text-blue-700'
-            : user.role === 'DELIVERY_DRIVER'
-            ? 'bg-green-100 text-green-700'
-            : 'bg-gray-100 text-gray-700'
-        }`}>
+        <span className="px-2 py-1 text-xs font-medium rounded-full bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400">
           {t(`admin.roles.${user.role}`)}
         </span>
       ),
@@ -82,7 +74,7 @@ export default function UsersPage() {
     {
       key: 'phone',
       header: t('admin.columns.phone'),
-      render: (user: AdminUser) => <span className="text-gray-500">{user.phone || '-'}</span>,
+      render: (user: AdminUser) => <span className="text-gray-500 dark:text-neutral-400">{user.phone || '-'}</span>,
     },
   ]
 
@@ -91,8 +83,8 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.users')}</h1>
-          <p className="text-gray-500 mt-1">{t('admin.manageUsers')}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.users')}</h1>
+          <p className="text-gray-500 dark:text-neutral-400 mt-1">{t('admin.manageUsers')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -155,7 +147,7 @@ export default function UsersPage() {
           <>
             <button
               onClick={() => openEditModal(user)}
-              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 rounded-lg transition-colors"
               title="Edit"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -164,7 +156,7 @@ export default function UsersPage() {
             </button>
             <button
               onClick={() => openDeleteModal(user)}
-              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
               title="Delete"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,8 +257,8 @@ export default function UsersPage() {
           />
 
           {/* User Address Section */}
-          <div className="border-t border-gray-200 pt-4 mt-4 space-y-4">
-            <p className="text-sm font-medium text-gray-700">{t('admin.modals.userAddress')} <span className="text-gray-400 font-normal">({t('common.optional')})</span></p>
+          <div className="border-t border-gray-200 dark:border-neutral-700 pt-4 mt-4 space-y-4">
+            <p className="text-sm font-medium text-gray-700 dark:text-neutral-300">{t('admin.modals.userAddress')} <span className="text-gray-400 dark:text-neutral-500 font-normal">({t('common.optional')})</span></p>
 
             <AddressAutocomplete
               label={t('address.streetAddress')}
@@ -284,7 +276,7 @@ export default function UsersPage() {
             />
 
             {formData.userAddress && (
-              <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+              <div className="text-sm text-gray-600 dark:text-neutral-400 bg-gray-50 dark:bg-neutral-800 p-2 rounded">
                 <strong>{t('address.selected')}:</strong> {formData.userAddress}, {formData.userCity}, {formData.userCountry}
               </div>
             )}
@@ -292,8 +284,8 @@ export default function UsersPage() {
 
           {/* Restaurant fields - shown when RESTAURANT_OWNER is selected */}
           {formData.role === 'RESTAURANT_OWNER' && (
-            <div className="border-t border-gray-200 pt-4 mt-4 space-y-4">
-              <p className="text-sm font-medium text-gray-700">{t('admin.modals.restaurantDetails')}</p>
+            <div className="border-t border-gray-200 dark:border-neutral-700 pt-4 mt-4 space-y-4">
+              <p className="text-sm font-medium text-gray-700 dark:text-neutral-300">{t('admin.modals.restaurantDetails')}</p>
 
               <Input
                 label={t('restaurant.name')}
@@ -305,8 +297,8 @@ export default function UsersPage() {
               />
 
               <div>
-                <label htmlFor="restaurantDescription" className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('restaurant.description')} <span className="text-gray-400 font-normal">({t('common.optional')})</span>
+                <label htmlFor="restaurantDescription" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+                  {t('restaurant.description')} <span className="text-gray-400 dark:text-neutral-500 font-normal">({t('common.optional')})</span>
                 </label>
                 <textarea
                   id="restaurantDescription"
@@ -337,7 +329,7 @@ export default function UsersPage() {
                 />
               </div>
 
-              <p className="text-sm font-medium text-gray-700 mt-2">{t('admin.modals.location')}</p>
+              <p className="text-sm font-medium text-gray-700 dark:text-neutral-300 mt-2">{t('admin.modals.location')}</p>
 
               <AddressAutocomplete
                 label={t('address.streetAddress')}
@@ -355,7 +347,7 @@ export default function UsersPage() {
               />
 
               {formData.restaurantAddress && (
-                <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                <div className="text-sm text-gray-600 dark:text-neutral-400 bg-gray-50 dark:bg-neutral-800 p-2 rounded">
                   <strong>{t('address.selected')}:</strong> {formData.restaurantAddress}, {formData.restaurantCity}, {formData.restaurantCountry}
                 </div>
               )}
@@ -441,11 +433,11 @@ export default function UsersPage() {
           />
 
           {/* User Address Section */}
-          <div className="border-t border-gray-200 pt-4 mt-4 space-y-4">
-            <p className="text-sm font-medium text-gray-700">{t('admin.modals.userAddress')}</p>
+          <div className="border-t border-gray-200 dark:border-neutral-700 pt-4 mt-4 space-y-4">
+            <p className="text-sm font-medium text-gray-700 dark:text-neutral-300">{t('admin.modals.userAddress')}</p>
 
             {formData.userAddress && (
-              <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded mb-2">
+              <div className="text-sm text-gray-600 dark:text-neutral-400 bg-gray-50 dark:bg-neutral-800 p-2 rounded mb-2">
                 <strong>{t('address.current')}:</strong> {formData.userAddress}, {formData.userCity}, {formData.userCountry}
               </div>
             )}

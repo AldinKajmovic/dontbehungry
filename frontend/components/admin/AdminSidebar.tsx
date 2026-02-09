@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { useLanguage } from '@/hooks/useLanguage'
-import { LanguageToggle } from '@/components/ui'
+import { LanguageToggle, ThemeToggle } from '@/components/ui'
 
 interface NavItem {
   labelKey: string
@@ -97,76 +97,109 @@ const navItems: NavItem[] = [
   },
 ]
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname()
   const { logout } = useAuth()
   const { t } = useLanguage()
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-100 min-h-screen">
-      {/* Logo */}
-      <div className="p-6 border-b border-gray-100">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
-          <div>
-            <span className="font-bold text-gray-900">Admin</span>
-            <span className="text-xs text-gray-500 block">{t('admin.dashboard')}</span>
-          </div>
-        </Link>
-      </div>
+    <>
+      {/* Backdrop overlay for mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onClose}
+        />
+      )}
 
-      {/* Navigation */}
-      <nav className="p-4">
-        <ul className="space-y-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/panel' && pathname.startsWith(item.href))
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-primary-50 text-primary-600'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                >
-                  {item.icon}
-                  {t(item.labelKey)}
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
-      </nav>
+      {/* Sidebar */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-neutral-900 border-r border-gray-100 dark:border-neutral-800 transform transition-transform duration-200 ease-in-out lg:relative lg:translate-x-0 lg:z-auto ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Logo */}
+          <div className="p-6 border-b border-gray-100 dark:border-neutral-800 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div>
+                <span className="font-bold text-gray-900 dark:text-white">Admin</span>
+                <span className="text-xs text-gray-500 dark:text-neutral-400 block">{t('admin.dashboard')}</span>
+              </div>
+            </Link>
+            {/* Close button for mobile */}
+            <button
+              onClick={onClose}
+              className="lg:hidden p-2 text-gray-500 dark:text-neutral-400 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-      {/* Language Toggle & Back to site & Logout */}
-      <div className="absolute bottom-0 left-0 w-64 p-4 border-t border-gray-100 bg-white space-y-1">
-        <div className="px-4 py-2 mb-2">
-          <LanguageToggle />
+          {/* Navigation */}
+          <nav className="p-4 flex-1 overflow-y-auto">
+            <ul className="space-y-1">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href || (item.href !== '/panel' && pathname.startsWith(item.href))
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={onClose}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        isActive
+                          ? 'bg-primary-50 dark:bg-primary-950/30 text-primary-600 dark:text-primary-400'
+                          : 'text-gray-600 dark:text-neutral-400 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-600 dark:hover:text-white'
+                      }`}
+                    >
+                      {item.icon}
+                      {t(item.labelKey)}
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
+
+          {/* Language Toggle & Back to site & Logout */}
+          <div className="p-4 border-t border-gray-100 dark:border-neutral-800 space-y-1">
+            <div className="px-4 py-2 mb-2 flex items-center gap-2">
+              <ThemeToggle />
+              <LanguageToggle />
+            </div>
+            <Link
+              href="/my-profile"
+              className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 dark:text-neutral-400 hover:bg-gray-50 dark:hover:bg-neutral-800 hover:text-gray-900 dark:hover:text-white rounded-xl transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+              </svg>
+              {t('common.back')}
+            </Link>
+            <button
+              onClick={logout}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              {t('common.logOut')}
+            </button>
+          </div>
         </div>
-        <Link
-          href="/my-profile"
-          className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
-          </svg>
-          {t('common.back')}
-        </Link>
-        <button
-          onClick={logout}
-          className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          {t('common.logOut')}
-        </button>
-      </div>
-    </aside>
+      </aside>
+    </>
   )
 }

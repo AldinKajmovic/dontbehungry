@@ -1,6 +1,6 @@
 # Shopping Cart System
 
-This guide documents the shopping cart functionality for the Don't Be Hungry food delivery application.
+This guide documents the shopping cart functionality for the Najedise food delivery application.
 
 ## Overview
 

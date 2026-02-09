@@ -22,17 +22,17 @@ interface StatusMessageProps {
 }
 
 const bgColors = {
-  success: 'bg-green-100',
-  error: 'bg-red-100',
-  loading: 'bg-primary-100',
-  info: 'bg-blue-100',
+  success: 'bg-green-100 dark:bg-green-950/40',
+  error: 'bg-red-100 dark:bg-red-950/40',
+  loading: 'bg-primary-100 dark:bg-primary-950/40',
+  info: 'bg-blue-100 dark:bg-blue-950/40',
 }
 
 const textColors = {
-  success: 'text-green-600',
-  error: 'text-red-600',
-  loading: 'text-primary-600',
-  info: 'text-blue-600',
+  success: 'text-green-600 dark:text-green-400',
+  error: 'text-red-600 dark:text-red-400',
+  loading: 'text-primary-600 dark:text-primary-400',
+  info: 'text-blue-600 dark:text-blue-400',
 }
 
 const defaultIcons = {
@@ -74,11 +74,11 @@ export function StatusMessage({
       ) : null}
 
       {title && (
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">{title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 text-center">{title}</h3>
       )}
 
       {children && (
-        <div className="text-center text-gray-600 mb-6">{children}</div>
+        <div className="text-center text-gray-600 dark:text-neutral-400 mb-6">{children}</div>
       )}
 
       {actions.length > 0 && (

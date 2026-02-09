@@ -9,10 +9,10 @@ interface AlertProps {
 }
 
 const styles = {
-  error: 'bg-red-50 border-red-100 text-red-600',
-  success: 'bg-green-50 border-green-100 text-green-600',
-  warning: 'bg-yellow-50 border-yellow-100 text-yellow-600',
-  info: 'bg-blue-50 border-blue-100 text-blue-600',
+  error: 'bg-red-50 border-red-100 text-red-600 dark:bg-red-950/30 dark:border-red-900 dark:text-red-400',
+  success: 'bg-green-50 border-green-100 text-green-600 dark:bg-green-950/30 dark:border-green-900 dark:text-green-400',
+  warning: 'bg-yellow-50 border-yellow-100 text-yellow-600 dark:bg-yellow-950/30 dark:border-yellow-900 dark:text-yellow-400',
+  info: 'bg-blue-50 border-blue-100 text-blue-600 dark:bg-blue-950/30 dark:border-blue-900 dark:text-blue-400',
 };
 
 const icons = {

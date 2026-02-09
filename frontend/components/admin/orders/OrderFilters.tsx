@@ -14,6 +14,8 @@ interface OrderFiltersProps {
   loadDriverOptions: (search: string) => Promise<{ value: string; label: string }[]>
 }
 
+const inputClasses = 'w-full px-3 py-2 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-neutral-100'
+
 export function OrderFiltersSection({
   t,
   filters,
@@ -43,7 +45,7 @@ export function OrderFiltersSection({
   ]
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
+    <div className="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 mb-6">
       <div className="flex flex-wrap items-end gap-4">
         <div className="min-w-[200px]">
           <SearchableSelect
@@ -57,11 +59,11 @@ export function OrderFiltersSection({
           />
         </div>
         <div className="min-w-[180px]">
-          <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.columns.status')}</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2">{t('admin.columns.status')}</label>
           <select
             value={filters.status || ''}
             onChange={(e) => onFilterChange('status', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
+            className={inputClasses}
           >
             {STATUS_FILTER_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -69,11 +71,11 @@ export function OrderFiltersSection({
           </select>
         </div>
         <div className="min-w-[160px]">
-          <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.paymentStatus.label')}</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2">{t('admin.paymentStatus.label')}</label>
           <select
             value={filters.paymentStatus || ''}
             onChange={(e) => onFilterChange('paymentStatus', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
+            className={inputClasses}
           >
             {PAYMENT_STATUS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -92,20 +94,20 @@ export function OrderFiltersSection({
           prefix="$"
         />
         <div className="min-w-[280px]">
-          <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.filters.createdDate')}</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-neutral-200 mb-2">{t('admin.filters.createdDate')}</label>
           <div className="flex items-center gap-2">
             <input
               type="date"
               value={filters.createdAtFrom || ''}
               onChange={(e) => onFilterChange('createdAtFrom', e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
+              className={`flex-1 ${inputClasses}`}
             />
-            <span className="text-gray-400">{t('admin.ordersPage.to')}</span>
+            <span className="text-gray-400 dark:text-neutral-500">{t('admin.ordersPage.to')}</span>
             <input
               type="date"
               value={filters.createdAtTo || ''}
               onChange={(e) => onFilterChange('createdAtTo', e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
+              className={`flex-1 ${inputClasses}`}
             />
           </div>
         </div>
@@ -123,7 +125,7 @@ export function OrderFiltersSection({
         {hasActiveFilters && (
           <button
             onClick={onClearFilters}
-            className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="px-3 py-2 text-sm text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
           >
             {t('admin.clearFilters')}
           </button>

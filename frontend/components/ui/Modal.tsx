@@ -24,19 +24,19 @@ interface ModalProps {
 }
 
 const iconBgColors = {
-  primary: 'bg-primary-100',
-  red: 'bg-red-100',
-  green: 'bg-green-100',
-  blue: 'bg-blue-100',
-  yellow: 'bg-yellow-100',
+  primary: 'bg-primary-100 dark:bg-primary-950/50',
+  red: 'bg-red-100 dark:bg-red-950/50',
+  green: 'bg-green-100 dark:bg-green-950/50',
+  blue: 'bg-blue-100 dark:bg-blue-950/50',
+  yellow: 'bg-yellow-100 dark:bg-yellow-950/50',
 }
 
 const iconTextColors = {
-  primary: 'text-primary-600',
-  red: 'text-red-600',
-  green: 'text-green-600',
-  blue: 'text-blue-600',
-  yellow: 'text-yellow-600',
+  primary: 'text-primary-600 dark:text-primary-400',
+  red: 'text-red-600 dark:text-red-400',
+  green: 'text-green-600 dark:text-green-400',
+  blue: 'text-blue-600 dark:text-blue-400',
+  yellow: 'text-yellow-600 dark:text-yellow-400',
 }
 
 const sizeClasses = {
@@ -77,14 +77,14 @@ export function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-black/50 dark:bg-black/70"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Modal */}
       <div
-        className={`relative bg-white rounded-xl shadow-xl ${sizeClasses[size]} w-full mx-4 p-6 max-h-[90vh] overflow-y-auto ${className}`}
+        className={`relative bg-white dark:bg-neutral-900 rounded-xl shadow-xl ${sizeClasses[size]} w-full mx-4 p-6 max-h-[90vh] overflow-y-auto ${className}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
@@ -96,7 +96,7 @@ export function Modal({
               <div className={iconTextColors[iconColor]}>{icon}</div>
             </div>
           )}
-          <h3 id="modal-title" className="text-lg font-semibold text-gray-900">
+          <h3 id="modal-title" className="text-lg font-semibold text-gray-900 dark:text-white">
             {title}
           </h3>
         </div>

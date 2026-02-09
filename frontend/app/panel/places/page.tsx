@@ -218,7 +218,7 @@ export default function PlacesPage() {
       header: t('admin.placesPage.streetAddress'),
       sortable: true,
       render: (place: AdminPlace) => (
-        <p className="font-medium text-gray-900">{place.address}</p>
+        <p className="font-medium text-gray-900 dark:text-white">{place.address}</p>
       ),
     },
     {
@@ -226,7 +226,7 @@ export default function PlacesPage() {
       header: t('admin.placesPage.city'),
       sortable: true,
       render: (place: AdminPlace) => (
-        <span className="text-gray-700">{place.city}</span>
+        <span className="text-gray-700 dark:text-neutral-300">{place.city}</span>
       ),
     },
     {
@@ -234,7 +234,7 @@ export default function PlacesPage() {
       header: t('admin.placesPage.state'),
       sortable: true,
       render: (place: AdminPlace) => (
-        <span className="text-gray-500">{place.state || '-'}</span>
+        <span className="text-gray-500 dark:text-neutral-400">{place.state || '-'}</span>
       ),
     },
     {
@@ -242,7 +242,7 @@ export default function PlacesPage() {
       header: t('admin.placesPage.country'),
       sortable: true,
       render: (place: AdminPlace) => (
-        <span className="text-gray-700">{place.country}</span>
+        <span className="text-gray-700 dark:text-neutral-300">{place.country}</span>
       ),
     },
     {
@@ -250,14 +250,7 @@ export default function PlacesPage() {
       header: t('admin.placesPage.postalCode'),
       sortable: true,
       render: (place: AdminPlace) => (
-        <span className="text-gray-500">{place.postalCode || '-'}</span>
-      ),
-    },
-    {
-      key: 'id',
-      header: 'ID',
-      render: (place: AdminPlace) => (
-        <span className="font-mono text-xs text-gray-400">{place.id.slice(0, 8)}...</span>
+        <span className="text-gray-500 dark:text-neutral-400">{place.postalCode || '-'}</span>
       ),
     },
   ]
@@ -267,8 +260,8 @@ export default function PlacesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.placesPage.title')}</h1>
-          <p className="text-gray-500 mt-1">{t('admin.placesPage.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.placesPage.title')}</h1>
+          <p className="text-gray-500 dark:text-neutral-400 mt-1">{t('admin.placesPage.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -306,52 +299,52 @@ export default function PlacesPage() {
       </form>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
+      <div className="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 mb-6">
         <div className="flex flex-wrap items-end gap-4">
           <div className="min-w-[150px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.placesPage.city')}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">{t('admin.placesPage.city')}</label>
             <input
               type="text"
               value={filters.city || ''}
               onChange={(e) => handleFilterChange('city', e.target.value)}
               placeholder={t('admin.placesPage.filterByCity')}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
+              className="w-full px-3 py-2 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white dark:bg-neutral-800 dark:text-neutral-200"
             />
           </div>
           <div className="min-w-[150px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.placesPage.state')}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">{t('admin.placesPage.state')}</label>
             <input
               type="text"
               value={filters.state || ''}
               onChange={(e) => handleFilterChange('state', e.target.value)}
               placeholder={t('admin.placesPage.filterByState')}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
+              className="w-full px-3 py-2 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white dark:bg-neutral-800 dark:text-neutral-200"
             />
           </div>
           <div className="min-w-[150px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.placesPage.country')}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">{t('admin.placesPage.country')}</label>
             <input
               type="text"
               value={filters.country || ''}
               onChange={(e) => handleFilterChange('country', e.target.value)}
               placeholder={t('admin.placesPage.filterByCountry')}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
+              className="w-full px-3 py-2 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white dark:bg-neutral-800 dark:text-neutral-200"
             />
           </div>
           <div className="min-w-[150px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.placesPage.postalCode')}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">{t('admin.placesPage.postalCode')}</label>
             <input
               type="text"
               value={filters.postalCode || ''}
               onChange={(e) => handleFilterChange('postalCode', e.target.value)}
               placeholder={t('admin.placesPage.filterByPostalCode')}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
+              className="w-full px-3 py-2 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white dark:bg-neutral-800 dark:text-neutral-200"
             />
           </div>
           {hasActiveFilters && (
             <button
               onClick={handleClearFilters}
-              className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="px-3 py-2 text-sm text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
             >
               {t('common.clearFilters')}
             </button>
@@ -375,7 +368,7 @@ export default function PlacesPage() {
           <>
             <button
               onClick={() => openEditModal(place)}
-              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 rounded-lg transition-colors"
               title="Edit"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -384,7 +377,7 @@ export default function PlacesPage() {
             </button>
             <button
               onClick={() => openDeleteModal(place)}
-              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
               title="Delete"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

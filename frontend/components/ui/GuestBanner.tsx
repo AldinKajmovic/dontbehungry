@@ -15,12 +15,12 @@ export function GuestBanner() {
   }
 
   return (
-    <div className="bg-amber-50 border-b border-amber-200">
+    <div className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800">
       <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <svg
-              className="w-5 h-5 text-amber-600 flex-shrink-0"
+              className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -30,7 +30,7 @@ export function GuestBanner() {
                 clipRule="evenodd"
               />
             </svg>
-            <p className="text-sm text-amber-800">
+            <p className="text-sm text-amber-800 dark:text-amber-200">
               <span className="font-medium">{t('guest.banner')}</span>
               <span className="hidden sm:inline">
                 {' '}
@@ -40,7 +40,7 @@ export function GuestBanner() {
           </div>
           <button
             onClick={() => setDismissed(true)}
-            className="text-amber-600 hover:text-amber-800 p-1"
+            className="text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-200 p-1"
             aria-label="Dismiss"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

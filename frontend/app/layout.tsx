@@ -8,13 +8,14 @@ import { SocketProvider } from '@/providers/SocketProvider'
 import { NotificationProvider } from '@/providers/NotificationProvider'
 import { LanguageProvider } from '@/providers/LanguageProvider'
 import { ToastProvider } from '@/providers/ToastProvider'
+import { ThemeProvider } from '@/providers/ThemeProvider'
 import { ToastContainer } from '@/components/ui'
 import DriverOrderQueueOverlay from '@/components/driver/DriverOrderQueueOverlay'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Glovo Copy - Food Delivery',
+  title: 'Najedise - Food Delivery',
   description: 'Order food from your favorite restaurants',
 }
 
@@ -24,25 +25,27 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <NextAuthProvider>
-          <LanguageProvider>
-            <AuthProvider>
-              <SocketProvider>
-                <NotificationProvider>
-                  <ToastProvider>
-                    <CartProvider>
-                      {children}
-                      <ToastContainer />
-                      <DriverOrderQueueOverlay />
-                    </CartProvider>
-                  </ToastProvider>
-                </NotificationProvider>
-              </SocketProvider>
-            </AuthProvider>
-          </LanguageProvider>
-        </NextAuthProvider>
+        <ThemeProvider>
+          <NextAuthProvider>
+            <LanguageProvider>
+              <AuthProvider>
+                <SocketProvider>
+                  <NotificationProvider>
+                    <ToastProvider>
+                      <CartProvider>
+                        {children}
+                        <ToastContainer />
+                        <DriverOrderQueueOverlay />
+                      </CartProvider>
+                    </ToastProvider>
+                  </NotificationProvider>
+                </SocketProvider>
+              </AuthProvider>
+            </LanguageProvider>
+          </NextAuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -323,7 +323,7 @@ export function AddressAutocomplete({
       {/* Search Input */}
       <div className="relative">
         {label && (
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
             {label}
           </label>
         )}
@@ -335,9 +335,9 @@ export function AddressAutocomplete({
             onChange={handleInputChange}
             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
             placeholder={placeholder || t('address.searchPlaceholder') || 'Search for an address...'}
-            className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+            className="w-full px-3 py-2 pl-10 border border-gray-300 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-neutral-100"
           />
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-neutral-500">
             {isLoading ? (
               <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
             ) : (
@@ -352,25 +352,25 @@ export function AddressAutocomplete({
         {showSuggestions && suggestions.length > 0 && (
           <div
             ref={suggestionsRef}
-            className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+            className="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg shadow-lg max-h-60 overflow-y-auto"
           >
             {suggestions.map((suggestion, index) => (
               <button
                 key={index}
                 type="button"
                 onClick={() => handleSelect(suggestion)}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 focus:outline-none focus:bg-gray-50"
+                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-neutral-700 border-b border-gray-100 dark:border-neutral-700 last:border-b-0 focus:outline-none focus:bg-gray-50 dark:focus:bg-neutral-700"
               >
                 <div className="flex items-start gap-3">
-                  <svg className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-gray-400 dark:text-neutral-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="text-sm font-medium text-gray-900 dark:text-neutral-100 truncate">
                       {suggestion.address || suggestion.displayName.split(',')[0]}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">
+                    <p className="text-xs text-gray-500 dark:text-neutral-400 truncate">
                       {[suggestion.city, suggestion.state, suggestion.country].filter(Boolean).join(', ')}
                     </p>
                   </div>
@@ -383,14 +383,14 @@ export function AddressAutocomplete({
 
       {/* Selected Address Display */}
       {selectedAddress && (
-        <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center gap-2 text-green-800 text-sm">
+        <div className="p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
+          <div className="flex items-center gap-2 text-green-800 dark:text-green-300 text-sm">
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
             <span className="font-medium">{t('address.selected') || 'Selected'}:</span>
           </div>
-          <p className="text-sm text-green-700 mt-1">
+          <p className="text-sm text-green-700 dark:text-green-400 mt-1">
             {selectedAddress.address}, {selectedAddress.city}, {selectedAddress.country}
           </p>
         </div>
@@ -402,9 +402,9 @@ export function AddressAutocomplete({
           <div
             ref={mapRef}
             style={{ height, width: '100%' }}
-            className="rounded-lg border border-gray-300 z-0"
+            className="rounded-lg border border-gray-300 dark:border-neutral-700 z-0"
           />
-          <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+          <p className="text-xs text-gray-500 dark:text-neutral-400 mt-1 flex items-center gap-1">
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>

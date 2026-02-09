@@ -83,7 +83,7 @@ export function ImageBrowserModal({ isOpen, onClose, onSelect, defaultFolder }: 
           <select
             value={folder}
             onChange={(e) => setFolder(e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
+            className="px-3 py-2 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white dark:bg-neutral-900 dark:text-white"
           >
             <option value="">{t('admin.imageBrowser.allFolders')}</option>
             {FOLDER_OPTIONS.map((f) => (
@@ -95,12 +95,12 @@ export function ImageBrowserModal({ isOpen, onClose, onSelect, defaultFolder }: 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('admin.imageBrowser.searchPlaceholder')}
-            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+            className="flex-1 px-3 py-2 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:bg-neutral-900 dark:text-white"
           />
         </div>
 
         {/* Count */}
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-neutral-400">
           {t('admin.imageBrowser.count', { count: filteredImages.length })}
         </p>
 
@@ -114,7 +114,7 @@ export function ImageBrowserModal({ isOpen, onClose, onSelect, defaultFolder }: 
               <div className="w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : filteredImages.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-gray-500 dark:text-neutral-400">
               {t('admin.imageBrowser.empty')}
             </div>
           ) : (
@@ -124,7 +124,7 @@ export function ImageBrowserModal({ isOpen, onClose, onSelect, defaultFolder }: 
                   key={img.name}
                   type="button"
                   onClick={() => handleSelect(img.url)}
-                  className="group relative rounded-lg overflow-hidden border-2 border-gray-200 hover:border-primary-500 transition-colors bg-gray-50 aspect-square"
+                  className="group relative rounded-lg overflow-hidden border-2 border-gray-200 dark:border-neutral-700 hover:border-primary-500 transition-colors bg-gray-50 dark:bg-neutral-800 aspect-square"
                   title={img.name}
                 >
                   <img

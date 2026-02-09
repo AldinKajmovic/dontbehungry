@@ -289,14 +289,14 @@ export default function AdminDriversPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.drivers.title')}</h1>
-          <p className="text-gray-500 mt-1">{t('admin.drivers.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.drivers.title')}</h1>
+          <p className="text-gray-500 dark:text-neutral-400 mt-1">{t('admin.drivers.subtitle')}</p>
         </div>
         <div className="flex items-center gap-4">
           {/* Connection Status */}
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${socketConnected ? 'bg-green-500' : 'bg-gray-400'}`} />
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 dark:text-neutral-400">
               {socketConnected ? t('admin.drivers.liveUpdates') : t('admin.drivers.connecting')}
             </span>
           </div>
@@ -305,7 +305,7 @@ export default function AdminDriversPage() {
           <button
             onClick={fetchDrivers}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors disabled:opacity-50 dark:text-neutral-300"
           >
             <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -317,7 +317,7 @@ export default function AdminDriversPage() {
 
       {/* Error state */}
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600">
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-xl text-red-600 dark:text-red-400">
           {error}
         </div>
       )}
@@ -325,12 +325,12 @@ export default function AdminDriversPage() {
       {/* Main content */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
         {/* Map */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="lg:col-span-2 bg-white dark:bg-neutral-900 rounded-xl border border-gray-200 dark:border-neutral-700 overflow-hidden">
           {loading && !leafletLoaded ? (
             <div className="h-full flex items-center justify-center">
               <div className="text-center">
                 <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                <p className="text-gray-500">{t('common.loading')}</p>
+                <p className="text-gray-500 dark:text-neutral-400">{t('common.loading')}</p>
               </div>
             </div>
           ) : (
@@ -339,10 +339,10 @@ export default function AdminDriversPage() {
         </div>
 
         {/* Driver List */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-gray-100">
+        <div className="bg-white dark:bg-neutral-900 rounded-xl border border-gray-200 dark:border-neutral-700 overflow-hidden flex flex-col">
+          <div className="p-4 border-b border-gray-100 dark:border-neutral-800">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-gray-900">{t('admin.drivers.onlineDrivers')}</h2>
+              <h2 className="font-semibold text-gray-900 dark:text-white">{t('admin.drivers.onlineDrivers')}</h2>
               <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
                 {drivers.length} {t('admin.drivers.online')}
               </span>
@@ -355,10 +355,10 @@ export default function AdminDriversPage() {
                 {[...Array(3)].map((_, i) => (
                   <div key={i} className="animate-pulse">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gray-200 rounded-full" />
+                      <div className="w-10 h-10 bg-gray-200 dark:bg-neutral-700 rounded-full" />
                       <div className="flex-1">
-                        <div className="h-4 bg-gray-200 rounded w-32 mb-2" />
-                        <div className="h-3 bg-gray-200 rounded w-24" />
+                        <div className="h-4 bg-gray-200 dark:bg-neutral-700 rounded w-32 mb-2" />
+                        <div className="h-3 bg-gray-200 dark:bg-neutral-700 rounded w-24" />
                       </div>
                     </div>
                   </div>
@@ -366,21 +366,21 @@ export default function AdminDriversPage() {
               </div>
             ) : drivers.length === 0 ? (
               <div className="p-8 text-center">
-                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-gray-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 </div>
-                <p className="text-gray-500 text-sm">{t('admin.drivers.noDriversOnline')}</p>
+                <p className="text-gray-500 dark:text-neutral-400 text-sm">{t('admin.drivers.noDriversOnline')}</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-100 dark:divide-neutral-800">
                 {drivers.map(driver => (
                   <button
                     key={driver.id}
                     onClick={() => handleDriverSelect(driver.id)}
-                    className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
-                      selectedDriverId === driver.id ? 'bg-primary-50 hover:bg-primary-50' : ''
+                    className={`w-full p-4 text-left hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors ${
+                      selectedDriverId === driver.id ? 'bg-primary-50 dark:bg-primary-950/30 hover:bg-primary-50 dark:hover:bg-primary-950/30' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -392,12 +392,12 @@ export default function AdminDriversPage() {
                         </svg>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 truncate">
+                        <p className="font-medium text-gray-900 dark:text-white truncate">
                           {driver.firstName} {driver.lastName}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
                           {driver.location ? (
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-500 dark:text-neutral-400">
                               {t('orders.tracking.lastUpdated')}: {getTimeAgo(driver.location.updatedAt)}
                             </span>
                           ) : (
@@ -413,11 +413,11 @@ export default function AdminDriversPage() {
                             {driver.activeOrdersCount} {t('admin.drivers.orders')}
                           </span>
                           {driver.phone && (
-                            <span className="text-xs text-gray-400">{driver.phone}</span>
+                            <span className="text-xs text-gray-400 dark:text-neutral-500">{driver.phone}</span>
                           )}
                         </div>
                       </div>
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </div>
@@ -430,7 +430,7 @@ export default function AdminDriversPage() {
       </div>
 
       {/* Legend */}
-      <div className="mt-4 flex items-center gap-6 text-sm text-gray-500">
+      <div className="mt-4 flex items-center gap-6 text-sm text-gray-500 dark:text-neutral-400">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-blue-500 rounded-full" />
           <span>{t('admin.drivers.driverMarker')}</span>

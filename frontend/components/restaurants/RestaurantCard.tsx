@@ -25,7 +25,7 @@ export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
   return (
     <div
       onClick={() => onClick(restaurant)}
-      className="group cursor-pointer rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+      className="group cursor-pointer rounded-xl overflow-hidden bg-white dark:bg-neutral-900 shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
     >
       {/* Cover Image */}
       <div className="relative h-40 overflow-hidden">
@@ -61,7 +61,7 @@ export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
         )}
 
         {/* Logo */}
-        <div className="absolute bottom-3 left-3 w-14 h-14 rounded-lg bg-white shadow-lg overflow-hidden border-2 border-white transition-transform duration-300 group-hover:scale-110">
+        <div className="absolute bottom-3 left-3 w-14 h-14 rounded-lg bg-white dark:bg-neutral-900 shadow-lg overflow-hidden border-2 border-white dark:border-neutral-700 transition-transform duration-300 group-hover:scale-110">
           {restaurant.logoUrl ? (
             <img
               src={restaurant.logoUrl}
@@ -69,8 +69,8 @@ export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-primary-100 flex items-center justify-center">
-              <span className="text-primary-600 font-bold text-lg">
+            <div className="w-full h-full bg-primary-100 dark:bg-primary-950/30 flex items-center justify-center">
+              <span className="text-primary-600 dark:text-primary-400 font-bold text-lg">
                 {restaurant.name.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -80,7 +80,7 @@ export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="font-semibold text-gray-900 text-lg mb-2 truncate">
+        <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-2 truncate">
           {restaurant.name}
         </h3>
 
@@ -98,33 +98,33 @@ export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
           {/* Distance (shown when logged in) */}
           {restaurant.distance !== undefined && (
             <>
-              <span className="inline-flex items-center gap-1 text-gray-600">
+              <span className="inline-flex items-center gap-1 text-gray-600 dark:text-neutral-400">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 {restaurant.distance} km
               </span>
-              <span className="text-gray-300">•</span>
+              <span className="text-gray-300 dark:text-neutral-600">•</span>
             </>
           )}
 
           {/* Delivery Time */}
-          <span className="text-gray-500">
+          <span className="text-gray-500 dark:text-neutral-400">
             {deliveryTimeMin}-{deliveryTimeMax} min
           </span>
 
-          <span className="text-gray-300">•</span>
+          <span className="text-gray-300 dark:text-neutral-600">•</span>
 
           {/* Rating */}
-          <span className="inline-flex items-center gap-1 text-gray-700">
+          <span className="inline-flex items-center gap-1 text-gray-700 dark:text-neutral-300">
             <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
             {ratingPercent}%
           </span>
 
-          <span className="text-gray-400 text-xs">(500+)</span>
+          <span className="text-gray-400 dark:text-neutral-500 text-xs">(500+)</span>
         </div>
 
         {/* Categories */}
@@ -133,13 +133,13 @@ export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
             {restaurant.categories.slice(0, 3).map((cat) => (
               <span
                 key={cat.id}
-                className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full"
+                className="text-xs text-gray-500 dark:text-neutral-400 bg-gray-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full"
               >
                 {cat.category.name}
               </span>
             ))}
             {restaurant.categories.length > 3 && (
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 dark:text-neutral-500">
                 +{restaurant.categories.length - 3}
               </span>
             )}

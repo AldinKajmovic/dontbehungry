@@ -116,20 +116,20 @@ StatusSelect.displayName = 'StatusSelect'
 
 // Base status data (colors only) - labels should be added by consuming components using translations
 export const ORDER_STATUS_COLORS: Record<string, string> = {
-  PENDING: 'bg-yellow-100 text-yellow-700',
-  CONFIRMED: 'bg-blue-100 text-blue-700',
-  PREPARING: 'bg-purple-100 text-purple-700',
-  READY_FOR_PICKUP: 'bg-indigo-100 text-indigo-700',
-  OUT_FOR_DELIVERY: 'bg-cyan-100 text-cyan-700',
-  DELIVERED: 'bg-green-100 text-green-700',
-  CANCELLED: 'bg-red-100 text-red-700',
+  PENDING: 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400',
+  CONFIRMED: 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400',
+  PREPARING: 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400',
+  READY_FOR_PICKUP: 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400',
+  OUT_FOR_DELIVERY: 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400',
+  DELIVERED: 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400',
+  CANCELLED: 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400',
 }
 
 export const PAYMENT_STATUS_COLORS: Record<string, string> = {
-  PENDING: 'bg-yellow-100 text-yellow-700',
-  COMPLETED: 'bg-green-100 text-green-700',
-  FAILED: 'bg-red-100 text-red-700',
-  REFUNDED: 'bg-blue-100 text-blue-700',
+  PENDING: 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400',
+  COMPLETED: 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400',
+  FAILED: 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400',
+  REFUNDED: 'bg-primary-100 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400',
 }
 
 // Pre-defined status options for orders (English labels, use getOrderStatusOptions for i18n)

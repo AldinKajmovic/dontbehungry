@@ -18,9 +18,9 @@ export function PaymentMethodSection({ selectedMethod, onSelect }: PaymentMethod
   const { t } = useLanguage()
 
   return (
-    <div className="border-t pt-4">
-      <h3 className="font-medium text-gray-900 mb-3">{t('cart.paymentMethod')}</h3>
-      <p className="text-sm text-gray-500 mb-3">
+    <div className="border-t dark:border-neutral-700 pt-4">
+      <h3 className="font-medium text-gray-900 dark:text-white mb-3">{t('cart.paymentMethod')}</h3>
+      <p className="text-sm text-gray-500 dark:text-neutral-400 mb-3">
         {t('cart.paymentOnDelivery')}
       </p>
       <div className="space-y-2">
@@ -30,8 +30,8 @@ export function PaymentMethodSection({ selectedMethod, onSelect }: PaymentMethod
             className={`
               flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors
               ${selectedMethod === method.value
-                ? 'border-primary-500 bg-primary-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/30'
+                : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
               }
             `}
           >
@@ -43,8 +43,8 @@ export function PaymentMethodSection({ selectedMethod, onSelect }: PaymentMethod
               className="mt-1 text-primary-600 focus:ring-primary-500"
             />
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900">{t(method.labelKey)}</p>
-              <p className="text-xs text-gray-500">{t(method.descriptionKey)}</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{t(method.labelKey)}</p>
+              <p className="text-xs text-gray-500 dark:text-neutral-400">{t(method.descriptionKey)}</p>
             </div>
           </label>
         ))}

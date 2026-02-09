@@ -36,8 +36,8 @@ export function RestaurantDeleteModal({
         { label: loading ? 'Deleting...' : 'Delete', onClick: onDelete, variant: 'danger', loading },
       ]}
     >
-      <p className="text-sm text-gray-600">
-        Are you sure you want to delete <span className="font-medium text-gray-900">{restaurant?.name}</span>? This will also delete all menu items associated with this restaurant. This action cannot be undone.
+      <p className="text-sm text-gray-600 dark:text-neutral-400">
+        Are you sure you want to delete <span className="font-medium text-gray-900 dark:text-white">{restaurant?.name}</span>? This will also delete all menu items associated with this restaurant. This action cannot be undone.
       </p>
     </Modal>
   )

@@ -56,35 +56,35 @@ export async function sendVerificationEmail(
       <title>Verify Your Email</title>
     </head>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <div style="background: linear-gradient(135deg, #00A082 0%, #00C49A 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-        <h1 style="color: white; margin: 0;">Glovo Clone</h1>
+      <div style="background: linear-gradient(135deg, #d9432a 0%, #b83420 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Najedise</h1>
       </div>
       <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
         <h2 style="color: #333;">Welcome, ${firstName}!</h2>
         <p>Thank you for signing up. Please verify your email address by clicking the button below:</p>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${verificationUrl}" style="background: #00A082; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+          <a href="${verificationUrl}" style="background: #d9432a; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
             Verify Email
           </a>
         </div>
         <p style="color: #666; font-size: 14px;">
           If the button doesn't work, copy and paste this link into your browser:
           <br>
-          <a href="${verificationUrl}" style="color: #00A082;">${verificationUrl}</a>
+          <a href="${verificationUrl}" style="color: #d9432a;">${verificationUrl}</a>
         </p>
         <p style="color: #666; font-size: 14px;">
           This link will expire in 24 hours. If you didn't create an account, you can safely ignore this email.
         </p>
       </div>
       <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-        <p>&copy; ${new Date().getFullYear()} Glovo Clone. All rights reserved.</p>
+        <p>&copy; ${new Date().getFullYear()} Najedise. All rights reserved.</p>
       </div>
     </body>
     </html>
   `
 
   const text = `
-    Welcome to Glovo Clone, ${firstName}!
+    Welcome to Najedise, ${firstName}!
 
     Please verify your email address by clicking the link below:
     ${verificationUrl}
@@ -94,7 +94,7 @@ export async function sendVerificationEmail(
 
   await sendEmail({
     to: email,
-    subject: 'Verify Your Email - Glovo Clone',
+    subject: 'Verify Your Email - Najedise',
     html,
     text,
   })
@@ -115,29 +115,29 @@ export async function sendPasswordResetEmail(
       <title>Reset Your Password</title>
     </head>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <div style="background: linear-gradient(135deg, #00A082 0%, #00C49A 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-        <h1 style="color: white; margin: 0;">Glovo Clone</h1>
+      <div style="background: linear-gradient(135deg, #d9432a 0%, #b83420 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Najedise</h1>
       </div>
       <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
         <h2 style="color: #333;">Password Reset Request</h2>
         <p>Hi ${firstName},</p>
         <p>We received a request to reset your password. Click the button below to create a new password:</p>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${resetUrl}" style="background: #00A082; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+          <a href="${resetUrl}" style="background: #d9432a; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
             Reset Password
           </a>
         </div>
         <p style="color: #666; font-size: 14px;">
           If the button doesn't work, copy and paste this link into your browser:
           <br>
-          <a href="${resetUrl}" style="color: #00A082;">${resetUrl}</a>
+          <a href="${resetUrl}" style="color: #d9432a;">${resetUrl}</a>
         </p>
         <p style="color: #666; font-size: 14px;">
           This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.
         </p>
       </div>
       <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-        <p>&copy; ${new Date().getFullYear()} Glovo Clone. All rights reserved.</p>
+        <p>&copy; ${new Date().getFullYear()} Najedise. All rights reserved.</p>
       </div>
     </body>
     </html>
@@ -156,7 +156,7 @@ export async function sendPasswordResetEmail(
 
   await sendEmail({
     to: email,
-    subject: 'Reset Your Password - Glovo Clone',
+    subject: 'Reset Your Password - Najedise',
     html,
     text,
   })
@@ -186,8 +186,8 @@ export async function sendReportEmail(
       <title>Admin Report</title>
     </head>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <div style="background: linear-gradient(135deg, #00A082 0%, #00C49A 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-        <h1 style="color: white; margin: 0;">DontBeHungry</h1>
+      <div style="background: linear-gradient(135deg, #d9432a 0%, #b83420 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Najedise</h1>
         <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0; font-size: 14px;">Admin Report</p>
       </div>
       <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
@@ -206,7 +206,7 @@ export async function sendReportEmail(
         </p>
       </div>
       <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-        <p>&copy; ${new Date().getFullYear()} DontBeHungry. All rights reserved.</p>
+        <p>&copy; ${new Date().getFullYear()} Najedise. All rights reserved.</p>
         <p style="margin-top: 5px;">This is an automated email from the Admin Panel.</p>
       </div>
     </body>
@@ -214,7 +214,7 @@ export async function sendReportEmail(
   `
 
   const text = `
-    DontBeHungry Admin Report
+    Najedise Admin Report
 
     ${subject}
 

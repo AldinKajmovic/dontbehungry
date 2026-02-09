@@ -45,23 +45,23 @@ export default function DriverOrderQueue({
 
       {/* Slide-in panel */}
       <div
-        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-sm flex-col bg-white shadow-xl transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-sm flex-col bg-white dark:bg-neutral-900 shadow-xl transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
-          <h3 className="text-lg font-semibold text-gray-900">
+        <div className="flex items-center justify-between border-b border-gray-200 dark:border-neutral-700 px-4 py-3">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             {t('driver.orderQueue.title')}
             {total > 0 && (
-              <span className="ml-2 inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-orange-100 px-1.5 text-sm font-medium text-orange-600">
+              <span className="ml-2 inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-primary-100 dark:bg-primary-950/30 px-1.5 text-sm font-medium text-primary-600 dark:text-primary-400">
                 {total}
               </span>
             )}
           </h3>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+            className="rounded-md p-1 text-gray-400 dark:text-neutral-500 transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 hover:text-gray-600 dark:hover:text-neutral-300"
             aria-label={t('common.close')}
           >
             <svg
@@ -85,13 +85,13 @@ export default function DriverOrderQueue({
         <div className="flex-1 overflow-y-auto p-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
             </div>
           ) : orders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="mb-3 h-12 w-12 text-gray-300"
+                className="mb-3 h-12 w-12 text-gray-300 dark:text-neutral-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -103,7 +103,7 @@ export default function DriverOrderQueue({
                   d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                 />
               </svg>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-neutral-400">
                 {t('driver.orderQueue.empty')}
               </p>
             </div>
@@ -124,11 +124,11 @@ export default function DriverOrderQueue({
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-1 border-t border-gray-200 px-4 py-3">
+          <div className="flex items-center justify-center gap-1 border-t border-gray-200 dark:border-neutral-700 px-4 py-3">
             <button
               onClick={() => onPageChange(page - 1)}
               disabled={page <= 1}
-              className="rounded-md px-2 py-1 text-sm text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-md px-2 py-1 text-sm text-gray-600 dark:text-neutral-400 transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-40"
             >
               &laquo;
             </button>
@@ -138,8 +138,8 @@ export default function DriverOrderQueue({
                 onClick={() => onPageChange(p)}
                 className={`min-w-[2rem] rounded-md px-2 py-1 text-sm font-medium transition-colors ${
                   p === page
-                    ? 'bg-orange-500 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'bg-primary-500 text-white'
+                    : 'text-gray-600 dark:text-neutral-400 hover:bg-gray-100 dark:hover:bg-neutral-700'
                 }`}
               >
                 {p}
@@ -148,7 +148,7 @@ export default function DriverOrderQueue({
             <button
               onClick={() => onPageChange(page + 1)}
               disabled={page >= totalPages}
-              className="rounded-md px-2 py-1 text-sm text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-md px-2 py-1 text-sm text-gray-600 dark:text-neutral-400 transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-40"
             >
               &raquo;
             </button>

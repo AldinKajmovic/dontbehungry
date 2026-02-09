@@ -16,7 +16,7 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
 
     const levels = [
       { label: 'Weak', color: 'bg-red-500' },
-      { label: 'Fair', color: 'bg-orange-500' },
+      { label: 'Fair', color: 'bg-primary-400' },
       { label: 'Good', color: 'bg-yellow-500' },
       { label: 'Strong', color: 'bg-green-500' },
     ];
@@ -35,12 +35,12 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
           <div
             key={level}
             className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-              level <= strength ? color : 'bg-gray-200'
+              level <= strength ? color : 'bg-gray-200 dark:bg-neutral-700'
             }`}
           />
         ))}
       </div>
-      <p className="text-xs text-gray-500 mt-1">
+      <p className="text-xs text-gray-500 dark:text-neutral-400 mt-1">
         Password strength: <span className="font-medium">{label || 'Too short'}</span>
       </p>
     </div>

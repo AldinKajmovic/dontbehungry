@@ -110,12 +110,12 @@ export function ImageUpload({
   return (
     <div>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">{label}</label>
       )}
       <div className="flex items-center gap-4">
         <div
           onClick={handleClick}
-          className={`relative ${width} ${height} ${roundedClass} overflow-hidden cursor-pointer group border-2 border-dashed border-gray-300 hover:border-primary-400 transition-colors bg-gray-50`}
+          className={`relative ${width} ${height} ${roundedClass} overflow-hidden cursor-pointer group border-2 border-dashed border-gray-300 dark:border-neutral-600 hover:border-primary-400 transition-colors bg-gray-50 dark:bg-neutral-800`}
         >
           {currentUrl ? (
             <>
@@ -134,7 +134,7 @@ export function ImageUpload({
             </>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center">
-              <svg className="w-8 h-8 text-gray-400 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-gray-400 dark:text-neutral-500 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
@@ -174,7 +174,7 @@ export function ImageUpload({
           {t('upload.browseExisting')}
         </button>
       )}
-      {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
+      {hint && <p className="text-xs text-gray-400 dark:text-neutral-500 mt-1">{hint}</p>}
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
 
       <input

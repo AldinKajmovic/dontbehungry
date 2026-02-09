@@ -38,8 +38,8 @@ export default function RestaurantsPage() {
       sortable: true,
       render: (restaurant: AdminRestaurant) => (
         <div>
-          <p className="font-medium text-gray-900">{restaurant.name}</p>
-          <p className="text-xs text-gray-500">{restaurant.place.city}, {restaurant.place.country}</p>
+          <p className="font-medium text-gray-900 dark:text-white">{restaurant.name}</p>
+          <p className="text-xs text-gray-500 dark:text-neutral-400">{restaurant.place.city}, {restaurant.place.country}</p>
         </div>
       ),
     },
@@ -49,7 +49,7 @@ export default function RestaurantsPage() {
       render: (restaurant: AdminRestaurant) => (
         <div>
           <p className="text-sm">{restaurant.owner.firstName} {restaurant.owner.lastName}</p>
-          <p className="text-xs text-gray-500">{restaurant.owner.email}</p>
+          <p className="text-xs text-gray-500 dark:text-neutral-400">{restaurant.owner.email}</p>
         </div>
       ),
     },
@@ -89,8 +89,8 @@ export default function RestaurantsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.restaurants')}</h1>
-          <p className="text-gray-500 mt-1">{t('admin.manageRestaurants')}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.restaurants')}</h1>
+          <p className="text-gray-500 dark:text-neutral-400 mt-1">{t('admin.manageRestaurants')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -128,7 +128,7 @@ export default function RestaurantsPage() {
       </form>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
+      <div className="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4 mb-6">
         <div className="flex flex-wrap items-end gap-4">
           <div className="min-w-[200px]">
             <SearchableSelect
@@ -176,7 +176,7 @@ export default function RestaurantsPage() {
           {hasActiveFilters && (
             <button
               onClick={handleClearFilters}
-              className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="px-3 py-2 text-sm text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
             >
               {t('admin.clearFilters')}
             </button>
@@ -200,7 +200,7 @@ export default function RestaurantsPage() {
           <>
             <button
               onClick={() => openEditModal(restaurant)}
-              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 rounded-lg transition-colors"
               title="Edit"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,7 +209,7 @@ export default function RestaurantsPage() {
             </button>
             <button
               onClick={() => openDeleteModal(restaurant)}
-              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
               title="Delete"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,7 +289,7 @@ export default function RestaurantsPage() {
           />
 
           {/* Place selection: toggle between existing and new */}
-          <div className="border-t border-gray-200 pt-4 mt-4">
+          <div className="border-t border-gray-200 dark:border-neutral-700 pt-4 mt-4">
             <div className="flex items-center gap-4 mb-4">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -299,7 +299,7 @@ export default function RestaurantsPage() {
                   onChange={() => setFormData({ ...formData, createNewPlace: false })}
                   className="w-4 h-4 text-primary-600"
                 />
-                <span className="text-sm font-medium text-gray-700">{t('admin.modals.selectExistingPlace')}</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">{t('admin.modals.selectExistingPlace')}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -309,7 +309,7 @@ export default function RestaurantsPage() {
                   onChange={() => setFormData({ ...formData, createNewPlace: true, placeId: '' })}
                   className="w-4 h-4 text-primary-600"
                 />
-                <span className="text-sm font-medium text-gray-700">{t('admin.modals.createNewPlace')}</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">{t('admin.modals.createNewPlace')}</span>
               </label>
             </div>
 
@@ -341,7 +341,7 @@ export default function RestaurantsPage() {
                   height="150px"
                 />
                 {formData.newPlaceAddress && (
-                  <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                  <div className="text-sm text-gray-600 dark:text-neutral-400 bg-gray-50 dark:bg-neutral-800 p-2 rounded">
                     <strong>{t('address.selected')}:</strong> {formData.newPlaceAddress}, {formData.newPlaceCity}, {formData.newPlaceCountry}
                   </div>
                 )}
@@ -374,11 +374,11 @@ export default function RestaurantsPage() {
 
           {/* Gallery Section */}
           <div className="mt-4">
-            <p className="text-sm text-gray-600 font-medium mb-2">{t('admin.modals.gallery')}</p>
+            <p className="text-sm text-gray-600 dark:text-neutral-400 font-medium mb-2">{t('admin.modals.gallery')}</p>
             <div className="grid grid-cols-3 gap-3">
               {formData.images.map((imgUrl, index) => (
                 <div key={index} className="relative group">
-                  <div className="relative w-full h-24 rounded-lg overflow-hidden bg-gray-100">
+                  <div className="relative w-full h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-neutral-800">
                     <img
                       src={imgUrl}
                       alt={`Gallery ${index + 1}`}
@@ -408,26 +408,26 @@ export default function RestaurantsPage() {
               {formData.images.length < 6 && (
                 <button
                   type="button"
-                  className="group flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer"
+                  className="group flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 dark:border-neutral-600 rounded-lg bg-gray-50 dark:bg-neutral-800 hover:border-primary-400 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-950/30 transition-colors cursor-pointer"
                   onClick={() => imageInputRef.current?.click()}
                   disabled={imageUploading}
                 >
                   {imageUploading ? (
-                    <svg className="w-8 h-8 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <svg className="w-8 h-8 text-gray-400 dark:text-neutral-500 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
                   ) : (
-                    <svg className="w-8 h-8 text-gray-400 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-8 h-8 text-gray-400 dark:text-neutral-500 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
                   )}
-                  <span className="text-xs text-gray-500 group-hover:text-primary-600 mt-1">{formData.images.length} / 6</span>
+                  <span className="text-xs text-gray-500 dark:text-neutral-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 mt-1">{formData.images.length} / 6</span>
                 </button>
               )}
             </div>
             <div className="flex items-center gap-3 mt-2">
-              <p className="text-xs text-gray-400">{t('admin.modals.clickToAddImages')}</p>
+              <p className="text-xs text-gray-400 dark:text-neutral-500">{t('admin.modals.clickToAddImages')}</p>
               <button
                 type="button"
                 onClick={() => setShowImageBrowser(true)}
@@ -512,7 +512,7 @@ export default function RestaurantsPage() {
           />
 
           {/* Place selection: toggle between existing and new */}
-          <div className="border-t border-gray-200 pt-4 mt-4">
+          <div className="border-t border-gray-200 dark:border-neutral-700 pt-4 mt-4">
             <div className="flex items-center gap-4 mb-4">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -522,7 +522,7 @@ export default function RestaurantsPage() {
                   onChange={() => setFormData({ ...formData, createNewPlace: false })}
                   className="w-4 h-4 text-primary-600"
                 />
-                <span className="text-sm font-medium text-gray-700">{t('admin.modals.selectExistingPlace')}</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">{t('admin.modals.selectExistingPlace')}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -532,7 +532,7 @@ export default function RestaurantsPage() {
                   onChange={() => setFormData({ ...formData, createNewPlace: true, placeId: '' })}
                   className="w-4 h-4 text-primary-600"
                 />
-                <span className="text-sm font-medium text-gray-700">{t('admin.modals.createNewPlace')}</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">{t('admin.modals.createNewPlace')}</span>
               </label>
             </div>
 
@@ -565,7 +565,7 @@ export default function RestaurantsPage() {
                   height="150px"
                 />
                 {formData.newPlaceAddress && (
-                  <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                  <div className="text-sm text-gray-600 dark:text-neutral-400 bg-gray-50 dark:bg-neutral-800 p-2 rounded">
                     <strong>{t('address.selected')}:</strong> {formData.newPlaceAddress}, {formData.newPlaceCity}, {formData.newPlaceCountry}
                   </div>
                 )}
@@ -598,11 +598,11 @@ export default function RestaurantsPage() {
 
           {/* Gallery Section */}
           <div className="mt-4">
-            <p className="text-sm text-gray-600 font-medium mb-2">{t('admin.modals.gallery')}</p>
+            <p className="text-sm text-gray-600 dark:text-neutral-400 font-medium mb-2">{t('admin.modals.gallery')}</p>
             <div className="grid grid-cols-3 gap-3">
               {formData.images.map((imgUrl, index) => (
                 <div key={index} className="relative group">
-                  <div className="relative w-full h-24 rounded-lg overflow-hidden bg-gray-100">
+                  <div className="relative w-full h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-neutral-800">
                     <img
                       src={imgUrl}
                       alt={`Gallery ${index + 1}`}
@@ -632,26 +632,26 @@ export default function RestaurantsPage() {
               {formData.images.length < 6 && (
                 <button
                   type="button"
-                  className="group flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer"
+                  className="group flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 dark:border-neutral-600 rounded-lg bg-gray-50 dark:bg-neutral-800 hover:border-primary-400 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-950/30 transition-colors cursor-pointer"
                   onClick={() => imageInputRef.current?.click()}
                   disabled={imageUploading}
                 >
                   {imageUploading ? (
-                    <svg className="w-8 h-8 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <svg className="w-8 h-8 text-gray-400 dark:text-neutral-500 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
                   ) : (
-                    <svg className="w-8 h-8 text-gray-400 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-8 h-8 text-gray-400 dark:text-neutral-500 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
                   )}
-                  <span className="text-xs text-gray-500 group-hover:text-primary-600 mt-1">{formData.images.length} / 6</span>
+                  <span className="text-xs text-gray-500 dark:text-neutral-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 mt-1">{formData.images.length} / 6</span>
                 </button>
               )}
             </div>
             <div className="flex items-center gap-3 mt-2">
-              <p className="text-xs text-gray-400">{t('admin.modals.clickToAddImages')}</p>
+              <p className="text-xs text-gray-400 dark:text-neutral-500">{t('admin.modals.clickToAddImages')}</p>
               <button
                 type="button"
                 onClick={() => setShowImageBrowser(true)}

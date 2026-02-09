@@ -39,7 +39,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
   const pathname = usePathname()
   const isAuthPage = SKIP_PATHS.some(path => pathname?.startsWith(path))
 
-  const shouldLoadNotifications = !isAuthPage && !authLoading && isAuthenticated && user && user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN'
+  const shouldLoadNotifications = !isAuthPage && !authLoading && isAuthenticated && user && user.role !== 'ADMIN'
 
   const fetchNotifications = useCallback(async (pageNum: number = 1, append: boolean = false) => {
     if (!shouldLoadNotifications) return

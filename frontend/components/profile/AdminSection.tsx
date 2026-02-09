@@ -9,7 +9,7 @@ export function AdminSection() {
   const { user } = useAuth()
   const { t } = useLanguage()
 
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN'
+  const isAdmin = user?.role === 'ADMIN'
 
   if (!isAdmin) return null
 

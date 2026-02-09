@@ -11,7 +11,7 @@ export function adminOnly(
     throw new UnauthorizedError('Unauthorized', 'Authentication required')
   }
 
-  const allowedRoles = ['ADMIN', 'SUPER_ADMIN']
+  const allowedRoles = ['ADMIN']
 
   if (!allowedRoles.includes(req.user.role)) {
     throw new ForbiddenError(

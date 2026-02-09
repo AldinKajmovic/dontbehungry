@@ -263,7 +263,7 @@ interface User {
   firstName: string
   lastName: string
   phone?: string
-  role: 'CUSTOMER' | 'RESTAURANT_OWNER' | 'DELIVERY_DRIVER' | 'ADMIN' | 'SUPER_ADMIN'
+  role: 'CUSTOMER' | 'RESTAURANT_OWNER' | 'DELIVERY_DRIVER' | 'ADMIN'
   emailVerified: boolean
   phoneVerified: boolean
   avatarUrl?: string

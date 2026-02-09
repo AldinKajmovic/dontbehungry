@@ -70,7 +70,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
       return
     }
 
-    if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') {
+    if (user.role === 'ADMIN') {
       return
     }
 

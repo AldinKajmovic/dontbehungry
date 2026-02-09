@@ -133,6 +133,7 @@ export interface OrderHistoryItem {
   deliveryPlace: { address: string; city: string; latitude: number | null; longitude: number | null }
   orderItems: Array<{ name: string; quantity: number; unitPrice: string }>
   payment: { status: string; method: string } | null
+  isDriverOnline: boolean
 }
 
 export interface OrderHistoryResponse {

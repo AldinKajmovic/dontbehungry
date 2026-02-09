@@ -113,7 +113,7 @@ router.get('/admin', authenticate, adminOnly, handler)
 router.get('/restaurant', authenticate, restaurantOwnerOnly, handler)
 
 // Custom role combinations
-router.get('/special', authenticate, authorize('ADMIN', 'SUPER_ADMIN'), handler)
+router.get('/special', authenticate, authorize('ADMIN'), handler)
 
 // Resource ownership check
 router.get('/orders/:id', authenticate, ownsResource(async (req) => {

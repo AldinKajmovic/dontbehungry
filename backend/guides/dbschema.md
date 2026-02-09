@@ -54,8 +54,7 @@ Defines user types in the system.
 | `CUSTOMER` | Regular app user who orders food |
 | `RESTAURANT_OWNER` | User who manages restaurant(s) |
 | `DELIVERY_DRIVER` | User who delivers orders |
-| `ADMIN` | Administrative user |
-| `SUPER_ADMIN` | Full system access |
+| `ADMIN` | Administrative user with full system access |
 
 ### OrderStatus
 Tracks order lifecycle.

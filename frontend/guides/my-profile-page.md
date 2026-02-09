@@ -422,7 +422,7 @@ const paginatedMenuItems = filteredMenuItems.slice(
 ```typescript
 const isRestaurantOwner = user?.role === 'RESTAURANT_OWNER'
 const isGoogleUser = !user?.phone && user?.avatarUrl?.includes('google')
-const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN'
+const isAdmin = user?.role === 'ADMIN'
 const isDeliveryDriver = user?.role === 'DELIVERY_DRIVER'
 
 // Order history section shown for all users

@@ -235,5 +235,5 @@ Pre-defined options are available:
 ## Security Notes
 
 - Socket token is fetched via authenticated `/api/auth/socket-token` endpoint
-- Admin users (ADMIN, SUPER_ADMIN) are excluded from receiving notifications
+- Admin users are excluded from receiving notifications
 - Notifications are user-scoped - users can only see their own

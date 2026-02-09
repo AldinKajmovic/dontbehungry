@@ -46,23 +46,7 @@ export function adminOnly(
     throw new UnauthorizedError('Unauthorized', 'Authentication required')
   }
 
-  if (req.user.role !== UserRole.ADMIN && req.user.role !== UserRole.SUPER_ADMIN) {
-    throw new ForbiddenError('Access denied', 'You do not have permission to access this resource')
-  }
-
-  next()
-}
-
-export function superAdminOnly(
-  req: AuthenticatedRequest,
-  _res: Response,
-  next: NextFunction
-): void {
-  if (!req.user) {
-    throw new UnauthorizedError('Unauthorized', 'Authentication required')
-  }
-
-  if (req.user.role !== UserRole.SUPER_ADMIN) {
+  if (req.user.role !== UserRole.ADMIN) {
     throw new ForbiddenError('Access denied', 'You do not have permission to access this resource')
   }
 
@@ -78,7 +62,7 @@ export function restaurantOwnerOnly(
     throw new UnauthorizedError('Unauthorized', 'Authentication required')
   }
 
-  const allowedRoles: UserRole[] = [UserRole.RESTAURANT_OWNER, UserRole.ADMIN, UserRole.SUPER_ADMIN]
+  const allowedRoles: UserRole[] = [UserRole.RESTAURANT_OWNER, UserRole.ADMIN]
   if (!allowedRoles.includes(req.user.role)) {
     throw new ForbiddenError('Access denied', 'You do not have permission to access this resource')
   }
@@ -95,7 +79,7 @@ export function driverOnly(
     throw new UnauthorizedError('Unauthorized', 'Authentication required')
   }
 
-  const allowedRoles: UserRole[] = [UserRole.DELIVERY_DRIVER, UserRole.ADMIN, UserRole.SUPER_ADMIN]
+  const allowedRoles: UserRole[] = [UserRole.DELIVERY_DRIVER, UserRole.ADMIN]
   if (!allowedRoles.includes(req.user.role)) {
     throw new ForbiddenError('Access denied', 'You do not have permission to access this resource')
   }
@@ -112,7 +96,7 @@ export function customerOnly(
     throw new UnauthorizedError('Unauthorized', 'Authentication required')
   }
 
-  const allowedRoles: UserRole[] = [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.SUPER_ADMIN]
+  const allowedRoles: UserRole[] = [UserRole.CUSTOMER, UserRole.ADMIN]
   if (!allowedRoles.includes(req.user.role)) {
     throw new ForbiddenError('Access denied', 'You do not have permission to access this resource')
   }
@@ -130,7 +114,7 @@ export function ownsResource(checkOwnership: ResourceOwnerCheck) {
       throw new UnauthorizedError('Unauthorized', 'Authentication required')
     }
 
-    if (req.user.role === UserRole.ADMIN || req.user.role === UserRole.SUPER_ADMIN) {
+    if (req.user.role === UserRole.ADMIN) {
       next()
       return
     }

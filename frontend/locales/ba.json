@@ -570,7 +570,6 @@
       "RESTAURANT_OWNER": "Vlasnik restorana",
       "DELIVERY_DRIVER": "Dostavljač",
       "ADMIN": "Admin",
-      "SUPER_ADMIN": "Super Admin",
       "allRoles": "Sve uloge"
     },
     "status": {

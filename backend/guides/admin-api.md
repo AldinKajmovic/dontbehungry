@@ -2,14 +2,14 @@
 
 ## Overview
 
-The Admin API provides CRUD operations for managing all entities in the system. Access is restricted to users with `ADMIN` or `SUPER_ADMIN` roles and optionally limited by IP whitelist.
+The Admin API provides CRUD operations for managing all entities in the system. Access is restricted to users with the `ADMIN` role and optionally limited by IP whitelist.
 
 ## Security Architecture
 
 All admin routes are protected by a security middleware stack:
 
 1. **Authentication** (`authenticate`) - Validates JWT token
-2. **Authorization** (`adminOnly`) - Requires ADMIN or SUPER_ADMIN role
+2. **Authorization** (`adminOnly`) - Requires ADMIN role
 3. **IP Whitelist** (`ipWhitelist`) - Restricts access by IP address
 4. **Rate Limiting** (`adminLimiter`) - 100 requests per 15 minutes
 

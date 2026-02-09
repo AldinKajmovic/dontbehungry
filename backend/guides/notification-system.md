@@ -209,7 +209,7 @@ When admin updates an order:
 
 - Socket connections require valid JWT
 - Notifications are user-scoped (users can only access their own)
-- Admin users (ADMIN, SUPER_ADMIN) are excluded from receiving notifications
+- Admin users are excluded from receiving notifications
 - Notification creation validates user exists and is not an admin
 
 ## Usage Example

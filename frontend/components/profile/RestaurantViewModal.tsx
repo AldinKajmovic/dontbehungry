@@ -43,7 +43,7 @@ export function RestaurantViewModal({
         <div className="space-y-6">
           {/* Cover Image */}
           {restaurant.coverUrl && (
-            <div className="relative h-48 rounded-lg overflow-hidden bg-gray-100">
+            <div className="relative h-48 rounded-lg overflow-hidden bg-gray-100 dark:bg-neutral-800">
               <img
                 src={restaurant.coverUrl}
                 alt={`${restaurant.name} cover`}
@@ -54,7 +54,7 @@ export function RestaurantViewModal({
 
           {/* Logo and Basic Info */}
           <div className="flex items-start gap-4">
-            <div className="w-20 h-20 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <div className="w-20 h-20 bg-primary-100 dark:bg-primary-950/30 rounded-xl flex items-center justify-center flex-shrink-0">
               {restaurant.logoUrl ? (
                 <img
                   src={restaurant.logoUrl}
@@ -68,9 +68,9 @@ export function RestaurantViewModal({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-xl font-semibold text-gray-900">{restaurant.name}</h3>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{restaurant.name}</h3>
               {restaurant.description && (
-                <p className="text-sm text-gray-600 mt-1">{restaurant.description}</p>
+                <p className="text-sm text-gray-600 dark:text-neutral-400 mt-1">{restaurant.description}</p>
               )}
               {restaurant.rating && parseFloat(restaurant.rating) > 0 && (
                 <div className="flex items-center gap-1 mt-2 text-yellow-600">
@@ -87,42 +87,42 @@ export function RestaurantViewModal({
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="space-y-3">
               <div>
-                <p className="text-gray-500">Location</p>
-                <p className="text-gray-900">
+                <p className="text-gray-500 dark:text-neutral-400">Location</p>
+                <p className="text-gray-900 dark:text-white">
                   {restaurant.place.address}, {restaurant.place.city}, {restaurant.place.country}
                 </p>
               </div>
               {restaurant.phone && (
                 <div>
-                  <p className="text-gray-500">Phone</p>
-                  <p className="text-gray-900">{restaurant.phone}</p>
+                  <p className="text-gray-500 dark:text-neutral-400">Phone</p>
+                  <p className="text-gray-900 dark:text-white">{restaurant.phone}</p>
                 </div>
               )}
               {restaurant.email && (
                 <div>
-                  <p className="text-gray-500">Email</p>
-                  <p className="text-gray-900">{restaurant.email}</p>
+                  <p className="text-gray-500 dark:text-neutral-400">Email</p>
+                  <p className="text-gray-900 dark:text-white">{restaurant.email}</p>
                 </div>
               )}
             </div>
             <div className="space-y-3">
               {restaurant.minOrderAmount && (
                 <div>
-                  <p className="text-gray-500">Min Order Amount</p>
-                  <p className="text-gray-900">${restaurant.minOrderAmount}</p>
+                  <p className="text-gray-500 dark:text-neutral-400">Min Order Amount</p>
+                  <p className="text-gray-900 dark:text-white">${restaurant.minOrderAmount}</p>
                 </div>
               )}
               {restaurant.deliveryFee && (
                 <div>
-                  <p className="text-gray-500">Delivery Fee</p>
-                  <p className="text-gray-900">${restaurant.deliveryFee}</p>
+                  <p className="text-gray-500 dark:text-neutral-400">Delivery Fee</p>
+                  <p className="text-gray-900 dark:text-white">${restaurant.deliveryFee}</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-gray-100">
+          <div className="flex gap-3 pt-4 border-t border-gray-100 dark:border-neutral-800">
             <Button
               type="button"
               className="flex-1"

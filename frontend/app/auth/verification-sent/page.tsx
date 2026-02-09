@@ -6,6 +6,7 @@ import { AuthLayout } from '@/components/ui/AuthLayout'
 import { Button } from '@/components/ui/Button'
 import { Alert } from '@/components/ui/Alert'
 import { LanguageToggle } from '@/components/ui/LanguageToggle'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function VerificationSentPage() {
@@ -52,11 +53,10 @@ export default function VerificationSentPage() {
       title="Check Your Email"
       subtitle="We've sent you a verification link"
       icon={icon}
-      backgroundGradient="green"
-      headerRight={<LanguageToggle />}
+      headerRight={<div className="flex items-center gap-2"><ThemeToggle /><LanguageToggle /></div>}
     >
       <div className="flex flex-col items-center py-6">
-        <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-4">
+        <div className="w-16 h-16 bg-primary-100 dark:bg-primary-950/50 rounded-full flex items-center justify-center mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-500" viewBox="0 0 20 20" fill="currentColor">
             <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
             <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
@@ -64,18 +64,18 @@ export default function VerificationSentPage() {
         </div>
 
         {user && (
-          <p className="text-gray-600 text-center mb-2">
+          <p className="text-gray-600 dark:text-neutral-400 text-center mb-2">
             We&apos;ve sent a verification email to:
           </p>
         )}
 
         {user && (
-          <p className="font-medium text-gray-900 mb-4">
+          <p className="font-medium text-gray-900 dark:text-white mb-4">
             {user.email}
           </p>
         )}
 
-        <p className="text-sm text-gray-500 text-center mb-6">
+        <p className="text-sm text-gray-500 dark:text-neutral-400 text-center mb-6">
           Click the link in the email to verify your account. The link will expire in 24 hours.
         </p>
 
@@ -116,7 +116,7 @@ export default function VerificationSentPage() {
           )}
         </div>
 
-        <p className="text-xs text-gray-400 text-center mt-6">
+        <p className="text-xs text-gray-400 dark:text-neutral-500 text-center mt-6">
           Didn&apos;t receive the email? Check your spam folder or request a new one.
         </p>
       </div>

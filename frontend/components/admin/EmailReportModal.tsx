@@ -109,8 +109,8 @@ export function EmailReportModal({
         />
 
         <div>
-          <label htmlFor="report-subject" className="block text-sm font-medium text-gray-700 mb-2">
-            {t('admin.reports.subject')} <span className="text-gray-400 font-normal">({t('common.optional')})</span>
+          <label htmlFor="report-subject" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+            {t('admin.reports.subject')} <span className="text-gray-400 dark:text-neutral-500 font-normal">({t('common.optional')})</span>
           </label>
           <input
             id="report-subject"
@@ -124,8 +124,8 @@ export function EmailReportModal({
         </div>
 
         <div>
-          <label htmlFor="report-message" className="block text-sm font-medium text-gray-700 mb-2">
-            {t('admin.reports.message')} <span className="text-gray-400 font-normal">({t('common.optional')})</span>
+          <label htmlFor="report-message" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+            {t('admin.reports.message')} <span className="text-gray-400 dark:text-neutral-500 font-normal">({t('common.optional')})</span>
           </label>
           <textarea
             id="report-message"

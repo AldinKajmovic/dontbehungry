@@ -55,7 +55,7 @@ export function PasswordForm() {
           />
         </div>
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-neutral-400">
           {t('profile.passwordTooShort')}
         </p>
 

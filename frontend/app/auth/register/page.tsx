@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { CountryCode } from 'libphonenumber-js'
-import { Input, Button, PhoneInput, Alert, AuthLayout, LanguageToggle, AddressAutocomplete } from '@/components/ui'
+import { Input, Button, PhoneInput, Alert, AuthLayout, LanguageToggle, ThemeToggle, AddressAutocomplete } from '@/components/ui'
 import { registerSchema, extractZodErrors, formatPhoneE164, RegisterForm } from '@/services/validation'
 import { useFormValidation } from '@/hooks/useFormValidation'
 import { useAuth } from '@/hooks/useAuth'
@@ -93,29 +93,28 @@ export default function RegisterPage() {
       title={t('auth.register.title')}
       subtitle={t('auth.register.subtitle')}
       icon={icon}
-      iconGradient="secondary"
-      backgroundGradient="green"
+      iconGradient="primary"
       footerText={t('auth.register.hasAccount')}
       footerLinkText={t('common.signIn')}
       footerLinkHref="/auth/login"
-      headerRight={<LanguageToggle />}
+      headerRight={<div className="flex items-center gap-2"><ThemeToggle /><LanguageToggle /></div>}
     >
       {/* Restaurant Owner Banner */}
       <Link
         href="/auth/register-restaurant"
-        className="block mb-6 p-4 bg-gradient-to-r from-secondary-50 to-secondary-100 border border-secondary-200 rounded-xl hover:from-secondary-100 hover:to-secondary-200 transition-all group"
+        className="block mb-6 p-4 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-950/30 dark:to-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-xl hover:from-primary-100 hover:to-primary-200 dark:hover:from-primary-950/50 dark:hover:to-primary-900/50 transition-all group"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-secondary-500 rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center flex-shrink-0">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
           </div>
           <div className="flex-1">
-            <p className="font-medium text-secondary-900">{t('auth.register.restaurantOwner')}</p>
-            <p className="text-sm text-secondary-700">{t('auth.register.registerRestaurant')}</p>
+            <p className="font-medium text-primary-900 dark:text-primary-300">{t('auth.register.restaurantOwner')}</p>
+            <p className="text-sm text-primary-700 dark:text-primary-400">{t('auth.register.registerRestaurant')}</p>
           </div>
-          <svg className="w-5 h-5 text-secondary-400 group-hover:text-secondary-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-primary-400 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </div>
@@ -205,8 +204,8 @@ export default function RegisterPage() {
         />
 
         {/* Delivery Address */}
-        <div className="pt-4 border-t border-gray-200">
-          <p className="text-sm font-medium text-gray-700 mb-3">{t('auth.register.deliveryAddress')}</p>
+        <div className="pt-4 border-t border-gray-200 dark:border-neutral-700">
+          <p className="text-sm font-medium text-gray-700 dark:text-neutral-300 mb-3">{t('auth.register.deliveryAddress')}</p>
           <AddressAutocomplete
             label={t('address.streetAddress')}
             placeholder={t('address.searchPlaceholder')}
@@ -228,10 +227,10 @@ export default function RegisterPage() {
       {/* Divider */}
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200" />
+          <div className="w-full border-t border-gray-200 dark:border-neutral-700" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-white text-gray-500">{t('auth.register.signUpWith')}</span>
+          <span className="px-4 bg-white dark:bg-neutral-900 text-gray-500 dark:text-neutral-400">{t('auth.register.signUpWith')}</span>
         </div>
       </div>
 

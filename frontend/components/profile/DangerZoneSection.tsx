@@ -9,7 +9,7 @@ export function DangerZoneSection() {
 
   return (
     <Section title={t('profile.dangerZone')} variant="danger">
-      <p className="text-sm text-gray-600 mb-4">
+      <p className="text-sm text-gray-600 dark:text-neutral-400 mb-4">
         {t('profile.dangerZoneDesc')}
       </p>
       <DeleteAccountModal />

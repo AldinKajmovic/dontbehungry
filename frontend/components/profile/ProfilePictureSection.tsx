@@ -85,23 +85,23 @@ export function ProfilePictureSection() {
             <img
               src={user.avatarUrl}
               alt={`${user.firstName}'s avatar`}
-              className="w-24 h-24 rounded-full object-cover border-4 border-gray-100"
+              className="w-24 h-24 rounded-full object-cover border-4 border-gray-100 dark:border-neutral-800"
             />
           ) : (
-            <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border-4 border-gray-100">
-              <span className="text-3xl font-bold text-gray-400">
+            <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-neutral-700 flex items-center justify-center border-4 border-gray-100 dark:border-neutral-800">
+              <span className="text-3xl font-bold text-gray-400 dark:text-neutral-500">
                 {user.firstName[0]}{user.lastName[0]}
               </span>
             </div>
           )}
           {uploading && (
-            <div className="absolute inset-0 rounded-full bg-white/70 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full bg-white/70 dark:bg-neutral-900/70 flex items-center justify-center">
               <div className="w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
             </div>
           )}
         </div>
         <div className="flex-1">
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-sm text-gray-600 dark:text-neutral-400 mb-3">
             {t('upload.maxSize')}
           </p>
           <div className="flex gap-3">

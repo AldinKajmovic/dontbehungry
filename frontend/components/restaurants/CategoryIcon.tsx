@@ -67,8 +67,8 @@ export function CategoryIcon({ category, isSelected, onClick }: CategoryIconProp
         transition-all duration-300 transform
         hover:scale-110
         ${isSelected
-          ? 'bg-primary-50 ring-2 ring-primary-500'
-          : 'hover:bg-gray-50'
+          ? 'bg-primary-50 dark:bg-primary-950/30 ring-2 ring-primary-500'
+          : 'hover:bg-gray-50 dark:hover:bg-neutral-800'
         }
       `}
     >
@@ -78,8 +78,8 @@ export function CategoryIcon({ category, isSelected, onClick }: CategoryIconProp
           transition-all duration-300 transform
           hover:scale-110
           ${isSelected
-            ? 'bg-primary-100 shadow-lg'
-            : 'bg-gray-100 hover:bg-gray-200'
+            ? 'bg-primary-100 dark:bg-primary-950/50 shadow-lg'
+            : 'bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700'
           }
         `}
       >
@@ -95,8 +95,8 @@ export function CategoryIcon({ category, isSelected, onClick }: CategoryIconProp
       </div>
       <span
         className={`
-          text-xs text-center font-medium truncate max-w-full
-          ${isSelected ? 'text-primary-700' : 'text-gray-600'}
+          text-xs text-center font-medium truncate max-w-full [text-shadow:_0_1px_2px_rgba(0,0,0,0.1)]
+          ${isSelected ? 'text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-neutral-200'}
         `}
       >
         {category.name}

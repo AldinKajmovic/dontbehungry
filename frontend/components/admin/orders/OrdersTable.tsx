@@ -1,7 +1,7 @@
 'use client'
 
 import { DataTable } from '@/components/admin/DataTable'
-import { ORDER_STATUS_COLORS } from '@/components/admin/StatusSelect'
+import { ORDER_STATUS_COLORS, PAYMENT_STATUS_COLORS } from '@/components/admin/StatusSelect'
 import { AdminOrder, SortParams } from '@/services/admin'
 
 interface OrdersTableProps {
@@ -29,8 +29,8 @@ export function OrdersTable({
       header: t('admin.columns.order'),
       render: (order: AdminOrder) => (
         <div>
-          <p className="font-medium text-gray-900 font-mono text-sm">{order.id.slice(0, 8)}...</p>
-          <p className="text-xs text-gray-500">{order.restaurant.name}</p>
+          <p className="font-medium text-gray-900 dark:text-white font-mono text-sm break-all">{order.id}</p>
+          <p className="text-xs text-gray-500 dark:text-neutral-400">{order.restaurant.name}</p>
         </div>
       ),
     },
@@ -40,7 +40,7 @@ export function OrdersTable({
       render: (order: AdminOrder) => (
         <div>
           <p className="text-sm">{order.user.firstName} {order.user.lastName}</p>
-          <p className="text-xs text-gray-500">{order.user.email}</p>
+          <p className="text-xs text-gray-500 dark:text-neutral-400">{order.user.email}</p>
         </div>
       ),
     },
@@ -58,7 +58,7 @@ export function OrdersTable({
       key: 'items',
       header: t('admin.columns.items'),
       render: (order: AdminOrder) => (
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-gray-600 dark:text-neutral-300">
           {order.orderItems?.length || 0} {t('admin.columns.items').toLowerCase()}
         </span>
       ),
@@ -76,16 +76,11 @@ export function OrdersTable({
       header: t('admin.columns.payment'),
       render: (order: AdminOrder) => (
         order.payment ? (
-          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-            order.payment.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-            order.payment.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
-            order.payment.status === 'REFUNDED' ? 'bg-blue-100 text-blue-700' :
-            'bg-red-100 text-red-700'
-          }`}>
+          <span className={`px-2 py-1 text-xs font-medium rounded-full ${PAYMENT_STATUS_COLORS[order.payment.status] || 'bg-gray-100 text-gray-700'}`}>
             {t(`admin.paymentStatus.${order.payment.status}`)}
           </span>
         ) : (
-          <span className="text-gray-400">-</span>
+          <span className="text-gray-400 dark:text-neutral-500">-</span>
         )
       ),
     },
@@ -105,7 +100,7 @@ export function OrdersTable({
       header: t('admin.columns.date'),
       sortable: true,
       render: (order: AdminOrder) => (
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-gray-500 dark:text-neutral-400">
           {new Date(order.createdAt).toLocaleDateString()}
         </span>
       ),
@@ -125,7 +120,7 @@ export function OrdersTable({
         <>
           <button
             onClick={() => onEdit(order)}
-            className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+            className="p-2 text-gray-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 rounded-lg transition-colors"
             title="Edit"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +129,7 @@ export function OrdersTable({
           </button>
           <button
             onClick={() => onDelete(order)}
-            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="p-2 text-gray-500 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
             title="Delete"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

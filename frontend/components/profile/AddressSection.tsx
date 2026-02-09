@@ -58,13 +58,13 @@ export function AddressSection() {
           </div>
         ) : addresses.length === 0 ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-gray-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <p className="text-gray-500 mb-4">{t('profile.noAddresses')}</p>
+            <p className="text-gray-500 dark:text-neutral-400 mb-4">{t('profile.noAddresses')}</p>
             <Button
               type="button"
               variant="secondary"
@@ -81,8 +81,8 @@ export function AddressSection() {
                 key={address.id}
                 className={`relative p-4 rounded-xl border-2 transition-colors ${
                   address.isDefault
-                    ? 'border-primary-500 bg-primary-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/30'
+                    : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
                 }`}
               >
                 {address.isDefault && (
@@ -91,43 +91,43 @@ export function AddressSection() {
                   </span>
                 )}
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-gray-500 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{address.address}</p>
-                    <p className="text-sm text-gray-500 truncate">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{address.address}</p>
+                    <p className="text-sm text-gray-500 dark:text-neutral-400 truncate">
                       {address.city}, {address.country}
                     </p>
                     {address.notes && (
-                      <p className="text-xs text-gray-400 mt-1 truncate">{address.notes}</p>
+                      <p className="text-xs text-gray-400 dark:text-neutral-500 mt-1 truncate">{address.notes}</p>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-neutral-800">
                   <button
                     type="button"
                     onClick={() => openEditModal(address)}
-                    className="text-xs text-gray-500 hover:text-gray-700"
+                    className="text-xs text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-300"
                   >
                     {t('common.edit')}
                   </button>
                   {!address.isDefault && (
                     <>
-                      <span className="text-gray-300">|</span>
+                      <span className="text-gray-300 dark:text-neutral-600">|</span>
                       <button
                         type="button"
                         onClick={() => handleSetDefault(address.id)}
-                        className="text-xs text-primary-600 hover:text-primary-700"
+                        className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                       >
                         {t('address.setAsDefault')}
                       </button>
                     </>
                   )}
-                  <span className="text-gray-300">|</span>
+                  <span className="text-gray-300 dark:text-neutral-600">|</span>
                   <button
                     type="button"
                     onClick={() => handleDelete(address.id)}
@@ -168,8 +168,8 @@ export function AddressSection() {
           />
 
           <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('address.deliveryNotes')} <span className="text-gray-400 font-normal">({t('common.optional')})</span>
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+              {t('address.deliveryNotes')} <span className="text-gray-400 dark:text-neutral-500 font-normal">({t('common.optional')})</span>
             </label>
             <textarea
               id="notes"

@@ -43,7 +43,8 @@
     "profile": "My Profile",
     "cart": "Cart",
     "notifications": "Notifications",
-    "adminPanel": "Admin Panel"
+    "adminPanel": "Admin Panel",
+    "contact": "Contact"
   },
   "home": {
     "title": "Food delivery made",
@@ -158,7 +159,7 @@
   "auth": {
     "login": {
       "title": "Welcome back",
-      "subtitle": "Sign in to continue to Glovo Copy",
+      "subtitle": "Sign in to continue to Najedise",
       "emailLabel": "Email address",
       "emailPlaceholder": "you@example.com",
       "passwordLabel": "Password",
@@ -170,7 +171,7 @@
     },
     "register": {
       "title": "Create your account",
-      "subtitle": "Join Glovo Copy and start ordering",
+      "subtitle": "Join Najedise and start ordering",
       "firstNameLabel": "First name",
       "firstNamePlaceholder": "John",
       "lastNameLabel": "Last name",
@@ -198,7 +199,7 @@
     },
     "registerRestaurant": {
       "title": "Register your restaurant",
-      "subtitle": "Join Glovo Copy and reach more customers",
+      "subtitle": "Join Najedise and reach more customers",
       "ownerInfo": "Owner Information",
       "restaurantInfo": "Restaurant Information",
       "deliverySettings": "Delivery Settings",

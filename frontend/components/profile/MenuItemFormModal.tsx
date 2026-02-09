@@ -71,8 +71,8 @@ export function MenuItemFormModal({
         />
 
         <div>
-          <label htmlFor="menuItemDescription" className="block text-sm font-medium text-gray-700 mb-2">
-            Description <span className="text-gray-400 font-normal">(optional)</span>
+          <label htmlFor="menuItemDescription" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+            Description <span className="text-gray-400 dark:text-neutral-500 font-normal">(optional)</span>
           </label>
           <textarea
             id="menuItemDescription"
@@ -113,8 +113,8 @@ export function MenuItemFormModal({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="menuItemCategory" className="block text-sm font-medium text-gray-700 mb-2">
-              Category <span className="text-gray-400 font-normal">(optional)</span>
+            <label htmlFor="menuItemCategory" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+              Category <span className="text-gray-400 dark:text-neutral-500 font-normal">(optional)</span>
             </label>
             <select
               id="menuItemCategory"
@@ -138,9 +138,9 @@ export function MenuItemFormModal({
                 name="isAvailable"
                 checked={form.isAvailable}
                 onChange={handleChange}
-                className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                className="w-5 h-5 text-primary-600 border-gray-300 dark:border-neutral-700 rounded focus:ring-primary-500 dark:bg-neutral-800"
               />
-              <span className="text-sm font-medium text-gray-700">Available</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">Available</span>
             </label>
           </div>
         </div>

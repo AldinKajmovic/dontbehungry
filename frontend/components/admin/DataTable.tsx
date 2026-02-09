@@ -37,7 +37,7 @@ function SortIcon({ direction, active }: { direction?: 'asc' | 'desc'; active: b
     <span className="ml-2 inline-flex items-center">
       <svg
         className={`w-3.5 h-3.5 transition-colors ${
-          active ? 'text-primary-600' : 'text-gray-300'
+          active ? 'text-primary-600 dark:text-primary-400' : 'text-gray-300 dark:text-neutral-600'
         }`}
         fill="currentColor"
         viewBox="0 0 24 24"
@@ -77,7 +77,7 @@ export function DataTable<T extends Record<string, any>>({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 overflow-hidden">
         <div className="p-8 flex items-center justify-center">
           <div className="animate-spin h-8 w-8 border-4 border-primary-500 border-t-transparent rounded-full" />
         </div>
@@ -87,32 +87,32 @@ export function DataTable<T extends Record<string, any>>({
 
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 overflow-hidden">
         <div className="p-8 text-center">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-gray-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
           </div>
-          <p className="text-gray-500">{emptyMessage}</p>
+          <p className="text-gray-500 dark:text-neutral-400">{emptyMessage}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+    <div className="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-100">
+            <tr className="bg-gray-50 dark:bg-neutral-800 border-b border-gray-100 dark:border-neutral-800">
               {columns.map((column) => {
                 const sortKey = column.sortKey || column.key
                 const isActive = sortConfig?.key === sortKey
                 return (
                   <th
                     key={column.key}
-                    className={`px-4 py-3 text-left text-xs font-semibold text-gray-500 tracking-wider ${column.className || ''} ${column.sortable ? 'cursor-pointer hover:bg-gray-100 select-none' : ''}`}
+                    className={`px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-neutral-400 tracking-wider ${column.className || ''} ${column.sortable ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-neutral-700 select-none' : ''}`}
                     onClick={() => handleSort(column)}
                   >
                     <span className="flex items-center">
@@ -128,21 +128,21 @@ export function DataTable<T extends Record<string, any>>({
                 )
               })}
               {actions && (
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 tracking-wider">
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-neutral-400 tracking-wider">
                   {t('admin.table.actions')}
                 </th>
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 dark:divide-neutral-800">
             {data.map((item) => (
               <tr
                 key={String(item[keyField])}
-                className={`hover:bg-gray-50 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
+                className={`transition-colors hover:bg-primary-900 ${onRowClick ? 'cursor-pointer' : ''} [&:hover_td]:!text-white [&:hover_td_*]:!text-white [&:hover_td_.rounded-full]:!bg-transparent`}
                 onClick={() => onRowClick?.(item)}
               >
                 {columns.map((column) => (
-                  <td key={column.key} className={`px-4 py-3 text-sm text-gray-700 ${column.className || ''}`}>
+                  <td key={column.key} className={`px-4 py-3 text-sm text-gray-700 dark:text-neutral-300 ${column.className || ''}`}>
                     {column.render ? column.render(item) : String(item[column.key] ?? '-')}
                   </td>
                 ))}

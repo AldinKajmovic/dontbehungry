@@ -59,8 +59,8 @@ export function NotificationItem({ notification, onMarkAsRead, onDelete }: Notif
       onClick={handleClick}
       className={`
         relative flex items-start gap-3 p-3 cursor-pointer transition-colors
-        ${notification.isRead ? 'bg-white' : 'bg-blue-50'}
-        hover:bg-gray-50 border-b border-gray-100 last:border-b-0
+        ${notification.isRead ? 'bg-white dark:bg-neutral-900' : 'bg-blue-50 dark:bg-blue-950/30'}
+        hover:bg-gray-50 dark:hover:bg-neutral-800 border-b border-gray-100 dark:border-neutral-800 last:border-b-0
       `}
     >
       {/* Icon */}
@@ -70,13 +70,13 @@ export function NotificationItem({ notification, onMarkAsRead, onDelete }: Notif
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <p className={`text-sm ${notification.isRead ? 'text-gray-700' : 'text-gray-900 font-medium'}`}>
+        <p className={`text-sm ${notification.isRead ? 'text-gray-700 dark:text-neutral-300' : 'text-gray-900 dark:text-white font-medium'}`}>
           {notification.title}
         </p>
-        <p className="text-sm text-gray-600 mt-0.5 line-clamp-2">
+        <p className="text-sm text-gray-600 dark:text-neutral-400 mt-0.5 line-clamp-2">
           {notification.message}
         </p>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-gray-400 dark:text-neutral-500 mt-1">
           {getTimeAgo(notification.createdAt)}
         </p>
       </div>
@@ -86,7 +86,7 @@ export function NotificationItem({ notification, onMarkAsRead, onDelete }: Notif
         {!notification.isRead && (
           <button
             onClick={handleMarkAsRead}
-            className="p-1 text-gray-400 hover:text-green-500 transition-colors"
+            className="p-1 text-gray-400 dark:text-neutral-500 hover:text-green-500 transition-colors"
             title="Mark as read"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@ export function NotificationItem({ notification, onMarkAsRead, onDelete }: Notif
         )}
         <button
           onClick={handleDelete}
-          className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+          className="p-1 text-gray-400 dark:text-neutral-500 hover:text-red-500 transition-colors"
           title="Delete notification"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

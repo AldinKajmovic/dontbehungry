@@ -75,12 +75,12 @@ export function RestaurantSection() {
           </div>
         ) : restaurants.length === 0 ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-gray-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            <p className="text-gray-500 mb-4">{t('profile.noRestaurantsYet')}</p>
+            <p className="text-gray-500 dark:text-neutral-400 mb-4">{t('profile.noRestaurantsYet')}</p>
             <Button
               type="button"
               variant="secondary"
@@ -95,11 +95,11 @@ export function RestaurantSection() {
             {restaurants.map((restaurant) => (
               <div
                 key={restaurant.id}
-                className="relative p-4 rounded-xl border-2 border-gray-200 hover:border-gray-300 transition-colors cursor-pointer"
+                className="relative p-4 rounded-xl border-2 border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 transition-colors cursor-pointer"
                 onClick={() => openViewModal(restaurant)}
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
                     {restaurant.logoUrl ? (
                       <img
                         src={restaurant.logoUrl}
@@ -113,8 +113,8 @@ export function RestaurantSection() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{restaurant.name}</p>
-                    <p className="text-sm text-gray-500 truncate">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{restaurant.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-neutral-400 truncate">
                       {restaurant.place.city}, {restaurant.place.country}
                     </p>
                     {restaurant.rating && (
@@ -127,29 +127,29 @@ export function RestaurantSection() {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-neutral-800">
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       openViewModal(restaurant)
                     }}
-                    className="text-xs text-primary-600 hover:text-primary-700"
+                    className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                   >
                     View
                   </button>
-                  <span className="text-gray-300">|</span>
+                  <span className="text-gray-300 dark:text-neutral-600">|</span>
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       openEditModal(restaurant)
                     }}
-                    className="text-xs text-gray-500 hover:text-gray-700"
+                    className="text-xs text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-300"
                   >
                     Edit
                   </button>
-                  <span className="text-gray-300">|</span>
+                  <span className="text-gray-300 dark:text-neutral-600">|</span>
                   <button
                     type="button"
                     onClick={(e) => {

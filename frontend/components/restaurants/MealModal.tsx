@@ -84,7 +84,7 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
       <div className="flex min-h-full items-center justify-center p-4">
         {/* Modal */}
         <div
-          className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden animate-modal-in"
+          className="relative bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden animate-modal-in"
           role="dialog"
           aria-modal="true"
         >
@@ -106,9 +106,9 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors"
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 dark:bg-neutral-800/90 hover:bg-white dark:hover:bg-neutral-800 flex items-center justify-center transition-colors"
             >
-              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -129,7 +129,7 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
             {/* Restaurant Info */}
             <div className="absolute bottom-4 left-4 right-4 flex items-end gap-4">
               {/* Logo */}
-              <div className="w-16 h-16 rounded-xl bg-white shadow-xl overflow-hidden border-2 border-white flex-shrink-0">
+              <div className="w-16 h-16 rounded-xl bg-white dark:bg-neutral-900 shadow-xl overflow-hidden border-2 border-white dark:border-neutral-700 flex-shrink-0">
                 {restaurant.logoUrl ? (
                   <img
                     src={restaurant.logoUrl}
@@ -137,8 +137,8 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-primary-100 flex items-center justify-center">
-                    <span className="text-primary-600 font-bold text-xl">
+                  <div className="w-full h-full bg-primary-100 dark:bg-primary-950/30 flex items-center justify-center">
+                    <span className="text-primary-600 dark:text-primary-400 font-bold text-xl">
                       {restaurant.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -156,14 +156,14 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
           </div>
 
           {/* Menu / About Tabs */}
-          <div className="border-b border-gray-200">
+          <div className="border-b border-gray-200 dark:border-neutral-700">
             <div className="flex px-4">
               <button
                 onClick={() => setActiveTab('menu')}
                 className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${
                   activeTab === 'menu'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                    : 'border-transparent text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-300'
                 }`}
               >
                 {t('mealModal.menu')}
@@ -172,8 +172,8 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
                 onClick={() => setActiveTab('about')}
                 className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${
                   activeTab === 'about'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                    : 'border-transparent text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-300'
                 }`}
               >
                 {t('mealModal.about')}
@@ -183,7 +183,7 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
 
           {/* Category Sub-tabs (only for menu) */}
           {activeTab === 'menu' && menuCategories.length > 0 && (
-            <div className="border-b border-gray-100 overflow-x-auto">
+            <div className="border-b border-gray-100 dark:border-neutral-800 overflow-x-auto">
               <div className="flex px-4 gap-1 min-w-max">
                 {menuCategories.map((cat) => (
                   <button
@@ -192,13 +192,13 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
                     className={`
                       px-3 py-2 text-xs font-medium whitespace-nowrap rounded-full
                       ${selectedCategory === cat.categoryId
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'text-gray-500 hover:bg-gray-100'
+                        ? 'bg-primary-100 dark:bg-primary-950/30 text-primary-700 dark:text-primary-400'
+                        : 'text-gray-500 dark:text-neutral-400 hover:bg-gray-100 dark:hover:bg-neutral-800'
                       }
                     `}
                   >
                     {cat.categoryName}
-                    <span className="ml-1 text-gray-400">({cat.items.length})</span>
+                    <span className="ml-1 text-gray-400 dark:text-neutral-500">({cat.items.length})</span>
                   </button>
                 ))}
               </div>
@@ -220,9 +220,9 @@ export function MealModal({ restaurant, isOpen, onClose, showAddButton = false }
                 <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : menuCategories.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 dark:text-neutral-400">
                 <svg
-                  className="w-12 h-12 mx-auto mb-3 text-gray-300"
+                  className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-neutral-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useLanguage } from '@/hooks/useLanguage'
-import { EmailVerificationBanner, LanguageToggle } from '@/components/ui'
+import { EmailVerificationBanner, LanguageToggle, ThemeToggle } from '@/components/ui'
 import { NotificationBell } from '@/components/notifications'
 import {
   ProfilePictureSection,
@@ -41,30 +41,29 @@ export default function MyProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-950">
       <EmailVerificationBanner />
 
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white dark:bg-neutral-900 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {user.role === 'CUSTOMER' && (
-                <Link
-                  href="/restaurants"
-                  className="text-gray-500 hover:text-gray-700 transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                </Link>
-              )}
-              <h1 className="text-2xl font-bold text-gray-900">{t('profile.title')}</h1>
+              <Link
+                href="/restaurants"
+                className="text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-300 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </Link>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('profile.title')}</h1>
             </div>
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <LanguageToggle />
               <NotificationBell />
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-950/50 text-primary-800 dark:text-primary-400">
                 {user.role.replace('_', ' ')}
               </span>
               <button

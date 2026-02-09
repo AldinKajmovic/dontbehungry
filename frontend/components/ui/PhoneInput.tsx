@@ -77,9 +77,9 @@ export function PhoneInput({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
           {label}
-          {hint && <span className="text-gray-400 font-normal"> {hint}</span>}
+          {hint && <span className="text-gray-400 dark:text-neutral-500 font-normal"> {hint}</span>}
         </label>
       )}
       <div className="flex gap-2">
@@ -91,10 +91,10 @@ export function PhoneInput({
               e.stopPropagation();
               setShowDropdown(!showDropdown);
             }}
-            className="flex items-center gap-1 px-3 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors min-w-[100px]"
+            className="flex items-center gap-1 px-3 py-3 rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors min-w-[100px]"
           >
             <span className="text-lg">{getFlagEmoji(selectedCountry)}</span>
-            <span className="text-sm text-gray-600">{selectedCountryData?.dialCode}</span>
+            <span className="text-sm text-gray-600 dark:text-neutral-400">{selectedCountryData?.dialCode}</span>
             <svg className={`w-4 h-4 text-gray-400 transition-transform ${showDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
@@ -103,17 +103,17 @@ export function PhoneInput({
           {/* Country dropdown */}
           {showDropdown && (
             <div
-              className="absolute z-50 top-full left-0 mt-1 w-64 max-h-64 overflow-auto bg-white rounded-xl shadow-lg border border-gray-200 animate-fade-in"
+              className="absolute z-50 top-full left-0 mt-1 w-64 max-h-64 overflow-auto bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-gray-200 dark:border-neutral-700 animate-fade-in"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Search */}
-              <div className="sticky top-0 bg-white p-2 border-b border-gray-100">
+              <div className="sticky top-0 bg-white dark:bg-neutral-800 p-2 border-b border-gray-100 dark:border-neutral-700">
                 <input
                   type="text"
                   placeholder="Search country..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
                   autoFocus
                 />
               </div>
@@ -121,7 +121,7 @@ export function PhoneInput({
               <div className="py-1">
                 {filteredCountries.map((country, idx) => (
                   country.code === 'DIVIDER' ? (
-                    <div key={`divider-${idx}`} className="px-3 py-1 text-xs text-gray-400">{country.name}</div>
+                    <div key={`divider-${idx}`} className="px-3 py-1 text-xs text-gray-400 dark:text-neutral-500">{country.name}</div>
                   ) : (
                     <button
                       key={country.code}
@@ -131,11 +131,11 @@ export function PhoneInput({
                         setShowDropdown(false);
                         setSearch('');
                       }}
-                      className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 transition-colors ${selectedCountry === country.code ? 'bg-primary-50' : ''}`}
+                      className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors ${selectedCountry === country.code ? 'bg-primary-50 dark:bg-primary-950/30' : ''}`}
                     >
                       <span className="text-lg">{getFlagEmoji(country.code)}</span>
-                      <span className="flex-1 text-sm text-gray-700 truncate">{country.name}</span>
-                      <span className="text-sm text-gray-400">{country.dialCode}</span>
+                      <span className="flex-1 text-sm text-gray-700 dark:text-neutral-300 truncate">{country.name}</span>
+                      <span className="text-sm text-gray-400 dark:text-neutral-500">{country.dialCode}</span>
                     </button>
                   )
                 ))}

@@ -96,8 +96,8 @@ export function RestaurantFormModal({
         />
 
         <div>
-          <label htmlFor="restaurantDescription" className="block text-sm font-medium text-gray-700 mb-2">
-            Description <span className="text-gray-400 font-normal">(optional)</span>
+          <label htmlFor="restaurantDescription" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+            Description <span className="text-gray-400 dark:text-neutral-500 font-normal">(optional)</span>
           </label>
           <textarea
             id="restaurantDescription"
@@ -135,11 +135,11 @@ export function RestaurantFormModal({
 
         {/* Gallery Section */}
         <div className="mt-4">
-          <p className="text-sm text-gray-600 font-medium mb-2">Gallery (Interior, Exterior, etc.)</p>
+          <p className="text-sm text-gray-600 dark:text-neutral-400 font-medium mb-2">Gallery (Interior, Exterior, etc.)</p>
           <div className="grid grid-cols-3 gap-3">
             {form.images.map((imgUrl, index) => (
               <div key={index} className="relative group">
-                <div className="relative w-full h-24 rounded-lg overflow-hidden bg-gray-100">
+                <div className="relative w-full h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-neutral-800">
                   <img
                     src={imgUrl}
                     alt={`Gallery ${index + 1}`}
@@ -162,22 +162,22 @@ export function RestaurantFormModal({
                 type="button"
                 onClick={onAddImage}
                 disabled={imageUploading}
-                className="group flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer disabled:opacity-50"
+                className="group flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 dark:border-neutral-600 rounded-lg bg-gray-50 dark:bg-neutral-800 hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 transition-colors cursor-pointer disabled:opacity-50"
               >
                 {imageUploading ? (
                   <div className="w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
-                    <svg className="w-8 h-8 text-gray-400 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-8 h-8 text-gray-400 dark:text-neutral-500 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    <span className="text-xs text-gray-500 group-hover:text-primary-600 mt-1">{form.images.length} / 6</span>
+                    <span className="text-xs text-gray-500 dark:text-neutral-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 mt-1">{form.images.length} / 6</span>
                   </>
                 )}
               </button>
             )}
           </div>
-          <p className="text-xs text-gray-400 mt-2">{t('upload.galleryHint')}</p>
+          <p className="text-xs text-gray-400 dark:text-neutral-500 mt-2">{t('upload.galleryHint')}</p>
         </div>
 
         {/* Opening Hours */}
@@ -190,7 +190,7 @@ export function RestaurantFormModal({
 
         {!editingRestaurant && (
           <>
-            <p className="text-sm text-gray-600 font-medium mt-4 mb-2">{t('admin.modals.location')}</p>
+            <p className="text-sm text-gray-600 dark:text-neutral-400 font-medium mt-4 mb-2">{t('admin.modals.location')}</p>
             <AddressAutocomplete
               label={t('address.streetAddress')}
               placeholder={t('address.searchPlaceholder')}
@@ -200,7 +200,7 @@ export function RestaurantFormModal({
           </>
         )}
 
-        <p className="text-sm text-gray-600 font-medium mt-4 mb-2">Delivery Settings</p>
+        <p className="text-sm text-gray-600 dark:text-neutral-400 font-medium mt-4 mb-2">Delivery Settings</p>
 
         <div className="grid grid-cols-2 gap-4 items-start">
           <Input

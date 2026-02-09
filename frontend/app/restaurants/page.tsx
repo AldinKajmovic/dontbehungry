@@ -7,8 +7,10 @@ import { useCart } from '@/hooks/useCart'
 import { useLanguage } from '@/hooks/useLanguage'
 import { publicService, PublicRestaurant, Category } from '@/services/public'
 import { addressService } from '@/services/address'
+import Image from 'next/image'
 import { RestaurantCard, CategoryIcon, MealModal } from '@/components/restaurants'
-import { GuestBanner, LanguageToggle } from '@/components/ui'
+import { GuestBanner, LanguageToggle, ThemeToggle } from '@/components/ui'
+import logo from '@/assets/logo.png'
 import { CartDrawer } from '@/components/cart'
 import { NotificationBell } from '@/components/notifications'
 import { logger } from '@/utils/logger'
@@ -139,13 +141,13 @@ export default function RestaurantsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-950">
       {/* Full-screen loading overlay for logged-in users */}
       {isAuthenticated && (isLoading || !coordinatesLoaded) && (
-        <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
+        <div className="fixed inset-0 bg-white dark:bg-neutral-900 z-50 flex flex-col items-center justify-center">
           <div className="w-20 h-20 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-6" />
-          <p className="text-xl font-semibold text-gray-800 mb-2">{t('restaurants.calculatingDistances')}</p>
-          <p className="text-gray-600 text-center max-w-md px-4">{t('restaurants.freeApiMessage')}</p>
+          <p className="text-xl font-semibold text-gray-800 dark:text-neutral-200 mb-2">{t('restaurants.calculatingDistances')}</p>
+          <p className="text-gray-600 dark:text-neutral-400 text-center max-w-md px-4">{t('restaurants.freeApiMessage')}</p>
         </div>
       )}
 
@@ -153,17 +155,18 @@ export default function RestaurantsPage() {
       <GuestBanner />
 
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-40">
+      <header className="bg-white dark:bg-neutral-900 shadow-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">D</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900 hidden sm:block">
-                Don&apos;t Be Hungry
-              </span>
+              <Image
+                src={logo}
+                alt="Najedise"
+                width={150}
+                height={130}
+                className="rounded-xl"
+              />
             </Link>
 
             {/* Search Bar */}
@@ -174,10 +177,10 @@ export default function RestaurantsPage() {
                   placeholder={t('restaurants.searchPlaceholder')}
                   value={searchQuery}
                   onChange={handleSearch}
-                  className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                  className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 focus:bg-white dark:focus:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all dark:text-white dark:placeholder-neutral-400"
                 />
                 <svg
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-neutral-500"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -192,22 +195,23 @@ export default function RestaurantsPage() {
               </div>
             </div>
 
-            {/* Language Toggle */}
+            {/* Theme & Language Toggle */}
+            <ThemeToggle />
             <LanguageToggle />
 
             {/* Auth-dependent UI - show nothing while loading to prevent flash */}
             {authLoading ? (
-              <div className="w-24 h-10 bg-gray-100 rounded-lg animate-pulse" />
+              <div className="w-24 h-10 bg-gray-100 dark:bg-neutral-800 rounded-lg animate-pulse" />
             ) : isAuthenticated ? (
               <div className="flex items-center gap-1">
                 <NotificationBell />
                 <button
                   onClick={openCart}
-                  className="relative p-3 rounded-full hover:bg-gray-100 transition-colors"
+                  className="relative p-3 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
                   aria-label="Open cart"
                 >
                   <svg
-                    className="w-6 h-6 text-gray-700"
+                    className="w-6 h-6 text-gray-700 dark:text-neutral-300"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -227,11 +231,11 @@ export default function RestaurantsPage() {
                 </button>
                 <Link
                   href="/my-profile"
-                  className="p-3 rounded-full hover:bg-gray-100 transition-colors"
+                  className="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
                   aria-label="My Profile"
                 >
                   <svg
-                    className="w-6 h-6 text-gray-700"
+                    className="w-6 h-6 text-gray-700 dark:text-neutral-300"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -249,13 +253,13 @@ export default function RestaurantsPage() {
               <div className="hidden md:flex items-center gap-2">
                 <Link
                   href="/auth/login"
-                  className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
+                  className="px-5 py-2.5 text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-800 transition-all duration-200"
                 >
                   {t('common.logIn')}
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
+                  className="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/30"
                 >
                   {t('common.signUp')}
                 </Link>
@@ -268,22 +272,22 @@ export default function RestaurantsPage() {
       <main className="max-w-7xl mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <div className="mb-4 text-sm">
-          <Link href="/" className="text-primary-600 hover:underline cursor-pointer">{t('common.home')}</Link>
-          <span className="text-gray-400 mx-2">&gt;</span>
-          <span className="text-gray-600">{t('nav.restaurants')}</span>
+          <Link href="/" className="text-primary-600 dark:text-primary-400 hover:underline cursor-pointer">{t('common.home')}</Link>
+          <span className="text-gray-400 dark:text-neutral-500 mx-2">&gt;</span>
+          <span className="text-gray-600 dark:text-neutral-400">{t('nav.restaurants')}</span>
         </div>
 
         {/* Title */}
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('restaurants.title')}</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">{t('restaurants.title')}</h1>
 
         {/* Categories */}
         <div className="relative mb-8">
           {/* Left Arrow */}
           <button
             onClick={() => scrollCategories('left')}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white dark:bg-neutral-800 shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors"
           >
-            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-600 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -301,8 +305,8 @@ export default function RestaurantsPage() {
                 flex flex-col items-center gap-2 min-w-[70px] p-2 rounded-xl
                 transition-all duration-300 transform hover:scale-110
                 ${!selectedCategory
-                  ? 'bg-primary-50 ring-2 ring-primary-500'
-                  : 'hover:bg-gray-50'
+                  ? 'bg-primary-50 dark:bg-primary-950/30 ring-2 ring-primary-500'
+                  : 'hover:bg-gray-50 dark:hover:bg-neutral-800'
                 }
               `}
             >
@@ -311,8 +315,8 @@ export default function RestaurantsPage() {
                   w-14 h-14 rounded-full flex items-center justify-center
                   transition-all duration-300 transform hover:scale-110
                   ${!selectedCategory
-                    ? 'bg-primary-100 shadow-lg'
-                    : 'bg-gray-100 hover:bg-gray-200'
+                    ? 'bg-primary-100 dark:bg-primary-950/50 shadow-lg'
+                    : 'bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700'
                   }
                 `}
               >
@@ -320,8 +324,8 @@ export default function RestaurantsPage() {
               </div>
               <span
                 className={`
-                  text-xs text-center font-medium
-                  ${!selectedCategory ? 'text-primary-700' : 'text-gray-600'}
+                  text-xs text-center font-medium [text-shadow:_0_1px_2px_rgba(0,0,0,0.1)]
+                  ${!selectedCategory ? 'text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-neutral-200'}
                 `}
               >
                 {t('restaurants.allCategories')}
@@ -341,9 +345,9 @@ export default function RestaurantsPage() {
           {/* Right Arrow */}
           <button
             onClick={() => scrollCategories('right')}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white dark:bg-neutral-800 shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors"
           >
-            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-600 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -351,7 +355,7 @@ export default function RestaurantsPage() {
 
         {/* Section Title - hide when authenticated and loading */}
         {!(isAuthenticated && (isLoading || !coordinatesLoaded)) && (
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             {selectedCategory
               ? categories.find((c) => c.id === selectedCategory)?.name || t('restaurants.title')
               : t('restaurants.allRestaurants')}
@@ -362,11 +366,11 @@ export default function RestaurantsPage() {
         {isAuthenticated && (isLoading || !coordinatesLoaded) ? null : isLoading ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="rounded-xl overflow-hidden bg-white shadow-md animate-pulse">
-                <div className="h-40 bg-gray-200" />
+              <div key={i} className="rounded-xl overflow-hidden bg-white dark:bg-neutral-900 shadow-md animate-pulse">
+                <div className="h-40 bg-gray-200 dark:bg-neutral-700" />
                 <div className="p-4">
-                  <div className="h-5 bg-gray-200 rounded w-3/4 mb-3" />
-                  <div className="h-4 bg-gray-200 rounded w-1/2" />
+                  <div className="h-5 bg-gray-200 dark:bg-neutral-700 rounded w-3/4 mb-3" />
+                  <div className="h-4 bg-gray-200 dark:bg-neutral-700 rounded w-1/2" />
                 </div>
               </div>
             ))}
@@ -374,7 +378,7 @@ export default function RestaurantsPage() {
         ) : restaurants.length === 0 ? (
           <div className="text-center py-16">
             <svg
-              className="w-20 h-20 mx-auto mb-4 text-gray-300"
+              className="w-20 h-20 mx-auto mb-4 text-gray-300 dark:text-neutral-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -386,8 +390,8 @@ export default function RestaurantsPage() {
                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
               />
             </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('restaurants.noResults')}</h3>
-            <p className="text-gray-500">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('restaurants.noResults')}</h3>
+            <p className="text-gray-500 dark:text-neutral-400">
               {searchQuery
                 ? t('restaurants.noResultsSearch', { query: searchQuery })
                 : t('restaurants.tryDifferent')}
@@ -411,17 +415,17 @@ export default function RestaurantsPage() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-neutral-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors dark:text-neutral-300"
             >
               {t('common.previous')}
             </button>
-            <span className="px-4 py-2 text-sm text-gray-600">
+            <span className="px-4 py-2 text-sm text-gray-600 dark:text-neutral-400">
               {t('common.page')} {page} {t('common.of')} {totalPages}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-neutral-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors dark:text-neutral-300"
             >
               {t('common.next')}
             </button>

@@ -19,14 +19,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={props.id} className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor={props.id} className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
             {label}
-            {hint && <span className="text-gray-400 font-normal"> {hint}</span>}
+            {hint && <span className="text-gray-400 dark:text-neutral-500 font-normal"> {hint}</span>}
           </label>
         )}
         <div className="relative">
           {prefix && (
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">{prefix}</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-neutral-400">{prefix}</span>
           )}
           <input
             ref={ref}
@@ -38,7 +38,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors"
             >
               {showPassword ? (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -38,7 +38,7 @@ export function DeleteConfirmModal({
       icon={WarningIcon}
       iconColor="red"
     >
-      <p className="text-sm text-gray-600 mb-6">{message}</p>
+      <p className="text-sm text-gray-600 dark:text-neutral-400 mb-6">{message}</p>
       <div className="flex gap-3">
         <Button
           type="button"

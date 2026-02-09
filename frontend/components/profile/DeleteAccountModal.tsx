@@ -34,7 +34,7 @@ export function DeleteAccountModal() {
       <button
         type="button"
         onClick={openModal}
-        className="px-6 py-2 border border-red-300 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-colors"
+        className="px-6 py-2 border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl font-medium transition-colors"
       >
         {t('profile.deleteAccountBtn')}
       </button>
@@ -58,12 +58,12 @@ export function DeleteAccountModal() {
         }
       >
         {step === 1 ? (
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-neutral-400">
             {t('profile.deleteAccountWarning')}
           </p>
         ) : (
           <>
-            <p className="text-sm text-gray-600 mb-2">
+            <p className="text-sm text-gray-600 dark:text-neutral-400 mb-2">
               {t('profile.deleteAccountFinalWarning')}
             </p>
             <p className="text-sm font-medium text-red-600 mb-2">

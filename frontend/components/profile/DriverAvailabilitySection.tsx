@@ -52,7 +52,7 @@ export function DriverAvailabilitySection() {
       <div className="space-y-6">
         {/* Error Message */}
         {error && (
-          <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+          <div className="p-3 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 rounded-lg text-sm">
             {error}
           </div>
         )}
@@ -78,16 +78,16 @@ export function DriverAvailabilitySection() {
         ) : (
           <>
             {/* Status Toggle Section */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-gray-50 dark:bg-neutral-800 rounded-xl">
               <div className="flex items-center gap-4">
                 {/* Status Indicator */}
-                <div className={`w-4 h-4 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
+                <div className={`w-4 h-4 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400 dark:bg-neutral-500'}`} />
                 <div>
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium text-gray-900 dark:text-white">
                     {isOnline ? t('profile.availability.online') : t('profile.availability.offline')}
                   </p>
                   {isOnline && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-neutral-400">
                       {hasStartedWorking
                         ? `${t('profile.availability.workingTime')}: ${formattedElapsedTime}`
                         : t('profile.availability.waitingForOrders')
@@ -133,52 +133,52 @@ export function DriverAvailabilitySection() {
 
             {/* Monthly Hours Table */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">{t('profile.availability.monthlyHours')}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-3">{t('profile.availability.monthlyHours')}</h3>
               {monthlyHours.length === 0 ? (
-                <p className="text-sm text-gray-500">{t('profile.availability.noShiftHistory')}</p>
+                <p className="text-sm text-gray-500 dark:text-neutral-400">{t('profile.availability.noShiftHistory')}</p>
               ) : (
                 <>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-gray-200">
-                          <th className="text-left py-2 px-3 font-medium text-gray-600">{t('profile.availability.month')}</th>
-                          <th className="text-right py-2 px-3 font-medium text-gray-600">{t('profile.availability.shifts')}</th>
-                          <th className="text-right py-2 px-3 font-medium text-gray-600">{t('profile.availability.hours')}</th>
+                        <tr className="border-b border-gray-200 dark:border-neutral-700">
+                          <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-neutral-400">{t('profile.availability.month')}</th>
+                          <th className="text-right py-2 px-3 font-medium text-gray-600 dark:text-neutral-400">{t('profile.availability.shifts')}</th>
+                          <th className="text-right py-2 px-3 font-medium text-gray-600 dark:text-neutral-400">{t('profile.availability.hours')}</th>
                         </tr>
                       </thead>
                       <tbody>
                         {monthlyHours.map((month) => (
                           <tr
                             key={month.month}
-                            className="border-b border-gray-100 hover:bg-gray-50"
+                            className="border-b border-gray-100 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-800"
                           >
-                            <td className="py-2 px-3 text-gray-900">
+                            <td className="py-2 px-3 text-gray-900 dark:text-white">
                               {getLocalizedMonthName(month.monthName)} {month.year}
                             </td>
-                            <td className="py-2 px-3 text-right text-gray-600">
+                            <td className="py-2 px-3 text-right text-gray-600 dark:text-neutral-400">
                               {month.shiftCount}
                             </td>
-                            <td className="py-2 px-3 text-right font-medium text-gray-900">
+                            <td className="py-2 px-3 text-right font-medium text-gray-900 dark:text-white">
                               {month.totalHours.toFixed(1)}{t('profile.availability.hoursUnit')}
                             </td>
                           </tr>
                         ))}
                       </tbody>
                       <tfoot>
-                        <tr className="bg-gray-50">
-                          <td className="py-2 px-3 font-semibold text-gray-900">{t('profile.availability.total')}</td>
-                          <td className="py-2 px-3 text-right text-gray-600">
+                        <tr className="bg-gray-50 dark:bg-neutral-800">
+                          <td className="py-2 px-3 font-semibold text-gray-900 dark:text-white">{t('profile.availability.total')}</td>
+                          <td className="py-2 px-3 text-right text-gray-600 dark:text-neutral-400">
                             {monthlyHours.reduce((sum, m) => sum + m.shiftCount, 0)}
                           </td>
-                          <td className="py-2 px-3 text-right font-semibold text-primary-600">
+                          <td className="py-2 px-3 text-right font-semibold text-primary-600 dark:text-primary-400">
                             {totalHours.toFixed(1)}{t('profile.availability.hoursUnit')}
                           </td>
                         </tr>
                       </tfoot>
                     </table>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-gray-500 dark:text-neutral-400 mt-2">
                     {t('profile.availability.showingLast6Months')}
                   </p>
                 </>

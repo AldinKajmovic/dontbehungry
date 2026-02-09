@@ -13,6 +13,7 @@ This folder contains documentation for the frontend codebase.
 | [orders-page.md](./orders-page.md) | Order history page with status and date filters |
 | [reusable-components.md](./reusable-components.md) | Reusable UI components documentation |
 | [admin-panel.md](./admin-panel.md) | Admin panel features and components |
+| [styling.md](./styling.md) | Styling & theming: colors, dark mode, hover effects, patterns |
 
 ## Tech Stack
 

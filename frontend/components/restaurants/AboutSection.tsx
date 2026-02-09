@@ -67,7 +67,7 @@ export function AboutSection({ restaurant }: AboutSectionProps) {
     <div className="space-y-6">
       {/* Review Stats */}
       {restaurant.reviewStats && (
-        <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
+        <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-neutral-800 rounded-xl">
           <div className="flex items-center gap-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <svg
@@ -75,7 +75,7 @@ export function AboutSection({ restaurant }: AboutSectionProps) {
                 className={`w-5 h-5 ${
                   star <= Math.round(restaurant.reviewStats!.averageRating)
                     ? 'text-yellow-400'
-                    : 'text-gray-300'
+                    : 'text-gray-300 dark:text-neutral-600'
                 }`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
@@ -84,10 +84,10 @@ export function AboutSection({ restaurant }: AboutSectionProps) {
               </svg>
             ))}
           </div>
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">
             {restaurant.reviewStats.averageRating.toFixed(1)}
           </span>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-500 dark:text-neutral-400">
             {restaurant.reviewStats.totalReviews > 0
               ? `${t('about.fromReviews').replace('{count}', String(restaurant.reviewStats.totalReviews))}`
               : t('about.noReviewsYet')}
@@ -98,12 +98,12 @@ export function AboutSection({ restaurant }: AboutSectionProps) {
       {/* Contact Info */}
       {(restaurant.phone || restaurant.email || restaurant.place) && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">{t('about.contactInfo')}</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-3">{t('about.contactInfo')}</h3>
           <div className="space-y-2">
             {restaurant.phone && (
               <a
                 href={`tel:${restaurant.phone}`}
-                className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700"
+                className="flex items-center gap-2 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -114,7 +114,7 @@ export function AboutSection({ restaurant }: AboutSectionProps) {
             {restaurant.email && (
               <a
                 href={`mailto:${restaurant.email}`}
-                className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700"
+                className="flex items-center gap-2 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -123,7 +123,7 @@ export function AboutSection({ restaurant }: AboutSectionProps) {
               </a>
             )}
             {restaurant.place && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-neutral-400">
                 <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -141,14 +141,14 @@ export function AboutSection({ restaurant }: AboutSectionProps) {
       {/* Gallery */}
       {images.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">{t('about.gallery')}</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-3">{t('about.gallery')}</h3>
           <div className="grid grid-cols-3 gap-2">
             {images.map((img, idx) => (
               <button
                 key={img.id}
                 type="button"
                 onClick={() => setLightboxIndex(idx)}
-                className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 hover:opacity-90 transition-opacity"
+                className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-neutral-800 hover:opacity-90 transition-opacity"
               >
                 <img
                   src={img.imageUrl}
@@ -165,7 +165,7 @@ export function AboutSection({ restaurant }: AboutSectionProps) {
       {restaurant.openingHours && restaurant.openingHours.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <h3 className="text-sm font-semibold text-gray-700">{t('openingHours.title')}</h3>
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-neutral-300">{t('openingHours.title')}</h3>
             <span
               className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                 openNow
@@ -181,11 +181,11 @@ export function AboutSection({ restaurant }: AboutSectionProps) {
               <div
                 key={h.dayOfWeek}
                 className={`flex items-center justify-between py-1.5 px-2 rounded text-sm ${
-                  h.dayOfWeek === currentDay ? 'bg-primary-50 font-medium' : ''
+                  h.dayOfWeek === currentDay ? 'bg-primary-50 dark:bg-primary-950/30 font-medium' : ''
                 }`}
               >
-                <span className="text-gray-700">{t(DAY_KEYS[h.dayOfWeek])}</span>
-                <span className={h.isClosed ? 'text-red-500' : 'text-gray-600'}>
+                <span className="text-gray-700 dark:text-neutral-300">{t(DAY_KEYS[h.dayOfWeek])}</span>
+                <span className={h.isClosed ? 'text-red-500' : 'text-gray-600 dark:text-neutral-400'}>
                   {h.isClosed ? t('openingHours.closed') : `${h.openTime} - ${h.closeTime}`}
                 </span>
               </div>
@@ -202,10 +202,10 @@ export function AboutSection({ restaurant }: AboutSectionProps) {
         >
           {/* Close Button */}
           <button
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center z-10"
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 dark:bg-neutral-800/90 hover:bg-white dark:hover:bg-neutral-800 flex items-center justify-center z-10"
             onClick={() => setLightboxIndex(null)}
           >
-            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -213,10 +213,10 @@ export function AboutSection({ restaurant }: AboutSectionProps) {
           {/* Previous Button */}
           {images.length > 1 && (
             <button
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center z-10"
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 dark:bg-neutral-800/90 hover:bg-white dark:hover:bg-neutral-800 flex items-center justify-center z-10"
               onClick={(e) => { e.stopPropagation(); goToPrev() }}
             >
-              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
@@ -233,10 +233,10 @@ export function AboutSection({ restaurant }: AboutSectionProps) {
           {/* Next Button */}
           {images.length > 1 && (
             <button
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center z-10"
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 dark:bg-neutral-800/90 hover:bg-white dark:hover:bg-neutral-800 flex items-center justify-center z-10"
               onClick={(e) => { e.stopPropagation(); goToNext() }}
             >
-              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>

@@ -43,7 +43,8 @@
     "profile": "Moj profil",
     "cart": "Korpa",
     "notifications": "Obavijesti",
-    "adminPanel": "Admin panel"
+    "adminPanel": "Admin panel",
+    "contact": "Kontakt"
   },
   "home": {
     "title": "Dostava hrane postala je",
@@ -158,7 +159,7 @@
   "auth": {
     "login": {
       "title": "Dobrodošli nazad",
-      "subtitle": "Prijavite se za nastavak na Glovo Copy",
+      "subtitle": "Prijavite se za nastavak na Najedise",
       "emailLabel": "Email adresa",
       "emailPlaceholder": "vi@primjer.com",
       "passwordLabel": "Lozinka",
@@ -170,7 +171,7 @@
     },
     "register": {
       "title": "Kreirajte vaš račun",
-      "subtitle": "Pridružite se Glovo Copy i počnite naručivati",
+      "subtitle": "Pridružite se Najedise i počnite naručivati",
       "firstNameLabel": "Ime",
       "firstNamePlaceholder": "Marko",
       "lastNameLabel": "Prezime",
@@ -198,7 +199,7 @@
     },
     "registerRestaurant": {
       "title": "Registrujte svoj restoran",
-      "subtitle": "Pridružite se Glovo Copy i dosegnite više kupaca",
+      "subtitle": "Pridružite se Najedise i dosegnite više kupaca",
       "ownerInfo": "Podaci o vlasniku",
       "restaurantInfo": "Podaci o restoranu",
       "deliverySettings": "Postavke dostave",

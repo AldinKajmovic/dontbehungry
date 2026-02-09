@@ -13,21 +13,22 @@ interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'chi
   hint?: string
   options: SelectOption[]
   placeholder?: string
+  labelClassName?: string
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, hint, options, placeholder, className = '', ...props }, ref) => {
+  ({ label, error, hint, options, placeholder, className = '', labelClassName, ...props }, ref) => {
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={props.id} className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor={props.id} className={`block text-sm font-medium mb-2 ${labelClassName || 'text-gray-700 dark:text-neutral-300'}`}>
             {label}
-            {hint && <span className="text-gray-400 font-normal"> {hint}</span>}
+            {hint && <span className="text-gray-400 dark:text-neutral-500 font-normal"> {hint}</span>}
           </label>
         )}
         <select
           ref={ref}
-          className={`input-field appearance-none bg-white cursor-pointer ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : ''} ${className}`}
+          className={`input-field appearance-none cursor-pointer ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : ''} ${className}`}
           {...props}
         >
           {placeholder && (

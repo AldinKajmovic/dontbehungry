@@ -64,11 +64,11 @@ export function NotificationDropdown({ isOpen, onClose, containerRef }: Notifica
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden"
+      className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white dark:bg-neutral-900 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-700 z-50 overflow-hidden"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-        <h3 className="text-sm font-semibold text-gray-900">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-neutral-800">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
           Notifications {unreadCount > 0 && `(${unreadCount})`}
         </h3>
         {unreadCount > 0 && (
@@ -86,7 +86,7 @@ export function NotificationDropdown({ isOpen, onClose, containerRef }: Notifica
         {notifications.length === 0 ? (
           <div className="px-4 py-8 text-center">
             <div className="text-4xl mb-2">🔔</div>
-            <p className="text-sm text-gray-500">No notifications yet</p>
+            <p className="text-sm text-gray-500 dark:text-neutral-400">No notifications yet</p>
           </div>
         ) : (
           <>
@@ -101,7 +101,7 @@ export function NotificationDropdown({ isOpen, onClose, containerRef }: Notifica
 
             {/* Load more */}
             {hasMore && (
-              <div className="px-4 py-3 border-t border-gray-100">
+              <div className="px-4 py-3 border-t border-gray-100 dark:border-neutral-800">
                 <button
                   onClick={loadMore}
                   disabled={isLoading}

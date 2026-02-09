@@ -212,7 +212,7 @@ export default function ReviewsPage() {
         {[1, 2, 3, 4, 5].map((star) => (
           <svg
             key={star}
-            className={`w-4 h-4 ${star <= rating ? 'text-yellow-400' : 'text-gray-200'}`}
+            className={`w-4 h-4 ${star <= rating ? 'text-yellow-400' : 'text-gray-200 dark:text-neutral-700'}`}
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -228,7 +228,7 @@ export default function ReviewsPage() {
       key: 'restaurant',
       header: t('admin.reviewsPage.restaurant'),
       render: (review: AdminReview) => (
-        <p className="font-medium text-gray-900">{review.restaurant.name}</p>
+        <p className="font-medium text-gray-900 dark:text-white">{review.restaurant.name}</p>
       ),
     },
     {
@@ -237,7 +237,7 @@ export default function ReviewsPage() {
       render: (review: AdminReview) => (
         <div>
           <p className="text-sm">{review.user.firstName} {review.user.lastName}</p>
-          <p className="text-xs text-gray-500">{review.user.email}</p>
+          <p className="text-xs text-gray-500 dark:text-neutral-400">{review.user.email}</p>
         </div>
       ),
     },
@@ -252,14 +252,14 @@ export default function ReviewsPage() {
       header: t('admin.reviewsPage.title'),
       sortable: true,
       render: (review: AdminReview) => (
-        <span className="text-gray-700">{review.title || '-'}</span>
+        <span className="text-gray-700 dark:text-neutral-300">{review.title || '-'}</span>
       ),
     },
     {
       key: 'content',
       header: t('admin.reviewsPage.content'),
       render: (review: AdminReview) => (
-        <span className="text-gray-500 truncate max-w-xs block text-sm">
+        <span className="text-gray-500 dark:text-neutral-400 truncate max-w-xs block text-sm">
           {review.content || '-'}
         </span>
       ),
@@ -280,8 +280,8 @@ export default function ReviewsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.reviewsPage.title')}</h1>
-          <p className="text-gray-500 mt-1">{t('admin.reviewsPage.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.reviewsPage.title')}</h1>
+          <p className="text-gray-500 dark:text-neutral-400 mt-1">{t('admin.reviewsPage.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <ReportButton
@@ -342,7 +342,7 @@ export default function ReviewsPage() {
           <>
             <button
               onClick={() => openEditModal(review)}
-              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 rounded-lg transition-colors"
               title="Edit"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -351,7 +351,7 @@ export default function ReviewsPage() {
             </button>
             <button
               onClick={() => openDeleteModal(review)}
-              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
               title="Delete"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -424,8 +424,8 @@ export default function ReviewsPage() {
           />
 
           <div>
-            <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('admin.reviewsPage.content')} <span className="text-gray-400 font-normal">({t('common.optional').toLowerCase()})</span>
+            <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+              {t('admin.reviewsPage.content')} <span className="text-gray-400 dark:text-neutral-500 font-normal">({t('common.optional').toLowerCase()})</span>
             </label>
             <textarea
               id="content"
@@ -460,14 +460,14 @@ export default function ReviewsPage() {
 
           {/* Review Info */}
           {selectedReview && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+            <div className="bg-gray-50 dark:bg-neutral-800 rounded-lg p-4 mb-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-500">{t('admin.reviewsPage.restaurant')}:</span>
+                  <span className="text-gray-500 dark:text-neutral-400">{t('admin.reviewsPage.restaurant')}:</span>
                   <p>{selectedReview.restaurant.name}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">{t('admin.reviewsPage.reviewer')}:</span>
+                  <span className="text-gray-500 dark:text-neutral-400">{t('admin.reviewsPage.reviewer')}:</span>
                   <p>{selectedReview.user.firstName} {selectedReview.user.lastName}</p>
                 </div>
               </div>
@@ -491,8 +491,8 @@ export default function ReviewsPage() {
           />
 
           <div>
-            <label htmlFor="edit-content" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('admin.reviewsPage.content')} <span className="text-gray-400 font-normal">({t('common.optional').toLowerCase()})</span>
+            <label htmlFor="edit-content" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+              {t('admin.reviewsPage.content')} <span className="text-gray-400 dark:text-neutral-500 font-normal">({t('common.optional').toLowerCase()})</span>
             </label>
             <textarea
               id="edit-content"

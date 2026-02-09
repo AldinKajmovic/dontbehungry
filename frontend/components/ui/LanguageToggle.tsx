@@ -6,9 +6,10 @@ import { Language } from '@/locales'
 
 interface LanguageToggleProps {
   className?: string
+  heroMode?: boolean
 }
 
-export function LanguageToggle({ className = '' }: LanguageToggleProps) {
+export function LanguageToggle({ className = '', heroMode = false }: LanguageToggleProps) {
   const { language, setLanguage, availableLanguages, languageInfo } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -54,7 +55,11 @@ export function LanguageToggle({ className = '' }: LanguageToggleProps) {
           e.stopPropagation()
           setIsOpen(!isOpen)
         }}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium text-gray-700"
+        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
+          heroMode
+            ? 'text-white hover:bg-white/10'
+            : 'text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-800'
+        }`}
         aria-label="Select language"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
@@ -62,7 +67,7 @@ export function LanguageToggle({ className = '' }: LanguageToggleProps) {
         <span className="text-base">{currentLanguage.flag}</span>
         <span className="hidden sm:inline">{language.toUpperCase()}</span>
         <svg
-          className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''} ${heroMode ? 'text-white/70' : 'text-gray-500 dark:text-neutral-400'}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -73,7 +78,7 @@ export function LanguageToggle({ className = '' }: LanguageToggleProps) {
 
       {isOpen && (
         <div
-          className="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-[100]"
+          className="absolute right-0 mt-1 w-40 bg-white dark:bg-neutral-800 rounded-lg shadow-xl border border-gray-200 dark:border-neutral-700 py-1 z-[100]"
           role="listbox"
           aria-label="Available languages"
         >
@@ -92,8 +97,8 @@ export function LanguageToggle({ className = '' }: LanguageToggleProps) {
                   w-full flex items-center gap-2 px-3 py-2 text-sm text-left
                   transition-colors cursor-pointer
                   ${isSelected
-                    ? 'bg-primary-50 text-primary-700'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400'
+                    : 'text-gray-700 hover:bg-gray-50 dark:text-neutral-300 dark:hover:bg-neutral-700'
                   }
                 `}
                 role="option"
@@ -103,7 +108,7 @@ export function LanguageToggle({ className = '' }: LanguageToggleProps) {
                 <span>{info.name}</span>
                 {isSelected && (
                   <svg
-                    className="w-4 h-4 ml-auto text-primary-600"
+                    className="w-4 h-4 ml-auto text-primary-600 dark:text-primary-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

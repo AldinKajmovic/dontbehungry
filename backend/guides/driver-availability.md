@@ -206,20 +206,30 @@ A cron job should run `closeStaleShifts()` every 30 minutes to:
 
 ## Cron Job Setup
 
-Add the following to your cron configuration:
+The auto-close logic is exposed via `closeStaleShifts()` and a standalone job script at `backend/src/jobs/closeStaleShifts.job.ts`. After running `npm run build`, the compiled version lives at `backend/dist/jobs/closeStaleShifts.job.js` and is safe to invoke from a system cron whenever the server process is not running.
+
+Add something like the following to your cron configuration (adjust the cadence to your needs, e.g. once per hour):
 
 ```bash
-# Run every 30 minutes to close stale shifts
-*/30 * * * * node /path/to/closeStaleShifts.job.js
+# Build once and keep the dist artifact up to date when deploying
+cd /home/rootkajma/Documents/repos/dontbehungry/backend && npm run build
+
+# Run every hour to cap shifts at 12h even when the app is down
+0 * * * * cd /home/rootkajma/Documents/repos/dontbehungry/backend && node dist/jobs/closeStaleShifts.job.js >> /var/log/glovo/close-shifts.log 2>&1
 ```
 
-Or use node-cron in your application:
+For local development you can also execute the script directly without building:
+
+```bash
+npx ts-node src/jobs/closeStaleShifts.job.ts
+```
+
+If you prefer an in-process scheduler, you can still run this inside the running backend server. For example, add the following near any service initialization code:
 
 ```typescript
 import cron from 'node-cron'
 import { closeStaleShifts } from './services/profile'
 
-// Run every 30 minutes
 cron.schedule('*/30 * * * *', async () => {
   const count = await closeStaleShifts()
   console.log(`Closed ${count} stale shifts`)

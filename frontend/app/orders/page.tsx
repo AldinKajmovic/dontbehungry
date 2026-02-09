@@ -331,6 +331,7 @@ export default function OrdersPage() {
 
                         {/* Track Driver Button */}
                         {order.status === 'OUT_FOR_DELIVERY' &&
+                          order.isDriverOnline &&
                           order.deliveryPlace.latitude &&
                           order.deliveryPlace.longitude && (
                             <button

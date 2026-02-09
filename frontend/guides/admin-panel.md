@@ -2,12 +2,12 @@
 
 ## Overview
 
-The Admin Panel provides a web interface for managing all entities in the system. It's accessible at `/panel` and restricted to users with `ADMIN` or `SUPER_ADMIN` roles.
+The Admin Panel provides a web interface for managing all entities in the system. It's accessible at `/panel` and restricted to users with the `ADMIN` role.
 
 ## Access Requirements
 
 1. User must be authenticated
-2. User must have `ADMIN` or `SUPER_ADMIN` role
+2. User must have `ADMIN` role
 3. User's IP must be in the whitelist (if configured)
 
 ## Features

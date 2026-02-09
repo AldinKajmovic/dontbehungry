@@ -571,7 +571,6 @@
       "RESTAURANT_OWNER": "Restaurant Owner",
       "DELIVERY_DRIVER": "Delivery Driver",
       "ADMIN": "Admin",
-      "SUPER_ADMIN": "Super Admin",
       "allRoles": "All Roles"
     },
     "status": {

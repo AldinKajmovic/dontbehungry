@@ -105,7 +105,8 @@ The "Track Driver" button appears in the orders list for `OUT_FOR_DELIVERY` orde
 
 **Conditions for showing button:**
 1. Order status is `OUT_FOR_DELIVERY`
-2. Order has delivery place coordinates (latitude and longitude)
+2. Driver is currently online (`isDriverOnline` is true — has an active shift)
+3. Order has delivery place coordinates (latitude and longitude)
 
 ## Service Methods
 

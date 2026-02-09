@@ -14,7 +14,6 @@ enum UserRole {
   RESTAURANT_OWNER
   DELIVERY_DRIVER
   ADMIN
-  SUPER_ADMIN
 }
 
 enum OrderStatus {

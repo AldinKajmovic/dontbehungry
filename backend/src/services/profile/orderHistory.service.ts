@@ -1,4 +1,5 @@
 // Order history queries: getMyOrderHistory, getDriverOrderHistory, getRestaurantOrders, updateRestaurantOrderStatus
+import { ShiftStatus } from '@prisma/client'
 import { prisma } from '../../lib/prisma'
 import { NotFoundError } from '../../utils/errors'
 import { validateStatusTransition } from '../../utils/orderStatus'
@@ -51,6 +52,15 @@ const orderHistorySelect = {
       method: true,
     },
   },
+  driver: {
+    select: {
+      driverShifts: {
+        where: { status: ShiftStatus.ACTIVE },
+        take: 1,
+        select: { id: true },
+      },
+    },
+  },
 }
 
 function formatOrderHistoryItem(order: {
@@ -63,6 +73,7 @@ function formatOrderHistoryItem(order: {
   deliveryPlace: { address: string; city: string; latitude: { toNumber(): number } | null; longitude: { toNumber(): number } | null }
   orderItems: Array<{ quantity: number; unitPrice: { toString(): string }; menuItem: { name: string } }>
   payment: { status: string; method: string } | null
+  driver: { driverShifts: Array<{ id: string }> } | null
 }): OrderHistoryItem {
   return {
     id: order.id,
@@ -83,6 +94,7 @@ function formatOrderHistoryItem(order: {
       unitPrice: item.unitPrice.toString(),
     })),
     payment: order.payment,
+    isDriverOnline: (order.driver?.driverShifts?.length ?? 0) > 0,
   }
 }
 

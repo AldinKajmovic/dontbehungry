@@ -82,7 +82,6 @@ export function useAdminUsers() {
         { value: 'RESTAURANT_OWNER', label: t('admin.roles.RESTAURANT_OWNER') },
         { value: 'DELIVERY_DRIVER', label: t('admin.roles.DELIVERY_DRIVER') },
         { value: 'ADMIN', label: t('admin.roles.ADMIN') },
-        { value: 'SUPER_ADMIN', label: t('admin.roles.SUPER_ADMIN') },
       ],
       placeholder: t('admin.roles.allRoles'),
     },

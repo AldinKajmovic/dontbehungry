@@ -13,7 +13,7 @@ export function validateUserFilters(query: {
 }): UserFilters {
   const filters: UserFilters = {}
 
-  const validRoles = ['CUSTOMER', 'RESTAURANT_OWNER', 'DELIVERY_DRIVER', 'ADMIN', 'SUPER_ADMIN']
+  const validRoles = ['CUSTOMER', 'RESTAURANT_OWNER', 'DELIVERY_DRIVER', 'ADMIN']
   if (query.role && validRoles.includes(query.role)) {
     filters.role = query.role
   }

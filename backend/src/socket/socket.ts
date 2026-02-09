@@ -43,7 +43,7 @@ export function initializeSocket(httpServer: HttpServer): Server {
     const userRole = socket.user?.role
 
     if (userId) {
-      const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN'
+      const isAdmin = userRole === 'ADMIN'
 
       if (isAdmin) {
         // Track admin sockets separately

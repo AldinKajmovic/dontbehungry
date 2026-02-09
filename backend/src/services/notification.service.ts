@@ -75,7 +75,7 @@ export async function createNotification(data: CreateNotificationData): Promise<
     throw new NotFoundError('User not found', 'Cannot create notification for non-existent user')
   }
 
-  if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') {
+  if (user.role === 'ADMIN') {
     throw new ForbiddenError('Not allowed', 'Admin users do not receive notifications')
   }
 

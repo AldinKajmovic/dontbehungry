@@ -9,6 +9,8 @@ import { sendVerificationEmail, sendPasswordResetEmail } from './email.service'
 import { Register, RegisterRestaurant, Login, userSelectFields, UserResponse, JwtPayload } from '../types'
 import { generateAccessToken } from '../utils/jwt'
 import { logger } from '../utils/logger'
+import { OAuth2Client } from 'google-auth-library'
+import { config } from '../config'
 
 interface AuthResult {
   user: UserResponse
@@ -175,7 +177,6 @@ export async function login(data: Login): Promise<AuthResult> {
     phone: user.phone,
     role: user.role,
     emailVerified: user.emailVerified,
-    phoneVerified: user.phoneVerified,
     avatarUrl: user.avatarUrl,
   }
 
@@ -214,7 +215,6 @@ export async function refreshTokens(oldRefreshToken: string): Promise<TokenRefre
     phone: user.phone,
     role: user.role,
     emailVerified: user.emailVerified,
-    phoneVerified: user.phoneVerified,
     avatarUrl: user.avatarUrl,
   }
 
@@ -283,16 +283,27 @@ export async function resetPassword(token: string, newPassword: string): Promise
   ])
 }
 
-interface GoogleAuthData {
-  email: string
-  firstName: string
-  lastName: string
-  providerId: string
-  avatarUrl?: string
-}
+const googleClient = new OAuth2Client(config.google.clientId)
 
-export async function googleAuth(data: GoogleAuthData): Promise<AuthResult> {
-  const { email, firstName, lastName, providerId, avatarUrl } = data
+export async function googleAuth(idToken: string): Promise<AuthResult> {
+  // Verify the Google ID token and extract identity claims
+  const ticket = await googleClient.verifyIdToken({
+    idToken,
+    audience: config.google.clientId,
+  }).catch(() => {
+    throw new UnauthorizedError('Invalid token', 'Google ID token verification failed')
+  })
+
+  const tokenPayload = ticket.getPayload()
+  if (!tokenPayload || !tokenPayload.email) {
+    throw new UnauthorizedError('Invalid token', 'Google ID token missing required claims')
+  }
+
+  const email = tokenPayload.email
+  const providerId = tokenPayload.sub
+  const firstName = tokenPayload.given_name || ''
+  const lastName = tokenPayload.family_name || ''
+  const avatarUrl = tokenPayload.picture
 
   // Try to find existing user by email
   let user = await prisma.user.findUnique({

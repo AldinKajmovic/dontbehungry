@@ -250,11 +250,7 @@ export async function getSocketToken(
 }
 
 interface GoogleAuthBody {
-  email: string
-  firstName: string
-  lastName: string
-  providerId: string
-  avatarUrl?: string
+  idToken: string
 }
 
 export async function googleAuth(
@@ -263,19 +259,13 @@ export async function googleAuth(
   next: NextFunction
 ): Promise<void> {
   try {
-    const { email, firstName, lastName, providerId, avatarUrl } = req.body
+    const { idToken } = req.body
 
-    if (!email || !providerId) {
-      throw new BadRequestError('Missing data', 'Email and provider ID are required')
+    if (!idToken) {
+      throw new BadRequestError('Missing data', 'Google ID token is required')
     }
 
-    const { user, accessToken, refreshToken } = await authService.googleAuth({
-      email,
-      firstName: firstName || '',
-      lastName: lastName || '',
-      providerId,
-      avatarUrl,
-    })
+    const { user, accessToken, refreshToken } = await authService.googleAuth(idToken)
 
     setAuthCookies(res, accessToken, refreshToken)
 

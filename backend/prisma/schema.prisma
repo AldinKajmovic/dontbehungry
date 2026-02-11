@@ -67,7 +67,6 @@ model User {
   avatarUrl     String?
   role          UserRole     @default(CUSTOMER)
   emailVerified Boolean      @default(false)
-  phoneVerified Boolean      @default(false)
   authProvider  AuthProvider @default(LOCAL)
   providerId    String?
 

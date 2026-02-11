@@ -70,7 +70,6 @@ export interface UpdateUserData {
   phone?: string
   role?: string
   emailVerified?: boolean
-  phoneVerified?: boolean
 }
 
 export function validateUpdateUser(data: UpdateUserData): void {

@@ -77,7 +77,6 @@ export interface AdminUser {
   phone: string | null
   role: string
   emailVerified: boolean
-  phoneVerified: boolean
   avatarUrl: string | null
   authProvider?: string
 }
@@ -427,4 +426,17 @@ export interface GCSImage {
 export interface BrowseImagesResponse {
   images: GCSImage[]
   total: number
+}
+
+// Jobs
+export interface JobInfo {
+  name: string
+  description: string
+}
+
+export interface JobResult {
+  job: string
+  success: boolean
+  message: string
+  durationMs: number
 }

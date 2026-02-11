@@ -279,7 +279,6 @@
     "addFirstRestaurant": "Dodajte prvi restoran za početak",
     "accountInfo": "Informacije o računu",
     "emailStatus": "Status emaila",
-    "phoneStatus": "Status telefona",
     "verified": "Verifikovano",
     "notVerified": "Nije verifikovano",
     "administration": "Administracija",
@@ -544,6 +543,16 @@
       "registerRestaurant": "Registruj novi restoran",
       "viewOrders": "Pregledaj narudžbe",
       "manageOrders": "Upravljaj narudžbama kupaca"
+    },
+    "jobs": {
+      "title": "Poslovi",
+      "selectJob": "Odaberi posao...",
+      "execute": "Pokreni",
+      "executing": "Pokretanje...",
+      "noJobs": "Nema dostupnih poslova",
+      "success": "Posao uspješno završen",
+      "failed": "Posao nije uspio",
+      "duration": "Trajanje: {duration}ms"
     },
     "users": "Korisnici",
     "restaurants": "Restorani",

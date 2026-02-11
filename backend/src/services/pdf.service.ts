@@ -304,7 +304,6 @@ export function createUsersReport(
     { header: 'Phone', key: 'phone', width: 100 },
     { header: 'Role', key: 'role', width: 100 },
     { header: 'Email Verified', key: 'emailVerified', width: 80, align: 'center' },
-    { header: 'Phone Verified', key: 'phoneVerified', width: 80, align: 'center' },
   ]
 
   const transformedData = data.map((user) => ({
@@ -313,7 +312,6 @@ export function createUsersReport(
     phone: user.phone || '-',
     role: String(user.role).replace(/_/g, ' '),
     emailVerified: user.emailVerified ? 'Yes' : 'No',
-    phoneVerified: user.phoneVerified ? 'Yes' : 'No',
   }))
 
   generateTable(doc, columns, transformedData)

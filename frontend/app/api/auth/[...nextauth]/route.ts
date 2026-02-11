@@ -13,33 +13,19 @@ const handler = NextAuth({
     error: '/auth/login',
   },
   callbacks: {
-    async signIn({ user, account }) {
-      if (account?.provider === 'google') {
-        try {
-          // Call our backend to create/find user and set cookies
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: user.email,
-              firstName: user.name?.split(' ')[0] || '',
-              lastName: user.name?.split(' ').slice(1).join(' ') || '',
-              providerId: account.providerAccountId,
-              avatarUrl: user.image,
-            }),
-          })
-
-          return response.ok
-        } catch {
-          return false
-        }
+    async jwt({ token, account }) {
+      // Store Google ID token on first sign-in for backend verification
+      if (account?.provider === 'google' && account.id_token) {
+        token.googleIdToken = account.id_token
       }
-      return true
+      return token
+    },
+    async session({ session, token }) {
+      // Expose Google ID token to the client for backend verification
+      session.googleIdToken = token.googleIdToken as string
+      return session
     },
     async redirect({ baseUrl }) {
-      // Redirect to callback page which will refresh user state
       return `${baseUrl}/auth/callback?success=true`
     },
   },

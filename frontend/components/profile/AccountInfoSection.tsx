@@ -23,12 +23,6 @@ export function AccountInfoSection() {
             {user.emailVerified ? t('profile.verified') : t('profile.notVerified')}
           </span>
         </div>
-        <div className="flex justify-between py-2">
-          <span className="text-gray-500 dark:text-neutral-400">{t('profile.phoneStatus')}</span>
-          <span className={user.phoneVerified ? 'text-green-600' : 'text-gray-400 dark:text-neutral-500'}>
-            {user.phoneVerified ? t('profile.verified') : t('profile.notVerified')}
-          </span>
-        </div>
       </div>
     </Section>
   )

@@ -105,7 +105,6 @@ model User {
   avatarUrl     String?
   role          UserRole  @default(CUSTOMER)
   emailVerified Boolean   @default(false)
-  phoneVerified Boolean   @default(false)
 }
 ```
 
@@ -120,7 +119,6 @@ model User {
 | `avatarUrl` | String | Optional | Profile picture URL |
 | `role` | UserRole | Default: CUSTOMER | User type |
 | `emailVerified` | Boolean | Default: false | Email verification status |
-| `phoneVerified` | Boolean | Default: false | Phone verification status |
 
 **Relations:**
 - `addresses` -> UserAddress[] (user's saved addresses)
@@ -523,7 +521,6 @@ model Review {
 | avatarUrl    |                              +------+-------+
 | role         |                                     |
 | emailVerified|                                     |
-| phoneVerified|                                     |
 +------+-------+                                     |
        |                                             |
        |     +------------------+                    |

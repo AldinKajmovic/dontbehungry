@@ -145,7 +145,6 @@ export async function getUsersForReport(
       phone: true,
       role: true,
       emailVerified: true,
-      phoneVerified: true,
     },
     orderBy: { lastName: 'asc' },
     take: MAX_REPORT_ITEMS,

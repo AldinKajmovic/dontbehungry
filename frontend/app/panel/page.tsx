@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { StatsCard } from '@/components/admin/StatsCard'
 import { CombinedReportModal } from '@/components/admin/CombinedReportModal'
-import { adminService, AdminStats } from '@/services/admin'
+import { adminService, AdminStats, JobInfo } from '@/services/admin'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useToast } from '@/hooks/useToast'
 
 // Icons
 const UsersIcon = (
@@ -33,13 +34,18 @@ const RevenueIcon = (
 
 export default function AdminDashboard() {
   const { t } = useLanguage()
+  const { toast } = useToast()
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showReportModal, setShowReportModal] = useState(false)
+  const [jobs, setJobs] = useState<JobInfo[]>([])
+  const [selectedJob, setSelectedJob] = useState('')
+  const [isExecutingJob, setIsExecutingJob] = useState(false)
 
   useEffect(() => {
     loadStats()
+    loadJobs()
   }, [])
 
   const loadStats = async () => {
@@ -52,6 +58,33 @@ export default function AdminDashboard() {
       setError(err instanceof Error ? err.message : 'Failed to load stats')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const loadJobs = async () => {
+    try {
+      const data = await adminService.getJobs()
+      setJobs(data)
+    } catch {
+      // Jobs may not be available — non-critical
+    }
+  }
+
+  const handleExecuteJob = async () => {
+    if (!selectedJob) return
+
+    setIsExecutingJob(true)
+    try {
+      const result = await adminService.executeJob(selectedJob)
+      if (result.success) {
+        toast.success(`${t('admin.jobs.success')}: ${result.message}`)
+      } else {
+        toast.error(`${t('admin.jobs.failed')}: ${result.message}`)
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t('admin.jobs.failed'))
+    } finally {
+      setIsExecutingJob(false)
     }
   }
 
@@ -184,6 +217,50 @@ export default function AdminDashboard() {
           </a>
         </div>
       </div>
+
+      {/* Jobs */}
+      {jobs.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('admin.jobs.title')}</h2>
+          <div className="bg-white dark:bg-neutral-900 rounded-xl border border-gray-100 dark:border-neutral-800 p-4">
+            <div className="flex items-end gap-3">
+              <div className="flex-1">
+                <select
+                  value={selectedJob}
+                  onChange={(e) => setSelectedJob(e.target.value)}
+                  disabled={isExecutingJob}
+                  className="w-full px-3 py-2.5 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                >
+                  <option value="">{t('admin.jobs.selectJob')}</option>
+                  {jobs.map((job) => (
+                    <option key={job.name} value={job.name}>
+                      {job.name} — {job.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                onClick={handleExecuteJob}
+                disabled={!selectedJob || isExecutingJob}
+                className="flex items-center gap-2 px-4 py-2.5 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isExecutingJob ? (
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
+                {isExecutingJob ? t('admin.jobs.executing') : t('admin.jobs.execute')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Combined Report Modal */}
       <CombinedReportModal

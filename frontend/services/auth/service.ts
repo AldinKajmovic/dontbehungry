@@ -7,6 +7,7 @@ import {
   RegisterUserData,
   RegisterRestaurantData,
   LoginData,
+  GoogleAuthData,
 } from './types'
 
 const BASE_PATH = '/api/auth'
@@ -67,6 +68,11 @@ class AuthService {
       token,
       password,
     })
+    return response.data
+  }
+
+  async googleAuth(data: GoogleAuthData): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>(`${BASE_PATH}/google`, data)
     return response.data
   }
 }

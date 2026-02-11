@@ -25,7 +25,7 @@ export default function Home() {
           fill
           priority
           sizes="100vw"
-          quality={90}
+          unoptimized
           className="object-cover"
         />
         {/* Dark gradient overlay - darker on left for text readability */}

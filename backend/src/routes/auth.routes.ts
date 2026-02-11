@@ -17,7 +17,7 @@ router.post('/google', authLimiter, authController.googleAuth)
 router.post('/refresh', authLimiter, authController.refresh)
 
 // Logout
-router.post('/logout', authController.logout)
+router.post('/logout', authenticate, authController.logout)
 router.post('/logout-all', authenticate, authController.logoutAll)
 
 // Email verification

@@ -42,6 +42,8 @@ import {
   SortParams,
   OnlineDriversResponse,
   BrowseImagesResponse,
+  JobInfo,
+  JobResult,
 } from './types'
 
 // API paths
@@ -243,6 +245,17 @@ class AdminService {
   async browseImages(folder?: string): Promise<BrowseImagesResponse> {
     const params = folder ? { folder } : {}
     const response = await api.get<BrowseImagesResponse>('/api/admin/images/browse', { params })
+    return response.data
+  }
+
+  // ============ Jobs ============
+  async getJobs(): Promise<JobInfo[]> {
+    const response = await api.get<{ jobs: JobInfo[] }>('/api/admin/jobs')
+    return response.data.jobs
+  }
+
+  async executeJob(jobName: string): Promise<JobResult> {
+    const response = await api.post<JobResult>(`/api/admin/jobs/${encodeURIComponent(jobName)}/execute`)
     return response.data
   }
 }

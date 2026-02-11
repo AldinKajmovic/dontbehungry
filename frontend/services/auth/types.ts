@@ -8,7 +8,6 @@ export interface User {
   phone?: string
   role: string
   emailVerified: boolean
-  phoneVerified: boolean
   avatarUrl?: string
 }
 
@@ -44,4 +43,8 @@ export interface RegisterRestaurantData extends RegisterUserData {
 export interface LoginData {
   email: string
   password: string
+}
+
+export interface GoogleAuthData {
+  idToken: string
 }

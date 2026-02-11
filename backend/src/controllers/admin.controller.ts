@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import * as adminService from '../services/admin'
+import * as jobService from '../services/job.service'
 import {
   validatePagination,
   validateUserFilters,
@@ -737,6 +738,35 @@ export async function browseImages(
     const folder = req.query.folder as string | undefined
     const images = await adminService.browseImages(folder)
     res.json({ images, total: images.length })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// ==================== JOBS ====================
+
+export async function getJobs(
+  _req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const jobs = jobService.listJobs()
+    res.json({ jobs })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function executeJob(
+  req: Request<{ jobName: string }>,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const { jobName } = req.params
+    const result = await jobService.executeJob(jobName)
+    res.json(result)
   } catch (error) {
     next(error)
   }

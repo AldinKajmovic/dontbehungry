@@ -1,36 +1,56 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
+import { useSession } from 'next-auth/react'
 import { useAuth } from '@/hooks/useAuth'
+import { authService } from '@/services/auth'
 
 function CallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { refreshUser } = useAuth()
+  const { data: session, status } = useSession()
+  const handledRef = useRef(false)
 
   useEffect(() => {
-    const handleCallback = async () => {
-      const success = searchParams.get('success')
-      const error = searchParams.get('error')
+    if (handledRef.current) return
+    if (status === 'loading') return
 
-      if (error) {
-        router.push(`/auth/login?error=${error}`)
-        return
-      }
+    const error = searchParams.get('error')
+    if (error) {
+      handledRef.current = true
+      router.push(`/auth/login?error=${encodeURIComponent(error)}`)
+      return
+    }
 
-      if (success) {
-        // Refresh user data after OAuth login
+    const success = searchParams.get('success')
+    if (!success) {
+      handledRef.current = true
+      router.push('/auth/login')
+      return
+    }
+
+    // Need NextAuth session with Google ID token to call our backend
+    if (!session?.googleIdToken) return
+
+    handledRef.current = true
+
+    const completeAuth = async () => {
+      try {
+        await authService.googleAuth({
+          idToken: session.googleIdToken as string,
+        })
         await refreshUser()
-        router.push('/')
-      } else {
-        router.push('/auth/login')
+        router.push('/restaurants')
+      } catch {
+        router.push('/auth/login?error=google-auth-failed')
       }
     }
 
-    handleCallback()
-  }, [searchParams, router, refreshUser])
+    completeAuth()
+  }, [searchParams, router, refreshUser, session, status])
 
   return (
     <div className="min-h-screen flex items-center justify-center">

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import * as adminController from '../controllers/admin.controller'
 import { authenticate } from '../middlewares/auth.middleware'
-import { adminOnly } from '../middlewares/adminOnly.middleware'
+import { adminOnly } from '../middlewares/authorize.middleware'
 import { ipWhitelist } from '../middlewares/ipWhitelist.middleware'
 import { adminLimiter } from '../middlewares/rateLimiter'
 
@@ -89,5 +89,9 @@ router.get('/images/browse', adminController.browseImages)
 
 // Drivers
 router.get('/drivers/online', adminController.getOnlineDrivers)
+
+// Jobs
+router.get('/jobs', adminController.getJobs)
+router.post('/jobs/:jobName/execute', adminController.executeJob)
 
 export default router

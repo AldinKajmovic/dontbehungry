@@ -1,7 +1,8 @@
 'use client'
 
-import { createContext, useCallback, useEffect, useState, ReactNode } from 'react'
+import { createContext, useCallback, useEffect, useState, useRef, ReactNode } from 'react'
 import { MenuItem, PublicRestaurant } from '@/services/public'
+import { useAuth } from '@/hooks/useAuth'
 import { logger } from '@/utils/logger'
 
 export interface CartItem {
@@ -58,15 +59,20 @@ interface CartProviderProps {
   children: ReactNode
 }
 
-const CART_STORAGE_KEY = 'dontbehungry_cart'
+const CART_STORAGE_PREFIX = 'najedise_cart_'
+const TAX_RATE = 0.20
 
-function loadCartFromStorage(): CartState {
-  if (typeof window === 'undefined') {
-    return { items: [], restaurant: null, paymentMethod: 'CASH' }
-  }
+const EMPTY_CART: CartState = { items: [], restaurant: null, paymentMethod: 'CASH' }
+
+function getStorageKey(userId: string): string {
+  return `${CART_STORAGE_PREFIX}${userId}`
+}
+
+function loadCartFromStorage(userId: string | null): CartState {
+  if (typeof window === 'undefined' || !userId) return EMPTY_CART
 
   try {
-    const stored = localStorage.getItem(CART_STORAGE_KEY)
+    const stored = localStorage.getItem(getStorageKey(userId))
     if (stored) {
       const parsed = JSON.parse(stored)
       return {
@@ -79,38 +85,48 @@ function loadCartFromStorage(): CartState {
     logger.warn('Failed to load cart from storage, using defaults')
   }
 
-  return { items: [], restaurant: null, paymentMethod: 'CASH' }
+  return EMPTY_CART
 }
 
-function saveCartToStorage(state: CartState): void {
-  if (typeof window === 'undefined') return
+function saveCartToStorage(userId: string | null, state: CartState): void {
+  if (typeof window === 'undefined' || !userId) return
 
   try {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state))
+    localStorage.setItem(getStorageKey(userId), JSON.stringify(state))
   } catch {
     logger.warn('Failed to save cart to storage')
   }
 }
 
 export function CartProvider({ children }: CartProviderProps) {
+  const { user, isLoading: authLoading } = useAuth()
   const [items, setItems] = useState<CartItem[]>([])
   const [restaurant, setRestaurant] = useState<CartRestaurant | null>(null)
   const [paymentMethod, setPaymentMethodState] = useState<PaymentMethod>('CASH')
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
+  const currentUserIdRef = useRef<string | null>(null)
 
-
+  // Load cart when user changes (login/logout/switch)
   useEffect(() => {
-    const stored = loadCartFromStorage()
+    if (authLoading) return
+
+    const userId = user?.id ?? null
+
+    // Skip if same user
+    if (isInitialized && currentUserIdRef.current === userId) return
+
+    currentUserIdRef.current = userId
+    const stored = loadCartFromStorage(userId)
     setItems(stored.items)
     setRestaurant(stored.restaurant)
     setPaymentMethodState(stored.paymentMethod)
     setIsInitialized(true)
-  }, [])
+  }, [user?.id, authLoading])
 
   useEffect(() => {
     if (isInitialized) {
-      saveCartToStorage({ items, restaurant, paymentMethod })
+      saveCartToStorage(currentUserIdRef.current, { items, restaurant, paymentMethod })
     }
   }, [items, restaurant, paymentMethod, isInitialized])
 
@@ -120,7 +136,7 @@ export function CartProvider({ children }: CartProviderProps) {
 
   const deliveryFee = restaurant?.deliveryFee ?? 0
 
-  const tax = subtotal * 0.20 // 20% tax
+  const tax = subtotal * TAX_RATE
 
   const minOrderFee = restaurant && subtotal < restaurant.minOrderAmount ? 5 : 0
 

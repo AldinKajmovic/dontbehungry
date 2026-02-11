@@ -58,7 +58,6 @@ export interface UserResponse {
   phone: string | null;
   role: UserRole;
   emailVerified: boolean;
-  phoneVerified: boolean;
   avatarUrl: string | null;
 }
 
@@ -70,7 +69,6 @@ export const userSelectFields = {
   phone: true,
   role: true,
   emailVerified: true,
-  phoneVerified: true,
   avatarUrl: true,
 } as const;
 

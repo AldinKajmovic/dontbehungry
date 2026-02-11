@@ -36,12 +36,14 @@ export default function RestaurantsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [userCoordinates, setUserCoordinates] = useState<UserCoordinates | null>(null)
   const [coordinatesLoaded, setCoordinatesLoaded] = useState(false)
+  const [canScrollCategories, setCanScrollCategories] = useState(false)
 
   const categoryScrollRef = useRef<HTMLDivElement>(null)
 
   // Load user's default address when authenticated
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
+      setCoordinatesLoaded(false)
       loadUserDefaultAddress()
     } else if (!isAuthenticated && !authLoading) {
       setUserCoordinates(null)
@@ -131,14 +133,38 @@ export default function RestaurantsPage() {
   }, [])
 
   const scrollCategories = (direction: 'left' | 'right') => {
-    if (categoryScrollRef.current) {
-      const scrollAmount = 200
-      categoryScrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      })
+    const container = categoryScrollRef.current
+    if (!container) return
+
+    const scrollAmount = Math.max(200, Math.round(container.clientWidth * 0.6))
+
+    if (direction === 'left') {
+      if (container.scrollLeft <= scrollAmount) {
+        container.scrollTo({ left: 0, behavior: 'smooth' })
+        return
+      }
+      container.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
+      return
     }
+
+    container.scrollBy({ left: scrollAmount, behavior: 'smooth' })
   }
+
+  useEffect(() => {
+    const container = categoryScrollRef.current
+    if (!container) return
+
+    const updateCanScroll = () => {
+      setCanScrollCategories(container.scrollWidth > container.clientWidth + 2)
+    }
+
+    updateCanScroll()
+    window.addEventListener('resize', updateCanScroll)
+
+    return () => {
+      window.removeEventListener('resize', updateCanScroll)
+    }
+  }, [categories])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-neutral-950">
@@ -250,16 +276,16 @@ export default function RestaurantsPage() {
                 </Link>
               </div>
             ) : (
-              <div className="hidden md:flex items-center gap-2">
+              <div className="flex items-center gap-1 md:gap-2">
                 <Link
                   href="/auth/login"
-                  className="px-5 py-2.5 text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-800 transition-all duration-200"
+                  className="px-3 md:px-5 py-2 md:py-2.5 text-sm md:text-base text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-neutral-800 transition-all duration-200"
                 >
                   {t('common.logIn')}
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/30"
+                  className="px-3 md:px-5 py-2 md:py-2.5 text-sm md:text-base bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/30"
                 >
                   {t('common.signUp')}
                 </Link>
@@ -283,19 +309,21 @@ export default function RestaurantsPage() {
         {/* Categories */}
         <div className="relative mb-8">
           {/* Left Arrow */}
-          <button
-            onClick={() => scrollCategories('left')}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white dark:bg-neutral-800 shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors"
-          >
-            <svg className="w-5 h-5 text-gray-600 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
+          {canScrollCategories && (
+            <button
+              onClick={() => scrollCategories('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white dark:bg-neutral-800 shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors"
+            >
+              <svg className="w-5 h-5 text-gray-600 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
 
-          {/* Categories Container */}
+        {/* Categories Container */}
           <div
             ref={categoryScrollRef}
-            className="flex gap-2 overflow-x-auto scrollbar-hide px-12 py-2"
+            className={`flex ${canScrollCategories ? 'justify-start' : 'justify-center'} gap-2 overflow-x-auto scrollbar-hide pl-10 pr-10 py-2`}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {/* All Categories Option */}
@@ -343,14 +371,16 @@ export default function RestaurantsPage() {
           </div>
 
           {/* Right Arrow */}
-          <button
-            onClick={() => scrollCategories('right')}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white dark:bg-neutral-800 shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors"
-          >
-            <svg className="w-5 h-5 text-gray-600 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          {canScrollCategories && (
+            <button
+              onClick={() => scrollCategories('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white dark:bg-neutral-800 shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors"
+            >
+              <svg className="w-5 h-5 text-gray-600 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* Section Title - hide when authenticated and loading */}

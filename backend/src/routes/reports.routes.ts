@@ -1,6 +1,6 @@
 import { Router, Response, NextFunction } from 'express'
 import { authenticate } from '../middlewares/auth.middleware'
-import { adminOnly } from '../middlewares/adminOnly.middleware'
+import { adminOnly } from '../middlewares/authorize.middleware'
 import { ipWhitelist } from '../middlewares/ipWhitelist.middleware'
 import { AuthenticatedRequest } from '../types'
 import rateLimit from 'express-rate-limit'

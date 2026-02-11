@@ -43,7 +43,6 @@ export async function getUsers(params: PaginationParams, filters: UserFilters = 
         phone: true,
         role: true,
         emailVerified: true,
-        phoneVerified: true,
         avatarUrl: true,
         authProvider: true,
       },
@@ -76,7 +75,6 @@ export async function getUserById(id: string) {
       phone: true,
       role: true,
       emailVerified: true,
-      phoneVerified: true,
       avatarUrl: true,
       authProvider: true,
     },
@@ -118,7 +116,6 @@ export async function createUser(data: CreateUserData) {
       phone: true,
       role: true,
       emailVerified: true,
-      phoneVerified: true,
       avatarUrl: true,
     },
   })
@@ -151,7 +148,6 @@ export async function updateUser(id: string, data: UpdateUserData) {
       ...(data.phone !== undefined && { phone: data.phone || null }),
       ...(data.role && { role: data.role as UserRole }),
       ...(data.emailVerified !== undefined && { emailVerified: data.emailVerified }),
-      ...(data.phoneVerified !== undefined && { phoneVerified: data.phoneVerified }),
     },
     select: {
       id: true,
@@ -161,7 +157,6 @@ export async function updateUser(id: string, data: UpdateUserData) {
       phone: true,
       role: true,
       emailVerified: true,
-      phoneVerified: true,
       avatarUrl: true,
     },
   })

@@ -265,7 +265,6 @@ interface User {
   phone?: string
   role: 'CUSTOMER' | 'RESTAURANT_OWNER' | 'DELIVERY_DRIVER' | 'ADMIN'
   emailVerified: boolean
-  phoneVerified: boolean
   avatarUrl?: string
 }
 ```

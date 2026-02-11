@@ -19,14 +19,14 @@ const IMAGE_CONFIGS: Record<ImageType, ImageConfig> = {
   'category-icon': { width: 200, height: 200, fit: 'cover', quality: 80 },
 }
 
-const ALLOWED_MIMETYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/jpg', 'image/svg+xml']
+const ALLOWED_MIMETYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/jpg']
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
 export function validateImageFile(mimetype: string, size: number): void {
   if (!ALLOWED_MIMETYPES.includes(mimetype)) {
     throw new BadRequestError(
       'Invalid file type',
-      'Only JPEG, PNG, WebP, JPG, SVG and GIF images are allowed'
+      'Only JPEG, PNG, WebP, JPG and GIF images are allowed'
     )
   }
   if (size > MAX_FILE_SIZE) {

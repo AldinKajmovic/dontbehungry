@@ -51,7 +51,6 @@ Updates the user's basic profile information including email.
     "phone": "+1234567890",
     "role": "CUSTOMER",
     "emailVerified": true,
-    "phoneVerified": false,
     "avatarUrl": null
   },
   "emailChanged": false
@@ -138,7 +137,6 @@ Updates the user's avatar URL. When replaced, old GCS images are automatically c
     "phone": "+1234567890",
     "role": "CUSTOMER",
     "emailVerified": true,
-    "phoneVerified": false,
     "avatarUrl": "https://example.com/avatar.jpg"
   }
 }

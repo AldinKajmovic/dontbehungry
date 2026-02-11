@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { CountryCode, getCountries, getCountryCallingCode } from 'libphonenumber-js';
 
 interface PhoneInputProps {
@@ -54,6 +54,8 @@ export function PhoneInput({
 }: PhoneInputProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [search, setSearch] = useState('');
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const selectedCountryData = countries.find(c => c.code === selectedCountry);
 
@@ -62,6 +64,52 @@ export function PhoneInput({
     c.name.toLowerCase().includes(search.toLowerCase()) ||
     c.dialCode.includes(search)
   );
+
+  // Selectable items only (no dividers)
+  const selectableItems = filteredCountries.filter(c => c.code !== 'DIVIDER');
+
+  // Reset highlight when search changes
+  useEffect(() => {
+    setHighlightedIndex(selectableItems.length === 1 ? 0 : -1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  const selectCountry = useCallback((code: CountryCode) => {
+    onCountryChange?.(code);
+    setShowDropdown(false);
+    setSearch('');
+    setHighlightedIndex(-1);
+  }, [onCountryChange]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (!selectableItems.length) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex(prev => {
+        const next = prev < selectableItems.length - 1 ? prev + 1 : 0;
+        // Scroll highlighted item into view
+        const code = selectableItems[next].code;
+        listRef.current?.querySelector(`[data-country="${code}"]`)?.scrollIntoView({ block: 'nearest' });
+        return next;
+      });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex(prev => {
+        const next = prev > 0 ? prev - 1 : selectableItems.length - 1;
+        const code = selectableItems[next].code;
+        listRef.current?.querySelector(`[data-country="${code}"]`)?.scrollIntoView({ block: 'nearest' });
+        return next;
+      });
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (highlightedIndex >= 0 && highlightedIndex < selectableItems.length) {
+        selectCountry(selectableItems[highlightedIndex].code as CountryCode);
+      } else if (selectableItems.length === 1) {
+        selectCountry(selectableItems[0].code as CountryCode);
+      }
+    }
+  }, [selectableItems, highlightedIndex, selectCountry]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -113,32 +161,33 @@ export function PhoneInput({
                   placeholder="Search country..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
                   autoFocus
                 />
               </div>
               {/* Country list */}
-              <div className="py-1">
-                {filteredCountries.map((country, idx) => (
-                  country.code === 'DIVIDER' ? (
-                    <div key={`divider-${idx}`} className="px-3 py-1 text-xs text-gray-400 dark:text-neutral-500">{country.name}</div>
-                  ) : (
+              <div className="py-1" ref={listRef}>
+                {filteredCountries.map((country, idx) => {
+                  if (country.code === 'DIVIDER') {
+                    return <div key={`divider-${idx}`} className="px-3 py-1 text-xs text-gray-400 dark:text-neutral-500">{country.name}</div>;
+                  }
+                  const selectableIdx = selectableItems.findIndex(c => c.code === country.code);
+                  const isHighlighted = selectableIdx === highlightedIndex;
+                  return (
                     <button
                       key={country.code}
                       type="button"
-                      onClick={() => {
-                        onCountryChange?.(country.code as CountryCode);
-                        setShowDropdown(false);
-                        setSearch('');
-                      }}
-                      className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors ${selectedCountry === country.code ? 'bg-primary-50 dark:bg-primary-950/30' : ''}`}
+                      data-country={country.code}
+                      onClick={() => selectCountry(country.code as CountryCode)}
+                      className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors ${selectedCountry === country.code ? 'bg-primary-50 dark:bg-primary-950/30' : ''} ${isHighlighted ? 'bg-gray-100 dark:bg-neutral-600' : ''}`}
                     >
                       <span className="text-lg">{getFlagEmoji(country.code)}</span>
                       <span className="flex-1 text-sm text-gray-700 dark:text-neutral-300 truncate">{country.name}</span>
                       <span className="text-sm text-gray-400 dark:text-neutral-500">{country.dialCode}</span>
                     </button>
-                  )
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

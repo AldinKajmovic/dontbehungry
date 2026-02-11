@@ -34,6 +34,7 @@ const PUBLIC_PATHS = [
   '/auth/reset-password',
   '/auth/verify-email',
   '/auth/verification-sent',
+  '/auth/callback',
 ]
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -85,8 +86,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const register = useCallback(async (data: RegisterUserData) => {
     const response = await authService.register(data)
     setUser(response.user)
-    // Show verification page after registration, but user can continue to app
-    router.push('/auth/verification-sent')
+    if (response.user.role === 'CUSTOMER') {
+      router.push('/restaurants')
+    } else {
+      router.push('/auth/verification-sent')
+    }
   }, [router])
 
   const registerRestaurant = useCallback(async (data: RegisterRestaurantData) => {

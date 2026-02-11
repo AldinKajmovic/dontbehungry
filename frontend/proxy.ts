@@ -8,6 +8,7 @@ const PROTECTED_ROUTES = [
   '/profile',
   '/my-profile',
   '/settings',
+  '/panel',
 ]
 
 // Routes that should redirect to home if already authenticated

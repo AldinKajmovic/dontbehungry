@@ -279,7 +279,6 @@
     "addFirstRestaurant": "Add your first restaurant to get started",
     "accountInfo": "Account Information",
     "emailStatus": "Email Status",
-    "phoneStatus": "Phone Status",
     "verified": "Verified",
     "notVerified": "Not Verified",
     "administration": "Administration",
@@ -545,6 +544,16 @@
       "registerRestaurant": "Register a new restaurant",
       "viewOrders": "View Orders",
       "manageOrders": "Manage customer orders"
+    },
+    "jobs": {
+      "title": "Jobs",
+      "selectJob": "Select a job...",
+      "execute": "Execute",
+      "executing": "Executing...",
+      "noJobs": "No jobs available",
+      "success": "Job completed successfully",
+      "failed": "Job failed",
+      "duration": "Duration: {duration}ms"
     },
     "users": "Users",
     "restaurants": "Restaurants",

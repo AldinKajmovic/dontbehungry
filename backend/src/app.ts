@@ -26,8 +26,14 @@ app.use(cors({
   credentials: true,
 }))
 
-// Body parsing
-app.use(express.json())
+// Prevent browser from caching API responses
+app.use((_req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, must-revalidate')
+  next()
+})
+
+// Body parsing with size limit to prevent DoS via large payloads
+app.use(express.json({ limit: '1mb' }))
 
 // Cookie parsing
 app.use(cookieParser())

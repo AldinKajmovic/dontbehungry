@@ -1,14 +1,14 @@
 import { BadRequestError } from '../utils/errors';
 import { Register, RegisterRestaurant, Login } from '../types';
+import { isValidEmailAddress } from './admin/shared'
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MIN_PASSWORD_LENGTH = 8;
 
 // Password must contain at least one uppercase, one lowercase, one number, and one special character
 const PASSWORD_COMPLEXITY_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
 
 export const validateEmail = (email: string): void => {
-  if (!EMAIL_REGEX.test(email)) {
+  if (!isValidEmailAddress(email)) {
     throw new BadRequestError('Invalid email', 'Please provide a valid email address');
   }
 };

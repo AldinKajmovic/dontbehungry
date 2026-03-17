@@ -1,6 +1,5 @@
 import { BadRequestError } from '../utils/errors'
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+import { isValidEmailAddress } from './admin/shared'
 
 const VALID_REPORT_TYPES = [
   'orders',
@@ -56,7 +55,7 @@ export function validateEmailReportData(data: EmailReportData): void {
     throw new BadRequestError('Missing email', 'Recipient email is required')
   }
 
-  if (!EMAIL_REGEX.test(email)) {
+  if (!isValidEmailAddress(email)) {
     throw new BadRequestError('Invalid email', 'Please provide a valid email address')
   }
 
@@ -118,11 +117,7 @@ export function createFilterDescription<T extends object>(
   for (const [key, value] of Object.entries(filters)) {
     if (value === undefined || value === null || value === '') continue
 
-    const displayKey = key
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, (str) => str.toUpperCase())
-      .replace(/Id$/, '')
-      .trim()
+    const displayKey = formatFilterKey(key)
 
     let displayValue: string
     if (value instanceof Date) {
@@ -141,4 +136,23 @@ export function createFilterDescription<T extends object>(
   }
 
   return description
+}
+
+function formatFilterKey(key: string): string {
+  let baseKey = key.endsWith('Id') ? key.slice(0, -2) : key
+  if (baseKey.length === 0) {
+    return key
+  }
+
+  let formatted = baseKey[0].toUpperCase()
+  for (let i = 1; i < baseKey.length; i++) {
+    const char = baseKey[i]
+    if (char >= 'A' && char <= 'Z') {
+      formatted += ` ${char}`
+    } else {
+      formatted += char
+    }
+  }
+
+  return formatted.trim()
 }

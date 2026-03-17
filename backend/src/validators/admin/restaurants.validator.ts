@@ -1,6 +1,6 @@
 // Restaurant validation: filters, create, update
 import { BadRequestError } from '../../utils/errors'
-import { validateStringLength, EMAIL_REGEX } from './shared'
+import { validateStringLength, isValidEmailAddress } from './shared'
 
 export interface RestaurantFilters {
   ownerId?: string
@@ -139,7 +139,7 @@ export function validateCreateRestaurant(data: CreateRestaurantData): void {
   validateStringLength(data.phone, 'phone')
   validateStringLength(email, 'email')
 
-  if (email && !EMAIL_REGEX.test(email)) {
+  if (email && !isValidEmailAddress(email)) {
     throw new BadRequestError('Invalid email', 'Please provide a valid restaurant email address')
   }
 
@@ -171,7 +171,7 @@ export function validateUpdateRestaurant(data: UpdateRestaurantData): void {
   validateStringLength(data.phone, 'phone')
   validateStringLength(email, 'email')
 
-  if (email && !EMAIL_REGEX.test(email)) {
+  if (email && !isValidEmailAddress(email)) {
     throw new BadRequestError('Invalid email', 'Please provide a valid restaurant email address')
   }
 

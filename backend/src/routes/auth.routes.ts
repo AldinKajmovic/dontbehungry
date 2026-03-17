@@ -6,6 +6,7 @@ import { apiLimiter, authLimiter, sensitiveOpLimiter, resendVerificationLimiter,
 const router = Router()
 
 // Public auth routes with rate limiting
+router.get('/csrf-token', authController.csrfToken)
 router.post('/register', authLimiter, authController.register)
 router.post('/register-restaurant', authLimiter, authController.registerRestaurant)
 router.post('/login', authLimiter, authController.login)

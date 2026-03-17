@@ -51,7 +51,7 @@
     "@types/nodemailer": "^7.0.9",
     "@types/pdfkit": "^0.17.4",
     "@types/sanitize-html": "^2.16.0",
-    "@types/sharp": "^0.31.1",
+    "@types/sharp": "^0.32.0",
     "jest": "^30.2.0",
     "prisma": "^7.3.0",
     "ts-jest": "^29.4.6",

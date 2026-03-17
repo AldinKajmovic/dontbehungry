@@ -1,5 +1,17 @@
 import rateLimit from 'express-rate-limit'
 
+// Global rate limiter applied at the app level to all API routes
+export const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  message: {
+    error: 'Too many requests',
+    details: 'You have exceeded the global rate limit. Please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, 
   max: 5, 

@@ -4,8 +4,9 @@ import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import { config } from './config'
 import api from './api'
-import { csrfProtection } from './middlewares/csrf.middleware'
 import { errorHandler } from './middlewares/error.middleware'
+import { globalLimiter } from './middlewares/rateLimiter'
+import { csrfProtection } from './middlewares/csrf.middleware'
 
 const app = express()
 
@@ -46,6 +47,9 @@ app.use(csrfProtection)
 app.get('/', (_req, res) => {
   res.json({ status: 'ok', message: 'Glovo Copy API' })
 })
+
+// Global rate limiting for all API routes
+app.use('/api', globalLimiter)
 
 // API routes
 app.use('/api', api)

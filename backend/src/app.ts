@@ -5,6 +5,8 @@ import helmet from 'helmet'
 import { config } from './config'
 import api from './api'
 import { errorHandler } from './middlewares/error.middleware'
+import { globalLimiter } from './middlewares/rateLimiter'
+import { csrfProtection } from './middlewares/csrf.middleware'
 
 const app = express()
 
@@ -33,14 +35,7 @@ app.use((_req, res, next) => {
 })
 
 // CSRF protection: require custom header on state-changing requests
-// Browsers enforce CORS preflight for custom headers, preventing cross-origin form submissions
-app.use((req, res, next) => {
-  const safeMethods = ['GET', 'HEAD', 'OPTIONS']
-  if (!safeMethods.includes(req.method) && !req.headers['x-requested-with']) {
-    return res.status(403).json({ error: 'Forbidden', details: 'Missing required X-Requested-With header' })
-  }
-  next()
-})
+app.use(csrfProtection)
 
 // Body parsing with size limit to prevent DoS via large payloads
 app.use(express.json({ limit: '1mb' }))
@@ -52,6 +47,9 @@ app.use(cookieParser())
 app.get('/', (_req, res) => {
   res.json({ status: 'ok', message: 'Glovo Copy API' })
 })
+
+// Global rate limiting for all API routes
+app.use('/api', globalLimiter)
 
 // API routes
 app.use('/api', api)

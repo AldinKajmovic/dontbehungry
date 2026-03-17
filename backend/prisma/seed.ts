@@ -10,6 +10,7 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import { faker } from '@faker-js/faker'
 import { fakerHR } from '@faker-js/faker'
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 
 const localFaker = fakerHR
 
@@ -37,11 +38,16 @@ const CITY_CLUSTERS = [
   { name: 'Sarajevo', country: 'Bosna i Hercegovina', lat: 43.8486, lng: 18.3564 },
 ]
 
+// Cryptographically secure random float in [0, 1)
+function secureRandom(): number {
+  return crypto.randomInt(0, 2 ** 32) / 2 ** 32
+}
+
 // Generate random coordinates within ~1km of city center (to stay on roads)
 function getRandomCoordsInCity(city: typeof CITY_CLUSTERS[0]): { lat: number; lng: number } {
   // ~0.009 degrees ≈ 1km - keeps points in urban areas with roads
-  const latOffset = (Math.random() - 0.5) * 0.018
-  const lngOffset = (Math.random() - 0.5) * 0.018
+  const latOffset = (secureRandom() - 0.5) * 0.018
+  const lngOffset = (secureRandom() - 0.5) * 0.018
   return {
     lat: city.lat + latOffset,
     lng: city.lng + lngOffset,
@@ -336,7 +342,7 @@ async function main() {
         const isClosed = closedDays.has(day)
         // Weekends may open an hour later
         let dayOpen = baseOpen
-        if (!isClosed && (day === 5 || day === 6) && Math.random() > 0.5) {
+        if (!isClosed && (day === 5 || day === 6) && secureRandom() > 0.5) {
           const idx = openTimes.indexOf(baseOpen)
           dayOpen = openTimes[Math.min(idx + 1, openTimes.length - 1)]
         }

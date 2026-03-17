@@ -2,12 +2,13 @@ import { Router } from 'express'
 import * as profileController from '../controllers/profile'
 import * as deliveryController from '../controllers/delivery.controller'
 import { authenticate } from '../middlewares/auth.middleware'
-import { sensitiveOpLimiter } from '../middlewares/rateLimiter'
+import { apiLimiter, sensitiveOpLimiter } from '../middlewares/rateLimiter'
 
 const router = Router()
 
 // All profile routes require authentication
 router.use(authenticate)
+router.use(apiLimiter)
 
 // Update profile (name, phone)
 router.patch('/', profileController.updateProfile)

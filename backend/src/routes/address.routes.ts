@@ -1,11 +1,13 @@
 import { Router } from 'express'
 import * as addressController from '../controllers/address.controller'
 import { authenticate } from '../middlewares/auth.middleware'
+import { apiLimiter } from '../middlewares/rateLimiter'
 
 const router = Router()
 
 // All address routes require authentication
 router.use(authenticate)
+router.use(apiLimiter)
 
 // Get all addresses
 router.get('/', addressController.getAddresses)

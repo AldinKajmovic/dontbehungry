@@ -23,6 +23,10 @@ export interface GetRestaurantsParams {
 class PublicService {
   async getRestaurants(params: GetRestaurantsParams = {}): Promise<PaginatedResponse<PublicRestaurant>> {
     const queryParams = new URLSearchParams()
+    const hasLocationFilters =
+      params.latitude !== undefined ||
+      params.longitude !== undefined ||
+      params.maxDistanceKm !== undefined
 
     if (params.page) queryParams.set('page', params.page.toString())
     if (params.limit) queryParams.set('limit', params.limit.toString())
@@ -31,9 +35,14 @@ class PublicService {
     if (params.sortOrder) queryParams.set('sortOrder', params.sortOrder)
     if (params.categoryId) queryParams.set('categoryId', params.categoryId)
     if (params.minRating) queryParams.set('minRating', params.minRating.toString())
-    if (params.latitude) queryParams.set('latitude', params.latitude.toString())
-    if (params.longitude) queryParams.set('longitude', params.longitude.toString())
-    if (params.maxDistanceKm) queryParams.set('maxDistanceKm', params.maxDistanceKm.toString())
+
+    if (hasLocationFilters) {
+      const response = await api.post<PaginatedResponse<PublicRestaurant>>(
+        '/api/public/restaurants/search',
+        params
+      )
+      return response.data
+    }
 
     const response = await api.get<PaginatedResponse<PublicRestaurant>>(
       `/api/public/restaurants?${queryParams.toString()}`

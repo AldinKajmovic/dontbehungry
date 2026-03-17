@@ -1,8 +1,8 @@
 import { BadRequestError } from '../utils/errors';
 import { UpdateProfile, ChangePassword } from '../types';
+import { isValidEmailAddress } from './admin/shared'
 
 const MIN_PASSWORD_LENGTH = 8;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const validateUpdateProfile = (data: UpdateProfile): void => {
   const { firstName, lastName, phone, email } = data;
@@ -31,7 +31,7 @@ export const validateUpdateProfile = (data: UpdateProfile): void => {
     if (email.trim().length === 0) {
       throw new BadRequestError('Invalid email', 'Email cannot be empty');
     }
-    if (!EMAIL_REGEX.test(email)) {
+    if (!isValidEmailAddress(email)) {
       throw new BadRequestError('Invalid email', 'Please provide a valid email address');
     }
   }

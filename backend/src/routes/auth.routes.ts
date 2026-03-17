@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import * as authController from '../controllers/auth.controller'
 import { authenticate } from '../middlewares/auth.middleware'
-import { authLimiter, sensitiveOpLimiter, resendVerificationLimiter, socketTokenLimiter } from '../middlewares/rateLimiter'
+import { apiLimiter, authLimiter, sensitiveOpLimiter, resendVerificationLimiter, socketTokenLimiter } from '../middlewares/rateLimiter'
 
 const router = Router()
 
@@ -17,11 +17,11 @@ router.post('/google', authLimiter, authController.googleAuth)
 router.post('/refresh', authLimiter, authController.refresh)
 
 // Logout
-router.post('/logout', authenticate, authController.logout)
-router.post('/logout-all', authenticate, authController.logoutAll)
+router.post('/logout', authenticate, apiLimiter, authController.logout)
+router.post('/logout-all', authenticate, apiLimiter, authController.logoutAll)
 
 // Email verification
-router.get('/verify-email', authController.verifyEmail)
+router.get('/verify-email', authLimiter, authController.verifyEmail)
 router.post('/resend-verification', authenticate, resendVerificationLimiter, authController.resendVerification)
 
 // Password reset
@@ -29,7 +29,7 @@ router.post('/forgot-password', sensitiveOpLimiter, authController.forgotPasswor
 router.post('/reset-password', sensitiveOpLimiter, authController.resetPassword)
 
 // Current user
-router.get('/me', authenticate, authController.me)
+router.get('/me', authenticate, apiLimiter, authController.me)
 
 // Socket token for real-time notifications
 router.get('/socket-token', authenticate, socketTokenLimiter, authController.getSocketToken)

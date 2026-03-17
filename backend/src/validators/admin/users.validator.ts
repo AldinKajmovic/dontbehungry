@@ -1,6 +1,6 @@
 // User validation: filters, create, update
 import { BadRequestError } from '../../utils/errors'
-import { validateStringLength, EMAIL_REGEX } from './shared'
+import { validateStringLength, isValidEmailAddress } from './shared'
 
 export interface UserFilters {
   role?: string
@@ -49,7 +49,7 @@ export function validateCreateUser(data: CreateUserData): void {
   validateStringLength(lastName, 'lastName')
   validateStringLength(data.phone, 'phone')
 
-  if (!EMAIL_REGEX.test(email)) {
+  if (!isValidEmailAddress(email)) {
     throw new BadRequestError('Invalid email', 'Please provide a valid email address')
   }
 
@@ -81,7 +81,7 @@ export function validateUpdateUser(data: UpdateUserData): void {
   validateStringLength(data.lastName, 'lastName')
   validateStringLength(data.phone, 'phone')
 
-  if (email && !EMAIL_REGEX.test(email)) {
+  if (email && !isValidEmailAddress(email)) {
     throw new BadRequestError('Invalid email', 'Please provide a valid email address')
   }
 

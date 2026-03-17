@@ -1,7 +1,6 @@
 // Shared validation utilities and types
 import { BadRequestError } from '../../utils/errors'
 
-export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 export const VALID_LIMITS = [5, 10, 25, 100]
 
 // Security: Maximum string lengths to prevent DoS and database issues
@@ -29,6 +28,79 @@ export function validateStringLength(value: string | undefined, field: string, m
   if (value.length > max) {
     throw new BadRequestError(`${field} too long`, `${field} must be at most ${max} characters`)
   }
+}
+
+function isAsciiLetterOrDigit(char: string): boolean {
+  return (
+    (char >= 'a' && char <= 'z') ||
+    (char >= 'A' && char <= 'Z') ||
+    (char >= '0' && char <= '9')
+  )
+}
+
+function isAllowedLocalPartChar(char: string): boolean {
+  return isAsciiLetterOrDigit(char) || ".!#$%&'*+/=?^_`{|}~-".includes(char)
+}
+
+export function isValidEmailAddress(value: string): boolean {
+  if (value.length === 0 || value.length > MAX_STRING_LENGTHS.email) {
+    return false
+  }
+
+  const atIndex = value.indexOf('@')
+  if (atIndex <= 0 || atIndex !== value.lastIndexOf('@') || atIndex === value.length - 1) {
+    return false
+  }
+
+  const localPart = value.slice(0, atIndex)
+  const domain = value.slice(atIndex + 1)
+
+  if (
+    localPart.length === 0 ||
+    localPart.length > 64 ||
+    localPart.startsWith('.') ||
+    localPart.endsWith('.') ||
+    localPart.includes('..')
+  ) {
+    return false
+  }
+
+  for (const char of localPart) {
+    if (!isAllowedLocalPartChar(char)) {
+      return false
+    }
+  }
+
+  if (domain.length === 0 || domain.length > 253 || domain.includes('..')) {
+    return false
+  }
+
+  const labels = domain.split('.')
+  if (labels.length < 2) {
+    return false
+  }
+
+  for (const label of labels) {
+    if (label.length === 0 || label.length > 63) {
+      return false
+    }
+
+    if (!isAsciiLetterOrDigit(label[0]) || !isAsciiLetterOrDigit(label[label.length - 1])) {
+      return false
+    }
+
+    for (const char of label) {
+      if (!isAsciiLetterOrDigit(char) && char !== '-') {
+        return false
+      }
+    }
+  }
+
+  return true
+}
+
+export const EMAIL_REGEX = {
+  test: isValidEmailAddress,
 }
 
 export interface PaginationParams {

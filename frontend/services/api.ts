@@ -1,9 +1,13 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+const CSRF_COOKIE_NAME = 'csrfToken'
+const CSRF_HEADER_NAME = 'X-CSRF-Token'
+const SAFE_METHODS = new Set(['get', 'head', 'options'])
 
 let isRefreshing = false
 let refreshSubscribers: ((success: boolean) => void)[] = []
+let csrfTokenRequest: Promise<string | null> | null = null
 
 function subscribeToRefresh(callback: (success: boolean) => void) {
   refreshSubscribers.push(callback)
@@ -23,9 +27,51 @@ export const api = axios.create({
   withCredentials: true,
 })
 
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') {
+    return null
+  }
+
+  const cookiePrefix = `${name}=`
+  const match = document.cookie
+    .split('; ')
+    .find((cookie) => cookie.startsWith(cookiePrefix))
+
+  return match ? decodeURIComponent(match.slice(cookiePrefix.length)) : null
+}
+
+async function ensureCsrfToken(): Promise<string | null> {
+  const existingToken = getCookie(CSRF_COOKIE_NAME)
+  if (existingToken) {
+    return existingToken
+  }
+
+  if (!csrfTokenRequest) {
+    csrfTokenRequest = axios.get<{ csrfToken: string }>(`${API_URL}/api/auth/csrf-token`, {
+      withCredentials: true,
+    })
+      .then((response) => response.data.csrfToken || getCookie(CSRF_COOKIE_NAME))
+      .finally(() => {
+        csrfTokenRequest = null
+      })
+  }
+
+  return csrfTokenRequest
+}
+
 // Request interceptor
 api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  async (config: InternalAxiosRequestConfig) => {
+    const method = config.method?.toLowerCase()
+
+    if (method && !SAFE_METHODS.has(method)) {
+      const csrfToken = await ensureCsrfToken()
+
+      if (csrfToken) {
+        config.headers.set(CSRF_HEADER_NAME, csrfToken)
+      }
+    }
+
     return config
   },
   (error) => Promise.reject(error)

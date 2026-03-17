@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import { config } from './config'
 import api from './api'
+import { csrfProtection } from './middlewares/csrf.middleware'
 import { errorHandler } from './middlewares/error.middleware'
 
 const app = express()
@@ -32,21 +33,14 @@ app.use((_req, res, next) => {
   next()
 })
 
-// CSRF protection: require custom header on state-changing requests
-// Browsers enforce CORS preflight for custom headers, preventing cross-origin form submissions
-app.use((req, res, next) => {
-  const safeMethods = ['GET', 'HEAD', 'OPTIONS']
-  if (!safeMethods.includes(req.method) && !req.headers['x-requested-with']) {
-    return res.status(403).json({ error: 'Forbidden', details: 'Missing required X-Requested-With header' })
-  }
-  next()
-})
-
 // Body parsing with size limit to prevent DoS via large payloads
 app.use(express.json({ limit: '1mb' }))
 
 // Cookie parsing
 app.use(cookieParser())
+
+// Double-submit CSRF protection for all state-changing requests
+app.use(csrfProtection)
 
 // Health check
 app.get('/', (_req, res) => {

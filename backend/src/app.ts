@@ -40,13 +40,13 @@ app.use(express.json({ limit: '1mb' }))
 // Cookie parsing
 app.use(cookieParser())
 
-// Double-submit CSRF protection for all state-changing requests
-app.use(csrfProtection)
-
 // Health check
 app.get('/', (_req, res) => {
   res.json({ status: 'ok', message: 'Glovo Copy API' })
 })
+
+// Double-submit CSRF protection for all state-changing API requests
+app.use('/api', csrfProtection)
 
 // Global rate limiting for all API routes
 app.use('/api', globalLimiter)

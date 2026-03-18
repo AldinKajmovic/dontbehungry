@@ -3,6 +3,7 @@
 import { createContext, useCallback, useEffect, useState, ReactNode } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { authService, User, LoginData, RegisterUserData, RegisterRestaurantData } from '@/services/auth'
+import { clearCsrfToken } from '@/services/api'
 
 interface AuthContextType {
   user: User | null
@@ -106,6 +107,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch {
       // Ignore errors on logout - just clear local state
     }
+    clearCsrfToken()
     setUser(null)
     router.push('/auth/login')
   }, [router])
@@ -116,6 +118,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch {
       // Ignore errors on logout - just clear local state
     }
+    clearCsrfToken()
     setUser(null)
     router.push('/auth/login')
   }, [router])

@@ -6,7 +6,7 @@ import { config } from './config'
 import api from './api'
 import { errorHandler } from './middlewares/error.middleware'
 import { globalLimiter } from './middlewares/rateLimiter'
-import { csrfProtection } from './middlewares/csrf.middleware'
+import { doubleCsrfProtection } from './middlewares/csrf.middleware'
 
 const app = express()
 
@@ -39,6 +39,9 @@ app.use(express.json({ limit: '1mb' }))
 
 // Cookie parsing
 app.use(cookieParser())
+
+// CSRF protection via csrf-csrf (double-submit cookie pattern)
+app.use(doubleCsrfProtection)
 
 // Health check
 app.get('/', (_req, res) => {

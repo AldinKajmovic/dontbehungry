@@ -1,13 +1,17 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-const CSRF_COOKIE_NAME = 'csrfToken'
 const CSRF_HEADER_NAME = 'X-CSRF-Token'
 const SAFE_METHODS = new Set(['get', 'head', 'options'])
 
 let isRefreshing = false
 let refreshSubscribers: ((success: boolean) => void)[] = []
 let csrfTokenRequest: Promise<string | null> | null = null
+let cachedCsrfToken: string | null = null
+
+export function clearCsrfToken(): void {
+  cachedCsrfToken = null
+}
 
 function subscribeToRefresh(callback: (success: boolean) => void) {
   refreshSubscribers.push(callback)
@@ -27,30 +31,19 @@ export const api = axios.create({
   withCredentials: true,
 })
 
-function getCookie(name: string): string | null {
-  if (typeof document === 'undefined') {
-    return null
-  }
-
-  const cookiePrefix = `${name}=`
-  const match = document.cookie
-    .split('; ')
-    .find((cookie) => cookie.startsWith(cookiePrefix))
-
-  return match ? decodeURIComponent(match.slice(cookiePrefix.length)) : null
-}
-
 async function ensureCsrfToken(): Promise<string | null> {
-  const existingToken = getCookie(CSRF_COOKIE_NAME)
-  if (existingToken) {
-    return existingToken
+  if (cachedCsrfToken) {
+    return cachedCsrfToken
   }
 
   if (!csrfTokenRequest) {
     csrfTokenRequest = axios.get<{ csrfToken: string }>(`${API_URL}/api/auth/csrf-token`, {
       withCredentials: true,
     })
-      .then((response) => response.data.csrfToken || getCookie(CSRF_COOKIE_NAME))
+      .then((response) => {
+        cachedCsrfToken = response.data.csrfToken || null
+        return cachedCsrfToken
+      })
       .finally(() => {
         csrfTokenRequest = null
       })
@@ -135,7 +128,8 @@ api.interceptors.response.use(
         isRefreshing = false
         notifySubscribers(false)
 
-        // Refresh failed - dispatch event for AuthProvider to handle
+        // Refresh failed - clear CSRF token and dispatch event for AuthProvider
+        cachedCsrfToken = null
         if (typeof window !== 'undefined') {
           const isAuthPage = window.location.pathname.startsWith('/auth/')
           if (!isAuthPage) {

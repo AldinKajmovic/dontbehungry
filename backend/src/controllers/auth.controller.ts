@@ -4,7 +4,8 @@ import * as userService from '../services/user.service'
 import { validateRegister, validateRegisterRestaurant, validateLogin, validatePassword, validateEmail } from '../validators/auth.validator'
 import { BadRequestError, NotFoundError, UnauthorizedError } from '../utils/errors'
 import { AuthenticatedRequest, Register, RegisterRestaurant, Login } from '../types'
-import { setAuthCookies, clearAuthCookies, getRefreshTokenFromCookie, setCsrfTokenCookie } from '../utils/cookies'
+import { setAuthCookies, clearAuthCookies, getRefreshTokenFromCookie } from '../utils/cookies'
+import { generateCsrfToken } from '../middlewares/csrf.middleware'
 
 export async function register(
   req: Request<object, object, Register>,
@@ -250,14 +251,14 @@ export async function getSocketToken(
 }
 
 export async function csrfToken(
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
-    const csrfToken = setCsrfTokenCookie(res)
-
-    res.json({ csrfToken })
+    // generateCsrfToken creates a token and sets the secret cookie
+    const token = generateCsrfToken(req, res)
+    res.json({ csrfToken: token })
   } catch (error) {
     next(error)
   }
